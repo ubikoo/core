@@ -1,0 +1,8 @@
+project(samplescompute)
+add_subdirectory(01-clinfo)
+add_subdirectory(02-hashmap)
+add_subdirectory(03-array-reduce-single)
+add_subdirectory(04-array-reduce-binary)
+add_subdirectory(05-pi-integral-single)
+add_subdirectory(06-pi-integral-binary)
+add_subdirectory(07-pi-integral-mpi)
