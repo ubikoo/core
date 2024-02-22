@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT.
 //
 
-#include "catch2/catch.hpp"
+#include "external/catch2/catch.hpp"
 #include "test-vector2.h"
 #include "test-vector3.h"
 #include "test-vector4.h"

@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT.
 //
 
-#include "catch2/catch.hpp"
+#include "external/catch2/catch.hpp"
 #include "test-arithmetic2.h"
 #include "test-arithmetic3.h"
 #include "test-arithmetic4.h"

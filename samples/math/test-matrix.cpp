@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT.
 //
 
-#include "catch2/catch.hpp"
+#include "external/catch2/catch.hpp"
 #include "test-matrix2.h"
 #include "test-matrix3.h"
 #include "test-matrix4.h"

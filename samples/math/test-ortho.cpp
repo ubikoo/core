@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT.
 //
 
-#include "catch2/catch.hpp"
+#include "external/catch2/catch.hpp"
 #include "test-ortho.h"
 
 TEST_CASE("Ortho") {

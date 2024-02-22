@@ -9,7 +9,7 @@
 
 /// @brief tinyobjloader implementation
 #define TINYOBJLOADER_IMPLEMENTATION
-#include <tinyobjloader/tiny_obj_loader.h>
+#include <external/tinyobjloader/tiny_obj_loader.h>
 
 #include <cmath>
 #include <cassert>

@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT.
 //
 
-#include "catch2/catch.hpp"
+#include "external/catch2/catch.hpp"
 #include "test-algebra-vector2.h"
 #include "test-algebra-vector3.h"
 #include "test-algebra-vector4.h"

@@ -21,7 +21,7 @@ add_library(corecompute STATIC
     program.h
     sampler.h)
 
-target_include_directories(corecompute PRIVATE ${CMAKE_SOURCE_DIR}/external)
+target_include_directories(corecompute PRIVATE ${CORE_ROOT_DIR})
 
 # Enable math compile options.
 find_library(MATH_LIBRARY m)

@@ -1,3 +1,9 @@
+# This is required to be defined by external callers!
+message(STATUS "CORE_ROOT_DIR - ${CORE_ROOT_DIR}")
+if(NOT DEFINED CORE_ROOT_DIR)
+	message(FATAL_ERROR "CORE_ROOT_DIR variable wasn't set.")
+endif()
+
 # Use glfw library
 option(CORE_USE_GLFW "Use glfw library" ON)
 if(CORE_USE_GLFW)

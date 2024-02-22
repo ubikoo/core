@@ -28,9 +28,7 @@ add_executable(${PROJECT_NAME}
     test-vector4.h)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE coremath)
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/external)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CORE_ROOT_DIR})
 
 file(COPY plot DESTINATION ${PROJECT_BINARY_DIR})
 file(COPY testmath.sh DESTINATION ${PROJECT_BINARY_DIR})

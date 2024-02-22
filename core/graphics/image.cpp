@@ -10,9 +10,9 @@
 /// @brief stb image loader implementation
 #define STBI_ONLY_PNG
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
+#include <external/stb/stb_image.h>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb/stb_image_write.h"
+#include <external/stb/stb_image_write.h>
 
 #include <cassert>
 #include <cstring>

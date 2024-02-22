@@ -12,6 +12,6 @@
 #else
 #define CATCH_CONFIG_RUNNER     // provide main() yourself
 #endif
-#include "catch2/catch.hpp"
+#include "external/catch2/catch.hpp"
 
 TEST_CASE("Empty") {}

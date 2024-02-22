@@ -11,7 +11,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include "catch2/catch.hpp"
+#include "external/catch2/catch.hpp"
 #include "core/math/math.h"
 #include "common.h"
 
