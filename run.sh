@@ -34,8 +34,18 @@ ask() {
 }
 
 # -------------------------------------------------------------------------------
-# Execute project
-execute() {
+do_clean() {
+    [[ -d build ]] && rm -rvf build
+}
+
+do_build() {
+    mkdir build
+    pushd build
+    cmake .. && make -j16 all
+    popd
+}
+
+do_execute() {
     dir="$1"
     target="$2"
     pushd "$dir"
@@ -43,7 +53,7 @@ execute() {
     popd
 }
 
-execute_mpi() {
+do_execute_mpi() {
     dir="$1"
     target="$2"
     pushd "$dir"
@@ -51,7 +61,6 @@ execute_mpi() {
     popd
 }
 
-# -------------------------------------------------------------------------------
 [[ $# == 0 ]] && die "usage: $0 clean | build | execute"
 
 DO_CLEAN=false
@@ -59,14 +68,14 @@ DO_BUILD=false
 DO_EXECUTE=false
 for arg in "$@"; do
     case $arg in
-    clean)
+    "clean")
         DO_CLEAN=true
     ;;
-    build)
+    "build")
         DO_CLEAN=true
         DO_BUILD=true
     ;;
-    execute)
+    "execute")
         DO_CLEAN=true
         DO_BUILD=true
         DO_EXECUTE=true
@@ -78,41 +87,32 @@ for arg in "$@"; do
     esac
 done
 
-if [[ $DO_CLEAN == "true" ]]; then
-    [[ -d build ]] && rm -rvf build
-fi
-
-if [[ $DO_BUILD == "true" ]]; then
-    mkdir build
-    pushd build
-    cmake .. && make -j16 all
-    popd
-fi
-
+[[ $DO_CLEAN == "true" ]] && do_clean
+[[ $DO_BUILD == "true" ]] && do_build
 if [[ $DO_EXECUTE == "true" ]]; then
-    pushd build
-    execute samples/math                                ./testmath
+    pushd build/samples
+    do_execute math                                ./testmath
 
-    execute samples/compute/01-clinfo                   ./01-clinfo
-    execute samples/compute/02-hashmap                  ./02-hashmap
-    execute samples/compute/03-array-reduce-single      ./03-array-reduce-single
-    execute samples/compute/04-array-reduce-binary      ./04-array-reduce-binary
-    execute samples/compute/05-pi-integral-single       ./05-pi-integral-single
-    execute samples/compute/06-pi-integral-binary       ./06-pi-integral-binary
-    execute_mpi samples/compute/07-pi-integral-mpi      ./07-pi-integral-mpi
+    do_execute compute/01-clinfo                   ./01-clinfo
+    do_execute compute/02-hashmap                  ./02-hashmap
+    do_execute compute/03-array-reduce-single      ./03-array-reduce-single
+    do_execute compute/04-array-reduce-binary      ./04-array-reduce-binary
+    do_execute compute/05-pi-integral-single       ./05-pi-integral-single
+    do_execute compute/06-pi-integral-binary       ./06-pi-integral-binary
+    do_execute_mpi compute/07-pi-integral-mpi      ./07-pi-integral-mpi
 
-    execute samples/graphics/00-image                    ./00-image
-    execute samples/graphics/01-glfw                     ./01-glfw
-    execute samples/graphics/02-triangle                 ./02-triangle
-    execute samples/graphics/03-triangle-instance-a      ./03-triangle-instance-a
-    execute samples/graphics/04-triangle-instance-b      ./04-triangle-instance-b
-    execute samples/graphics/05-triangle-instance-c      ./05-triangle-instance-c
-    execute samples/graphics/06-quad                     ./06-quad
-    execute samples/graphics/07-quad-image               ./07-quad-image
-    execute samples/graphics/08-sphere-image             ./08-sphere-image
-    execute samples/graphics/09-mesh-model               ./09-mesh-model
-    execute samples/graphics/10-panorama                 ./10-panorama
-    execute samples/graphics/11-framebuffer              ./11-framebuffer
-    execute samples/graphics/12-iobuffer                 ./12-iobuffer
+    do_execute graphics/00-image                    ./00-image
+    do_execute graphics/01-glfw                     ./01-glfw
+    do_execute graphics/02-triangle                 ./02-triangle
+    do_execute graphics/03-triangle-instance-a      ./03-triangle-instance-a
+    do_execute graphics/04-triangle-instance-b      ./04-triangle-instance-b
+    do_execute graphics/05-triangle-instance-c      ./05-triangle-instance-c
+    do_execute graphics/06-quad                     ./06-quad
+    do_execute graphics/07-quad-image               ./07-quad-image
+    do_execute graphics/08-sphere-image             ./08-sphere-image
+    do_execute graphics/09-mesh-model               ./09-mesh-model
+    do_execute graphics/10-panorama                 ./10-panorama
+    do_execute graphics/11-framebuffer              ./11-framebuffer
+    do_execute graphics/12-iobuffer                 ./12-iobuffer
     popd
 fi
