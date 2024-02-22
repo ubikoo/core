@@ -91,16 +91,15 @@ done
 [[ $DO_BUILD == "true" ]] && do_build
 if [[ $DO_EXECUTE == "true" ]]; then
     pushd build/samples
-    do_execute math                                ./testmath
-
-    do_execute compute/01-clinfo                   ./01-clinfo
-    do_execute compute/02-hashmap                  ./02-hashmap
-    do_execute compute/03-array-reduce-single      ./03-array-reduce-single
-    do_execute compute/04-array-reduce-binary      ./04-array-reduce-binary
-    do_execute compute/05-pi-integral-single       ./05-pi-integral-single
-    do_execute compute/06-pi-integral-binary       ./06-pi-integral-binary
-    do_execute_mpi compute/07-pi-integral-mpi      ./07-pi-integral-mpi
-
+    do_execute empty                                ./empty
+    do_execute math                                 ./testmath
+    do_execute compute/01-clinfo                    ./01-clinfo
+    do_execute compute/02-hashmap                   ./02-hashmap
+    do_execute compute/03-array-reduce-single       ./03-array-reduce-single
+    do_execute compute/04-array-reduce-binary       ./04-array-reduce-binary
+    do_execute compute/05-pi-integral-single        ./05-pi-integral-single
+    do_execute compute/06-pi-integral-binary        ./06-pi-integral-binary
+    do_execute_mpi compute/07-pi-integral-mpi       ./07-pi-integral-mpi
     do_execute graphics/00-image                    ./00-image
     do_execute graphics/01-glfw                     ./01-glfw
     do_execute graphics/02-triangle                 ./02-triangle
