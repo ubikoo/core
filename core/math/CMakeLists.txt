@@ -17,7 +17,7 @@ add_library(coremath STATIC
     transform.h
     vector.h)
 
-target_include_directories(coremath PRIVATE ${CORE_ROOT_DIR}/external)
+target_include_directories(coremath PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 
 # Enable math compile options.
 find_library(MATH_LIBRARY m)

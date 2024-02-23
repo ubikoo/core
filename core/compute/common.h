@@ -18,7 +18,6 @@
 
 #if defined(ENABLE_OPENCL_INTEROP)
 #include <glad/glad.h>
-
 #if defined(__APPLE__)
 #include <OpenCL/cl_gl.h>
 #include <OpenCL/cl_gl_ext.h>

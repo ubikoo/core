@@ -32,7 +32,7 @@ add_library(coregraphics STATIC
     common.h
     graphics.h)
 
-target_include_directories(coregraphics PRIVATE ${CORE_ROOT_DIR})
+target_include_directories(coregraphics PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 
 # Enable math compile options.
 find_library(MATH_LIBRARY m)
