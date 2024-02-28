@@ -11,6 +11,7 @@
 #define MATH_ORTHO_H_
 
 #include <cmath>
+#include <limits>
 #include <type_traits>
 #include "vector.h"
 #include "matrix.h"

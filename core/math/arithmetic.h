@@ -11,6 +11,7 @@
 #define MATH_ARITHMETIC_H_
 
 #include <cmath>
+#include <limits>
 #include <type_traits>
 #include <algorithm>
 #include "vector.h"
