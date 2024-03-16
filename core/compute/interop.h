@@ -19,54 +19,54 @@
 namespace Compute {
 
 /// @brief Create a device with a shared OpenCL/OpenGL context.
-Device CreateDeviceFromGLContext(const size_t device_index);
+Device CreateDeviceFromGLContext(const size_t deviceIndex);
 
 /// @brief Create an OpenCL buffer object from an OpenGL buffer object.
 Buffer CreateFromGLBuffer(
     const Device &device,
-    GLuint gl_buffer,
+    GLuint glbufferId,
     cl_mem_flags flags);
 
 /// @brief Create an OpenCL image object from an OpenGL texture object.
 Image CreateFromGLTexture(
     const Device &device,
-    GLenum texture_target,
+    GLenum textureTarget,
     GLint miplevel,
-    GLuint gl_texture,
-  	cl_mem_flags flags);
+    GLuint gltextureId,
+    cl_mem_flags flags);
 
 /// @brief Create an OpenCL image object from an OpenGL renderbuffer object.
 Image CreateFromGLRenderbuffer(
     const Device &device,
-    GLuint gl_renderbuffer,
+    GLuint glrenderbufferId,
     cl_mem_flags flags);
 
 /// @brief Query a OpenGL memory object used to create an OpenCL memory object.
 void GetGLObjectInfo(
-    const cl_mem &mem_object,
-    cl_gl_object_type *gl_object_type,
-    GLuint *gl_object_name);
+    const cl_mem &memObject,
+    cl_gl_object_type *globjectType,
+    GLuint *globjectId);
 
 /// @brief Query a OpenGL texture object associated with an OpenCL memory object.
 void GetGLTextureInfo(
-    const cl_mem &mem_object,
-    cl_gl_texture_info param_name,
-    size_t param_value_size,
-    void *param_value,
-    size_t *param_value_size_ret);
+    const cl_mem &memObject,
+    cl_gl_texture_info paramName,
+    size_t paramValueSize,
+    void *paraValue,
+    size_t *paramValueSizeRet);
 
 /// @brief Acquire OpenCL memory objects that were created from OpenGL objects.
 void AcquireGLObjects(
     const Device &device,
-    const std::vector<cl_mem> &mem_objects,
-    const std::vector<cl_event> *wait_list = NULL,
+    const std::vector<cl_mem> &memObjects,
+    const std::vector<cl_event> *waitList = NULL,
     cl_event *event = NULL);
 
 /// @brief Release OpenCL memory objects that were created from OpenGL objects.
 void ReleaseGLObjects(
     const Device &device,
-    const std::vector<cl_mem> &mem_objects,
-    const std::vector<cl_event> *wait_list = NULL,
+    const std::vector<cl_mem> &memObjects,
+    const std::vector<cl_event> *waitList = NULL,
     cl_event *event = NULL);
 } // Compute
 

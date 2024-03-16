@@ -23,24 +23,24 @@ namespace Compute {
 /// @brief Create an interface to a OpenCL kernel object on the device.
 ///
 struct KernelObject {
-    DeviceObject *device{NULL};
-    cl_kernel id{NULL};
-    NDRange ndrange{};
+    DeviceObject *mDevice{NULL};
+    cl_kernel mId{NULL};
+    NDRange mNDRange{};
 
-    void Run(const std::vector<cl_event> *wait_list = NULL,
+    void Run(const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL);
-    void Task(const std::vector<cl_event> *wait_list = NULL,
+    void Task(const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL);
 
     void SetRanges1d(
-        const std::array<size_t,1> &num_work_items,
-        const std::array<size_t,1> &work_group_size);
+        const std::array<size_t,1> &numWorkItems,
+        const std::array<size_t,1> &workGroupSize);
     void SetRanges2d(
-        const std::array<size_t,2> &num_work_items,
-        const std::array<size_t,2> &work_group_size);
+        const std::array<size_t,2> &numWorkItems,
+        const std::array<size_t,2> &workGroupSize);
     void SetRanges3d(
-        const std::array<size_t,3> &num_work_items,
-        const std::array<size_t,3> &work_group_size);
+        const std::array<size_t,3> &numWorkItems,
+        const std::array<size_t,3> &workGroupSize);
 
     void SetArg(cl_uint index, size_t size, const void *value);
     void SetArg(cl_uint index, const cl_mem *mem);
@@ -52,7 +52,7 @@ struct KernelObject {
 };
 struct KernelDeleter {
     void operator()(KernelObject *obj) {
-        if (obj) { clReleaseKernel(obj->id); };
+        if (obj) { clReleaseKernel(obj->mId); };
         delete obj;
     }
 };

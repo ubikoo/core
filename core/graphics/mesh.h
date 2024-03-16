@@ -12,7 +12,10 @@
 
 #include <string>
 #include <vector>
-#include "core/graphics/common.h"
+#include <memory>
+#include "common.h"
+#include "attribute.h"
+#include "buffer.h"
 
 namespace Graphics {
 
@@ -61,7 +64,7 @@ namespace Graphics {
 ///      https://martindevans.me/game-development/2016/03/30/
 ///          Procedural-Generation-For-Dummies-Half-Edge-Geometry
 ///
-struct Mesh {
+struct MeshObject {
     // Vertex holds the geometry and attributes of a vertex in the mesh.
     struct Vertex {
         GLfloat position[3];
@@ -74,31 +77,34 @@ struct Mesh {
     typedef GLuint Index;
 
     // Mesh member variables.
-    std::string name;                   // mesh name
-    std::vector<Vertex> vertices;       // vertex list
-    std::vector<Index> indices;         // face indexed list
-    std::vector<VertexAttributeDescription> attributes; // vertex attributes
-    GLuint vbo;                         // vertex buffer object
-    GLuint ebo;                         // element buffer object
+    std::string mName;                              // mesh name
+    std::vector<Vertex> mVertices;                  // vertex list
+    std::vector<Index> mIndices;                    // face indexed list
+    std::vector<AttributeDescription> mAttributes;  // vertex attributes
+    Buffer mVbo;                                    // vertex buffer object
+    Buffer mEbo;                                    // element buffer object
+
+    // Copy mesh vertex data onto the gpu.
+    void Copy() const;
+
+    // Bind/unbind the mesh vertex and element buffer objects.
+    void Bind() const;
+    void Unbind() const;
+
+    // Render the mesh.
+    void Render() const;
 };
 
+using Mesh = std::unique_ptr<MeshObject>;
+
 // Create an indexed grid with (n1 * n2) vertices.
-std::vector<Mesh::Index> CreateGrid(const size_t n1, const size_t n2);
+std::vector<MeshObject::Index> CreateGrid(const size_t n1, const size_t n2);
 
 // Create a mesh.
 Mesh CreateMesh(
     const std::string &name,
-    const std::vector<Mesh::Vertex> &vertices,
-    const std::vector<Mesh::Index> &indices);
-
-// Destroy a mesh.
-void DestroyMesh(Mesh &mesh);
-
-// Upload mesh vertex data onto the gpu.
-void UpdateMesh(const Mesh &mesh);
-
-// Render the mesh.
-void RenderMesh(const Mesh &mesh);
+    const std::vector<MeshObject::Vertex> &vertices,
+    const std::vector<MeshObject::Index> &indices);
 
 // Create a plane mesh with (n1 * n2) vertices.
 Mesh CreatePlane(

@@ -26,26 +26,26 @@ namespace Compute {
 /// context and command queue.
 ///
 struct DeviceObject {
-    cl_platform_id platform{NULL};
-    cl_device_id id{NULL};
-    cl_context context{NULL};
-    cl_command_queue queue{NULL};
+    cl_platform_id mPlatform{NULL};
+    cl_device_id mId{NULL};
+    cl_context mContext{NULL};
+    cl_command_queue mQueue{NULL};
 
     void FlushQueue() const;
     void FinishQueue() const;
     void QueueMarker(
-        const std::vector<cl_event> *wait_list = NULL,
+        const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL) const;
     void QueueBarrier(
-        const std::vector<cl_event> *wait_list = NULL,
+        const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL) const;
 };
 struct DeviceDeleter {
     void operator()(DeviceObject *obj) {
         if (obj) {
-            clReleaseCommandQueue(obj->queue);
-            clReleaseContext(obj->context);
-            clReleaseDevice(obj->id);
+            clReleaseCommandQueue(obj->mQueue);
+            clReleaseContext(obj->mContext);
+            clReleaseDevice(obj->mId);
         };
         delete obj;
     }
@@ -53,7 +53,7 @@ struct DeviceDeleter {
 using Device = std::unique_ptr<DeviceObject, DeviceDeleter>;
 
 /// @brief Create a device with the specified index on the first platform.
-Device CreateDevice(const size_t device_index);
+Device CreateDevice(const size_t deviceIndex);
 
 } // Compute
 

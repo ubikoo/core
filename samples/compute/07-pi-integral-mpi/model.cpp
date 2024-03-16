@@ -16,7 +16,7 @@
 ///
 /// @brief Create a model with an OpenCL context on the specified proc id.
 ///
-Model::Model(const int proc_id, const int n_procs)
+Model::Model(const int procId, const int nProcs)
 {
     // Initialize model data.
     {
@@ -24,12 +24,12 @@ Model::Model(const int proc_id, const int n_procs)
         mData.PiCpu = 0.0;
         mData.PiGpu = 0.0;
 
-        cl_double delta_x = 1.0 / (cl_double) n_procs;
-        mData.xlo = delta_x * (cl_double) proc_id;
+        cl_double delta_x = 1.0 / (cl_double) nProcs;
+        mData.xlo = delta_x * (cl_double) procId;
         mData.xhi = mData.xlo + delta_x;
 
-        mData.proc_id = proc_id;
-        mData.n_procs = n_procs;
+        mData.procId = procId;
+        mData.nProcs = nProcs;
     }
 
     // Initialize OpenCL data.
@@ -87,7 +87,7 @@ void Model::ComputeGpu()
 {
     // Reset pi partial sums.
     {
-        mKernels[KernelResetPi]->SetArg(0, &mBuffers[BufferGroupSums]->id);
+        mKernels[KernelResetPi]->SetArg(0, &mBuffers[BufferGroupSums]->mId);
         mKernels[KernelResetPi]->SetArg(1, &kNumIntervals);
         mKernels[KernelResetPi]->SetRanges1d({kNumWorkItems}, {kWorkGroupSize});
         mKernels[KernelResetPi]->Run();
@@ -95,7 +95,7 @@ void Model::ComputeGpu()
 
     // Compute pi.
     {
-        mKernels[KernelComputePi]->SetArg(0, &mBuffers[BufferGroupSums]->id);
+        mKernels[KernelComputePi]->SetArg(0, &mBuffers[BufferGroupSums]->mId);
         mKernels[KernelComputePi]->SetArg(1, kWorkGroupSize * sizeof(cl_double), NULL);
         mKernels[KernelComputePi]->SetArg(2, &kNumIntervals);
         mKernels[KernelComputePi]->SetArg(3, &kIntervalSteps);
@@ -127,10 +127,10 @@ void Model::ComputeGpu()
 void Model::PostProcess()
 {
     // Receive the CPU partial sums from each process and compute pi
-    if (mData.proc_id == kMasterId) {
+    if (mData.procId == kMasterId) {
         std::cout << "CPU\n";
         cl_double pi_sum = mData.PiCpu;
-        for (int src_id = 1; src_id < mData.n_procs; ++src_id) {
+        for (int src_id = 1; src_id < mData.nProcs; ++src_id) {
             cl_double pi_partial = 0.0;
             MPI_Recv(
                 &pi_partial,
@@ -144,7 +144,7 @@ void Model::PostProcess()
 
             std::cout << std::setprecision(15)
                 << " recv: proc " << src_id
-                << " of " << mData.n_procs
+                << " of " << mData.nProcs
                 << " pi_partial " << pi_partial
                 << " pi_sum " << pi_sum
                 << " err " << std::fabs(M_PI - pi_sum)
@@ -162,10 +162,10 @@ void Model::PostProcess()
     }
 
     // Receive the GPU partial sums from each process and compute pi
-    if (mData.proc_id == kMasterId) {
+    if (mData.procId == kMasterId) {
         std::cout << "GPU\n";
         cl_double pi_sum = mData.PiGpu;
-        for (int src_id = 1; src_id < mData.n_procs; ++src_id) {
+        for (int src_id = 1; src_id < mData.nProcs; ++src_id) {
             cl_double pi_partial = 0.0;
             MPI_Recv(
                 &pi_partial,
@@ -179,7 +179,7 @@ void Model::PostProcess()
 
             std::cout << std::setprecision(15)
                 << " recv: proc " << src_id
-                << " of " << mData.n_procs
+                << " of " << mData.nProcs
                 << " pi_partial " << pi_partial
                 << " pi_sum " << pi_sum
                 << " err " << std::fabs(M_PI - pi_sum)

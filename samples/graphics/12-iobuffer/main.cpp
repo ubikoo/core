@@ -9,35 +9,256 @@
 
 #include <iostream>
 #include <exception>
-
+#include <vector>
 #include "core/graphics/graphics.h"
-#include "map.h"
 
+/// -----------------------------------------------------------------------------
+static const std::string kImageFilename = "../assets/monarch_512.png";
+static const int kWidth = 1024;
+static const int kHeight = 1024;
+
+struct Map {
+    size_t mReadIx;
+    size_t mWriteIx;
+    size_t mNumIterations;
+    std::array<Graphics::Framebuffer, 2> mIOBuffer;
+
+    struct {
+        Graphics::Mesh quad;
+        Graphics::Texture texture;
+        Graphics::Pipeline pipeline;
+    } mBeginPass;
+
+    struct {
+        Graphics::Mesh quad;
+        Graphics::Pipeline pipeline;
+    } mRunPass;
+
+    struct {
+        Graphics::Mesh quad;
+        Graphics::Pipeline pipeline;
+    } mEndPass;
+
+    void Initialize();
+    void Update();
+    void Render();
+};
 Map gMap;
 
 ///
-/// @brief Renderer callback functions.
+/// @brief Initialize the map
 ///
-void Graphics::OnResize(int width, int height)
+void Map::Initialize()
 {
-    glViewport(0, 0, width, height);
-}
+    // Initialize the map input/output framebuffers.
+    {
+        mReadIx = 0;
+        mWriteIx = 1;
+        mNumIterations = 0;
 
-void Graphics::OnKeyboard(int code, int scancode, int action, int mods)
-{
-    if (code == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-        Graphics::Close();
+        Graphics::FramebufferCreateInfo fboInfo = {};
+        fboInfo.width = kWidth;
+        fboInfo.height = kHeight;
+        fboInfo.minFilter = GL_NEAREST;
+        fboInfo.magFilter = GL_NEAREST;
+        fboInfo.numColorAttachments = 1;
+        fboInfo.colorInternalformat = GL_RGB32F;
+        fboInfo.colorPixelformat = GL_RGB;
+        fboInfo.colorPixeltype = GL_FLOAT;
+        fboInfo.useDepthAttachment = GL_FALSE;
+        fboInfo.depthInternalformat = GL_DEPTH_COMPONENT32F;
+        fboInfo.depthPixelformat = GL_DEPTH_COMPONENT;
+        fboInfo.depthPixeltype = GL_FLOAT;
+        mIOBuffer[0] = Graphics::CreateFramebuffer(fboInfo);
+        mIOBuffer[1] = Graphics::CreateFramebuffer(fboInfo);
     }
 
+    // Initialize the map begin pass.
+    {
+        mBeginPass.quad = Graphics::CreatePlane(
+            "quad",     // attributes prefix
+            2,          // n1 vertices
+            2,          // n2 vertices
+            -1.0,       // xlo
+             1.0,       // xhi
+            -1.0,       // ylo
+             1.0);      // yhi
+
+        Graphics::Image image = Graphics::LoadImage(kImageFilename, true);
+        Graphics::TextureCreateInfo textureInfo = {};
+        textureInfo.target = GL_TEXTURE_2D;
+        textureInfo.width = image->mWidth;
+        textureInfo.height = image->mHeight;
+        textureInfo.internalformat = GL_RGBA8;
+        textureInfo.pixelformat = image->mFormat;
+        textureInfo.pixeltype = GL_UNSIGNED_BYTE;
+        textureInfo.pixels = &image->mBitmap[0];
+        textureInfo.generateMipmap = GL_TRUE;
+        textureInfo.minFilter = GL_LINEAR;
+        textureInfo.magFilter = GL_LINEAR;
+        textureInfo.wrapS = GL_CLAMP_TO_EDGE;
+        textureInfo.wrapT = GL_CLAMP_TO_EDGE;
+        mBeginPass.texture = Graphics::CreateTexture(textureInfo);
+
+        Graphics::PipelineCreateInfo pipelineInfo = {};
+        pipelineInfo.polygonMode = GL_FILL;
+        pipelineInfo.enableCullFace = GL_FALSE;
+        pipelineInfo.cullFaceMode = GL_BACK;
+        pipelineInfo.frontFaceMode = GL_CCW;
+        pipelineInfo.enableDepthTest = GL_TRUE;
+        pipelineInfo.depthFunc = GL_LESS;
+        pipelineInfo.clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+        pipelineInfo.clearColor = {0.5f, 0.5f, 0.5f, 1.0f};
+        pipelineInfo.clearDepth = 1.0f;
+        pipelineInfo.lineWidth = 1.0f;
+        pipelineInfo.pointSize = 1.0f;
+        pipelineInfo.shaders = {
+            Graphics::CreateShaderFromFile(GL_VERTEX_SHADER, "data/map-begin.vert"),
+            Graphics::CreateShaderFromFile(GL_FRAGMENT_SHADER, "data/map-begin.frag")};
+        mBeginPass.pipeline = Graphics::CreatePipeline(pipelineInfo);
+        mBeginPass.pipeline->Bind();
+        mBeginPass.quad->Bind();
+        mBeginPass.pipeline->SetAttribute(mBeginPass.quad->mAttributes);
+        mBeginPass.pipeline->Unbind();
+    }
+
+    // Initialize the map run pass.
+    {
+        mRunPass.quad = Graphics::CreatePlane(
+            "quad",             // vertex attributes prefix
+            2,                  // n1 vertices
+            2,                  // n2 vertices
+            -1.0,               // xlo
+             1.0,               // xhi
+            -1.0,               // ylo
+             1.0);              // yhi
+
+        Graphics::PipelineCreateInfo pipelineInfo = {};
+        pipelineInfo.polygonMode = GL_FILL;
+        pipelineInfo.enableCullFace = GL_FALSE;
+        pipelineInfo.cullFaceMode = GL_BACK;
+        pipelineInfo.frontFaceMode = GL_CCW;
+        pipelineInfo.enableDepthTest = GL_TRUE;
+        pipelineInfo.depthFunc = GL_LESS;
+        pipelineInfo.clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+        pipelineInfo.clearColor = {0.5f, 0.5f, 0.5f, 1.0f};
+        pipelineInfo.clearDepth = 1.0f;
+        pipelineInfo.lineWidth = 1.0f;
+        pipelineInfo.pointSize = 1.0f;
+        pipelineInfo.shaders = {
+            Graphics::CreateShaderFromFile(GL_VERTEX_SHADER, "data/map-run.vert"),
+            Graphics::CreateShaderFromFile(GL_FRAGMENT_SHADER, "data/map-run.frag")};
+        mRunPass.pipeline = Graphics::CreatePipeline(pipelineInfo);
+        mRunPass.pipeline->Bind();
+        mRunPass.quad->Bind();
+        mRunPass.pipeline->SetAttribute(mRunPass.quad->mAttributes);
+        mRunPass.pipeline->Unbind();
+    }
+
+    // Initialize end render pass.
+    {
+        mEndPass.quad = Graphics::CreatePlane(
+            "quad",             // vertex attributes prefix
+            2,                  // n1 vertices
+            2,                  // n2 vertices
+            -1.0,               // xlo
+             1.0,               // xhi
+            -1.0,               // ylo
+             1.0);              // yhi
+
+        Graphics::PipelineCreateInfo pipelineInfo = {};
+        pipelineInfo.polygonMode = GL_FILL;
+        pipelineInfo.enableCullFace = GL_FALSE;
+        pipelineInfo.cullFaceMode = GL_BACK;
+        pipelineInfo.frontFaceMode = GL_CCW;
+        pipelineInfo.enableDepthTest = GL_TRUE;
+        pipelineInfo.depthFunc = GL_LESS;
+        pipelineInfo.clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+        pipelineInfo.clearColor = {0.5f, 0.5f, 0.5f, 1.0f};
+        pipelineInfo.clearDepth = 1.0f;
+        pipelineInfo.lineWidth = 1.0f;
+        pipelineInfo.pointSize = 1.0f;
+        pipelineInfo.shaders = {
+            Graphics::CreateShaderFromFile(GL_VERTEX_SHADER, "data/map-end.vert"),
+            Graphics::CreateShaderFromFile(GL_FRAGMENT_SHADER, "data/map-end.frag")};
+        mEndPass.pipeline = Graphics::CreatePipeline(pipelineInfo);
+        mEndPass.pipeline->Bind();
+        mEndPass.quad->Bind();
+        mEndPass.pipeline->SetAttribute(mEndPass.quad->mAttributes);
+        mEndPass.pipeline->Unbind();
+    }
+}
+
+///
+/// @brief Begin by rendering the image to the map framebuffer.
+///        Run the map shader program over a double framebuffer.
+///        End by rendering the map framebuffer to the screen.
+///
+void Map::Render()
+{
+    // Map begin render pass.
+    {
+        std::swap(mReadIx, mWriteIx);
+        mIOBuffer[mWriteIx]->Bind();
+
+        auto viewport = Graphics::GetViewport();
+        Graphics::SetViewport({0, 0, kWidth, kHeight});
+
+        GLenum texunit = 0;
+        mBeginPass.pipeline->Use();
+        mBeginPass.pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
+        mBeginPass.texture->Bind(texunit);
+        mBeginPass.pipeline->Clear();
+        mBeginPass.quad->Render();
+
+        mIOBuffer[mWriteIx]->Unbind();
+        Graphics::SetViewport(viewport);
+    }
+
+    // Map run render pass.
+    for (size_t iter = 0; iter < mNumIterations; ++iter) {
+        std::swap(mReadIx, mWriteIx);
+        mIOBuffer[mWriteIx]->Bind();
+
+        auto viewport = Graphics::GetViewport();
+        Graphics::SetViewport({0, 0, kWidth, kHeight});
+
+        GLenum texunit = 0;
+        mRunPass.pipeline->Use();
+        mRunPass.pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
+        mIOBuffer[mReadIx]->mColorAttachments[0]->Bind(texunit);
+        mRunPass.pipeline->Clear();
+        mRunPass.quad->Render();
+
+        mIOBuffer[mWriteIx]->Unbind();
+        Graphics::SetViewport(viewport);
+    }
+
+    // Map end shader.
+    {
+        std::swap(mReadIx, mWriteIx);
+
+        GLenum texunit = 0;
+        mEndPass.pipeline->Use();
+        mEndPass.pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
+        mIOBuffer[mReadIx]->mColorAttachments[0]->Bind(texunit);
+        mEndPass.pipeline->Clear();
+        mEndPass.quad->Render();
+    }
+}
+
+/// -----------------------------------------------------------------------------
+void Graphics::OnKeyboard(int code, int scancode, int action, int mods)
+{
     if (code == GLFW_KEY_UP) {
-        gMap.m_draw.iterations++;
-        std::cout << "m_draw.iterations " << gMap.m_draw.iterations << "\n";
+        gMap.mNumIterations++;
+        std::cout << "mNumIterations " << gMap.mNumIterations << "\n";
     }
 
     if (code == GLFW_KEY_DOWN) {
-        if (gMap.m_draw.iterations > 0) {
-            gMap.m_draw.iterations--;
-            std::cout << "m_draw.iterations " << gMap.m_draw.iterations << "\n";
+        if (gMap.mNumIterations > 0) {
+            gMap.mNumIterations--;
+            std::cout << "mNumIterations " << gMap.mNumIterations << "\n";
         }
     }
 }
@@ -54,43 +275,27 @@ void Graphics::OnInitialize()
 }
 
 void Graphics::OnTerminate()
-{
-    gMap.Cleanup();
-}
+{}
 
-void Graphics::OnUpdate()
+void Graphics::OnMainLoop()
 {
-    static const uint32_t kMaxFrames = 360;
-    static uint32_t FrameCount = 0;
-    if (++FrameCount >= kMaxFrames) {
-        Graphics::Close();
-    }
-    gMap.Update();
-}
-
-void Graphics::OnRender()
-{
-    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-    glClearDepth(1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     gMap.Render();
 }
 
-///
-/// @brief main application client.
-///
+/// -----------------------------------------------------------------------------
 int main(int argc, char const *argv[])
 {
-    Graphics::RenderDesc desc =  {};
-    desc.WindowTitle = "12-iobuffer";
-    desc.WindowWidth = 800;
-    desc.WindowHeight = 800;
-    desc.GLVersionMajor = 3;
-    desc.GLVersionMinor = 3;
-    desc.PollTimeout = 0.01;
+    Graphics::Settings settings = {};
+    settings.WindowTitle = "12-iobuffer";
+    settings.WindowWidth = 800;
+    settings.WindowHeight = 800;
+    settings.GLVersionMajor = 3;
+    settings.GLVersionMinor = 3;
+    settings.PollTimeout = 0.01;
+    settings.MaxFrames = 600;
 
     try {
-        Graphics::RenderLoop(desc);
+        Graphics::MainLoop(settings);
     } catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;

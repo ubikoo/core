@@ -21,67 +21,66 @@ namespace Compute {
 /// @brief Create an interface to a OpenCL buffer memory object on the device.
 ///
 struct BufferObject {
-    DeviceObject *device{NULL};
-    cl_mem id{NULL};
-    size_t size{};
+    DeviceObject *mDevice{NULL};
+    cl_mem mId{NULL};
+    size_t mSize{};
 
     /// @brief Read from the buffer object to host memory.
     void Read(
-        size_t buffer_offset,
-        size_t buffer_size,
+        size_t bufferOffset,
+        size_t bufferSize,
         void *ptr,
-        const std::vector<cl_event> *wait_list = NULL,
+        const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL);
 
     void Read(
         void *ptr,
-        const std::vector<cl_event> *wait_list = NULL,
+        const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL);
 
     /// @brief Write to the buffer object from host memory.
     void Write(
-        size_t buffer_offset,
-        size_t buffer_size,
+        size_t bufferOffset,
+        size_t bufferSize,
         void *ptr,
-        const std::vector<cl_event> *wait_list = NULL,
+        const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL);
 
     void Write(
         void *ptr,
-        const std::vector<cl_event> *wait_list = NULL,
+        const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL);
 
     /// @brief Fill the buffer object with a pattern of a specified size.
     void Fill(
         const void *pattern,
-        size_t pattern_size,
-        size_t buffer_offset,
-        size_t buffer_size,
-        const std::vector<cl_event> *wait_list = NULL,
+        size_t patternSize,
+        size_t bufferOffset,
+        size_t bufferSize,
+        const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL);
 
     void Fill(
         const void *pattern,
-        size_t pattern_size,
-        const std::vector<cl_event> *wait_list = NULL,
+        size_t patternSize,
+        const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL);
 
     /// @brief Map an entire buffer object into a host address space.
-    ///
     void *Map(
         cl_map_flags flags,
-        const std::vector<cl_event> *wait_list = NULL,
+        const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL);
 
     /// @brief Unmap a previously mapped buffer.
     void Unmap(
         void *pointer,
-        const std::vector<cl_event> *wait_list = NULL,
+        const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL);
 };
 struct BufferDeleter {
     void operator()(BufferObject *obj) {
-        if (obj) { clReleaseMemObject(obj->id); };
+        if (obj) { clReleaseMemObject(obj->mId); };
         delete obj;
     }
 };
@@ -92,56 +91,56 @@ Buffer CreateBuffer(const Device &device, size_t size, cl_mem_flags flags);
 /// @brief Create an interface to a OpenCL image memory object on the device.
 ///
 struct ImageObject {
-    DeviceObject *device{NULL};
-    cl_mem id{NULL};
-    std::array<size_t,3> origin{};
-    std::array<size_t,3> region{};
+    DeviceObject *mDevice{NULL};
+    cl_mem mId{NULL};
+    std::array<size_t,3> mOrigin{};
+    std::array<size_t,3> mRegion{};
 
     /// @brief Read image object to host memory data.
     void Read(
         void *ptr,
-        const std::vector<cl_event> *wait_list = NULL,
+        const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL);
 
     /// @brief Write host memory dataw to image object.
     void Write(
         void *ptr,
-        const std::vector<cl_event> *wait_list = NULL,
+        const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL);
 
     /// @brief Fill an image object with a specified color.
     void Fill(
-        const cl_float4 fill_color,
-        const std::vector<cl_event> *wait_list = NULL,
+        const cl_float4 fillColor,
+        const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL);
 
     /// @brief Fill an image object with a specified color.
     void Fill(
-        const cl_int4 fill_color,
-        const std::vector<cl_event> *wait_list = NULL,
+        const cl_int4 fillColor,
+        const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL);
 
     /// @brief Fill an image object with a specified color.
     void Fill(
-        const cl_uint4 fill_color,
-        const std::vector<cl_event> *wait_list = NULL,
+        const cl_uint4 fillColor,
+        const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL);
 
     /// @brief Map an entire image object into a host address space.
     void *Map(
         cl_map_flags flags,
-        const std::vector<cl_event> *wait_list = NULL,
+        const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL);
 
     /// @brief Unmap a previously mapped image.
     void Unmap(
         void *pointer,
-        const std::vector<cl_event> *wait_list = NULL,
+        const std::vector<cl_event> *waitList = NULL,
         cl_event *event = NULL);
 };
 struct ImageDeleter {
     void operator()(ImageObject *obj) {
-        if (obj) { clReleaseMemObject(obj->id); };
+        if (obj) { clReleaseMemObject(obj->mId); };
         delete obj;
     }
 };

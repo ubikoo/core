@@ -51,7 +51,7 @@ void ModelCpu::Run(std::vector<Point> &points)
     };
 
     // Compute the cell index of a given point.
-    auto cell_ix = [&](const cl_float3 &p) -> cl_uint3 {
+    auto CellId = [&](const cl_float3 &p) -> cl_uint3 {
         cl_float3 u = (p - kDomainLo);
         u /= (kDomainHi - kDomainLo);
         u *= (cl_float) kNumCells;
@@ -65,7 +65,7 @@ void ModelCpu::Run(std::vector<Point> &points)
     // Create the hashmap from the array of particles.
     mHashmap.clear();
     for (size_t i = 0; i < kNumPoints; i++) {
-         mHashmap.insert(hash(cell_ix(points[i].pos)), (uint32_t) i);
+         mHashmap.insert(hash(CellId(points[i].pos)), (uint32_t) i);
     }
 
     // Query the hashmap for all valid key-value pairs.

@@ -41,7 +41,7 @@ do_clean() {
 do_build() {
     mkdir build
     pushd build
-    cmake .. && make -j16 all
+    cmake .. && make -j32 all
     popd
 }
 
@@ -103,9 +103,9 @@ if [[ $DO_EXECUTE == "true" ]]; then
     do_execute graphics/00-image                    ./00-image
     do_execute graphics/01-glfw                     ./01-glfw
     do_execute graphics/02-triangle                 ./02-triangle
-    do_execute graphics/03-triangle-instance-a      ./03-triangle-instance-a
-    do_execute graphics/04-triangle-instance-b      ./04-triangle-instance-b
-    do_execute graphics/05-triangle-instance-c      ./05-triangle-instance-c
+    do_execute graphics/03-triangle-instance        ./03-triangle-instance
+    do_execute graphics/04-triangle-instance        ./04-triangle-instance
+    do_execute graphics/05-triangle-instance        ./05-triangle-instance
     do_execute graphics/06-quad                     ./06-quad
     do_execute graphics/07-quad-image               ./07-quad-image
     do_execute graphics/08-sphere-image             ./08-sphere-image

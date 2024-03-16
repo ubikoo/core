@@ -11,24 +11,20 @@
 #define COMPUTE_H_
 
 ///
-/// @brief Helper functions providing an interface to OpenCL.
-///
-/// The interface is divided in two layers:
+/// @brief Compute provides an interface to OpenCL. It consists of two layers:
 ///  1. Platform layer
-///     Query platform
-///     Create device
-///     Create command queue
-///
+///         Query platform
+///         Create device
+///         Create command queue
 ///  2. Runtime layer
-///     Compile program
-///     Build kernel
-///     Create buffers
-///
-/// A typical runtime would have the form:
-///     Write buffer data
-///     Set kernel arguments
-///     Execute kernel
-///     Read buffer data
+///         Compile program
+///         Build kernel
+///         Create buffers
+///     A typical runtime would have the form
+///         Write buffer data
+///         Set kernel arguments
+///         Execute kernel
+///         Read buffer data
 ///
 #include "common.h"
 #include "device.h"

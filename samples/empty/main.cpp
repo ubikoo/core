@@ -17,19 +17,9 @@
 
 Graphics::Camera gCamera;
 
-///
-/// @brief Renderer callback functions.
-///
-void Graphics::OnResize(int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
-
+/// -----------------------------------------------------------------------------
 void Graphics::OnKeyboard(int code, int scancode, int action, int mods)
 {
-    if (code == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-        Graphics::Close();
-    }
     gCamera.Keyboard(code, scancode, action, mods);
 }
 
@@ -47,19 +37,18 @@ void Graphics::OnInitialize()
 {
     // Initialize camera.
     {
-        std::array<GLint,4> viewport = {};
-        glGetIntegerv(GL_VIEWPORT, &viewport[0]);
-        float width = static_cast<float>(viewport[2]);
-        float height = static_cast<float>(viewport[3]);
-
-        gCamera = Graphics::CreateCamera(
-            math::vec3f{0.0f, 0.0f,  0.0f},     // eye-position
-            math::vec3f{0.0f, 0.0f, -1.0f},     // view-direction
-            math::vec3f{0.0f, 1.0f,  0.0f},     // up-direction
-            0.5f * M_PI,                        // y-fov
-            width / height,                     // aspect
-            0.01f,                              // z-near
-            10.0f);                             // z-far
+        Viewport viewport = Graphics::GetViewport();
+        CameraCreateInfo info = {};
+        info.position = {0.0f, 0.0f,  0.0f};
+        info.ctr = {0.0f, 0.0f, -1.0f};
+        info.up = {0.0f, 1.0f,  0.0f};
+        info.fovy = 0.5f * M_PI;
+        info.aspect = viewport.width / viewport.height;
+        info.znear = 0.1f;
+        info.zfar = 10.0f;
+        info.moveSpeed = 1.0f;
+        info.rotateSpeed = 0.01f * M_PI;
+        gCamera = Graphics::CreateCamera(info);
     }
 
     // Query information about all available platforms.
@@ -85,37 +74,28 @@ void Graphics::OnInitialize()
 void Graphics::OnTerminate()
 {}
 
-void Graphics::OnUpdate()
+void Graphics::OnMainLoop()
 {
-    static const uint32_t kMaxFrames = 360;
-    static uint32_t FrameCount = 0;
-    if (++FrameCount >= kMaxFrames) {
-        Graphics::Close();
-    }
-}
-
-void Graphics::OnRender()
-{
+    // Clear the framebuffer.
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClearDepth(1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-///
-/// @brief Renderer callback functions.
-///
+/// -----------------------------------------------------------------------------
 int main(int argc, char const *argv[])
 {
-    Graphics::RenderDesc desc = {};
-    desc.WindowTitle = "app";
-    desc.WindowWidth = 800;
-    desc.WindowHeight = 800;
-    desc.GLVersionMajor = 3;
-    desc.GLVersionMinor = 3;
-    desc.PollTimeout = 0.01;
+    Graphics::Settings settings = {};
+    settings.WindowTitle = "empty";
+    settings.WindowWidth = 800;
+    settings.WindowHeight = 800;
+    settings.GLVersionMajor = 3;
+    settings.GLVersionMinor = 3;
+    settings.PollTimeout = 0.01;
+    settings.MaxFrames = 600;
 
     try {
-        Graphics::RenderLoop(desc);
+        Graphics::MainLoop(settings);
     } catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;

@@ -19,21 +19,21 @@ namespace Compute {
 /// @brief Create an interface to a OpenCL sampler object on the device.
 ///
 struct SamplerObject {
-    DeviceObject *device{NULL};
-    cl_sampler id{NULL};
+    DeviceObject *mDevice{NULL};
+    cl_sampler mId{NULL};
 };
 struct SamplerDeleter {
     void operator()(SamplerObject *obj) {
-        if (obj) { clReleaseSampler(obj->id); };
+        if (obj) { clReleaseSampler(obj->mId); };
         delete obj;
     }
 };
 using Sampler = std::unique_ptr<SamplerObject, SamplerDeleter>;
 Sampler CreateSampler(
     const Device &device,
-    cl_bool normalized_coords,
-    cl_addressing_mode addressing_mode,
-    cl_filter_mode filter_mode);
+    cl_bool normalizedCoords,
+    cl_addressing_mode addressingMode,
+    cl_filter_mode filterMode);
 
 } // Compute
 

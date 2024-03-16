@@ -12,7 +12,9 @@
 
 #include <string>
 #include <vector>
-#include "core/graphics/common.h"
+#include <memory>
+#include "common.h"
+#include "texture.h"
 
 namespace Graphics {
 
@@ -30,41 +32,42 @@ namespace Graphics {
 ///      size:   size of the bitmap pixel buffer in bytes.
 ///      bitmap: bitmap pixel buffer data array.
 ///
-struct Image {
+struct ImageObject {
     // Image data.
-    uint32_t width;                 // bitmap width in pixels
-    uint32_t height;                // bitmap height in pixels
-    uint32_t bpp;                   // pixel bit depth
-    GLenum format;                  // pixel format congruous with bit depth
-    uint32_t pitch;                 // scanline size in bytes
-    uint32_t size;                  // bitmap size in bytes, height*pitch
-    std::vector<uint8_t> bitmap;    // bitmap pixel buffer array
+    uint32_t mWidth;                 // bitmap width in pixels
+    uint32_t mHeight;                // bitmap height in pixels
+    uint32_t mBpp;                   // pixel bit depth
+    GLenum mFormat;                  // pixel format congruous with bit depth
+    uint32_t mPitch;                 // scanline size in bytes
+    uint32_t mSize;                  // bitmap size in bytes, height*pitch
+    std::vector<uint8_t> mBitmap;    // bitmap pixel buffer array
 
     // Return a pointer to the image pixel (x,y).
-    uint8_t *operator()(const uint32_t x, const uint32_t y);
-    const uint8_t *operator()(const uint32_t, const uint32_t y) const;
+    uint8_t *Pixel(uint32_t x, uint32_t y);
+    const uint8_t *Pixel(uint32_t x, uint32_t y) const;
 };
+
+using Image = std::unique_ptr<ImageObject>;
 
 ///
 /// @brief Access the pixel at row x and column y. If x and y are inside the
 /// bitmap range, return a pointer to the pixel address specified by the pitch
 /// size and number of colour components. Otherwise, return null.
 ///
-inline uint8_t *Image::operator()(const uint32_t x, const uint32_t y)
+inline uint8_t *ImageObject::Pixel(uint32_t x, uint32_t y)
 {
-    const uint32_t pixel_bytes = bpp >> 3;
-    if (!bitmap.empty() && (x < width) && (y < height)) {
-        return &bitmap[y * pitch + x * pixel_bytes];
+    const uint32_t pixelBytes = mBpp >> 3;
+    if (!mBitmap.empty() && (x < mWidth) && (y < mHeight)) {
+        return &mBitmap[y * mPitch + x * pixelBytes];
     }
     return nullptr;
 }
 
-inline const uint8_t *Image::operator()(
-    const uint32_t x, const uint32_t y) const
+inline const uint8_t *ImageObject::Pixel(uint32_t x, uint32_t y) const
 {
-    const uint32_t pixel_bytes = bpp >> 3;
-    if (!bitmap.empty() && (x < width) && (y < height)) {
-        return &bitmap[y * pitch + x * pixel_bytes];
+    const uint32_t pixelBytes = mBpp >> 3;
+    if (!mBitmap.empty() && (x < mWidth) && (y < mHeight)) {
+        return &mBitmap[y * mPitch + x * pixelBytes];
     }
     return nullptr;
 }
@@ -72,9 +75,7 @@ inline const uint8_t *Image::operator()(
 ///
 /// @brief Return a string with image properties.
 ///
-std::string GetImagePropertiesString(
-    const Image &image,
-    const char *comment = nullptr);
+std::string GetImageInfo(const Image &image, const char *comment = nullptr);
 
 ///
 /// @brief Create an image with specified size and pixel depth.
@@ -89,28 +90,28 @@ Image CreateImage(
 ///
 Image LoadImage(
     const std::string &filename,
-    const bool flip_vertically = false,
-    const int32_t n_channels = 0);
+    const bool flipVertically = false,
+    const int32_t nChannels = 0);
 
 void SaveImagePng(
     const Image &image,
     const std::string &filename,
-    const bool flip_vertically = false);
+    const bool flipVertically = false);
 
 void SaveImagePpma(
     const Image &image,
     const std::string &filename,
-    const bool flip_vertically = false);
+    const bool flipVertically = false);
 
 void SaveImagePpmb(
     const Image &image,
     const std::string &filename,
-    const bool flip_vertically = false);
+    const bool flipVertically = false);
 
 ///
 /// @brief Generate an OpenGL 2d-texture from the specified image.
 ///
-GLuint CreateTextureFromImage(Image &image);
+Texture CreateTextureFromImage(Image &image);
 
 } // Graphics
 

@@ -16,14 +16,14 @@
 namespace Compute {
 
 struct NDRange {
-    cl_uint dimension{};
-    std::array<size_t,3> global{};
-    std::array<size_t,3> local{};
-    std::array<size_t,3> offset{};
+    cl_uint mDimension{};
+    std::array<size_t,3> mGlobal{};
+    std::array<size_t,3> mLocal{};
+    std::array<size_t,3> mOffset{};
 };
 
 /// @brief Round up global work size to the next multiple of local work size.
-size_t RoundupRange(size_t global_work_size, size_t local_work_size);
+size_t RoundupRange(size_t globalWorkSize, size_t localWorkSize);
 
 /// @brief Factory functions.
 NDRange CreateNDRange(size_t global_0, size_t local_0, size_t offset_0);

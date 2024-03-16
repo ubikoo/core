@@ -20,43 +20,43 @@ namespace Compute {
 /// @brief OpenCL context error callback function.
 ///
 static void CL_CALLBACK ContextCallback(
-    const char *error_info,
-    const void *private_info,
+    const char *errorInfo,
+    const void *privateInfo,
     size_t cb,
-    void *user_data)
+    void *userData)
 {
-    std::cerr << "OpenCL context error: " << error_info << std::endl;
+    std::cerr << "OpenCL context error: " << errorInfo << std::endl;
 }
 
 ///
 /// @brief Create a device with the specified index on the first platform.
 ///
-Device CreateDevice(const size_t device_index)
+Device CreateDevice(const size_t deviceIndex)
 {
     DeviceObject *device = new DeviceObject;
 
     // Get the id of the device with the specified index in the first platform.
     {
-        auto platform_ids = GetPlatformIDs();
-        device->platform = platform_ids[0];
+        auto platformIds = GetPlatformIDs();
+        device->mPlatform = platformIds[0];
 
-        auto device_ids = GetDeviceIDs(device->platform);
-        ThrowIfNot(device_index < device_ids.size());
-        device->id = device_ids[device_index];
+        auto deviceIds = GetDeviceIDs(device->mPlatform);
+        ThrowIfNot(deviceIndex < deviceIds.size());
+        device->mId = deviceIds[deviceIndex];
     }
 
     // Create an context with the OpenCL device.
     {
-        const cl_context_properties context_properties[] = {
+        const cl_context_properties kContextProperties[] = {
             CL_CONTEXT_PLATFORM,
-            (cl_context_properties) device->platform,
+            (cl_context_properties) device->mPlatform,
             (cl_context_properties) NULL};
 
         cl_int err;
-        device->context = clCreateContext(
-            context_properties,         // specify the platform to use
+        device->mContext = clCreateContext(
+            kContextProperties,         // specify the platform to use
             1,                          // only one device id.
-            &device->id,                // pointer to the device handle.
+            &device->mId,                // pointer to the device handle.
             &ContextCallback,           // register log callback function
             NULL,
             &err);
@@ -65,13 +65,13 @@ Device CreateDevice(const size_t device_index)
 
     //Create a command queue on the OpenCL device wiht in-order execution.
     {
-        static const cl_command_queue_properties queue_properties = 0;
+        static const cl_command_queue_properties kQueueProperties = 0;
 
         cl_int err;
-        device->queue = clCreateCommandQueue(
-            device->context,
-            device->id,
-            queue_properties,
+        device->mQueue = clCreateCommandQueue(
+            device->mContext,
+            device->mId,
+            kQueueProperties,
             &err);
         ThrowIfFailed(err);
     }
@@ -84,7 +84,7 @@ Device CreateDevice(const size_t device_index)
 ///
 void DeviceObject::FlushQueue() const
 {
-    ThrowIfFailed(clFlush(queue));
+    ThrowIfFailed(clFlush(mQueue));
 }
 
 ///
@@ -92,7 +92,7 @@ void DeviceObject::FlushQueue() const
 ///
 void DeviceObject::FinishQueue() const
 {
-    ThrowIfFailed(clFinish(queue));
+    ThrowIfFailed(clFinish(mQueue));
 }
 
 ///
@@ -100,15 +100,15 @@ void DeviceObject::FinishQueue() const
 /// or for all previously enqueued commands to complete.
 ///
 void DeviceObject::QueueMarker(
-    const std::vector<cl_event> *wait_list,
+    const std::vector<cl_event> *waitList,
     cl_event *event) const
 {
-    bool has_wait_list = (wait_list && !wait_list->empty());
+    bool hasWaitList = (waitList && !waitList->empty());
     cl_event tmp;
     ThrowIfFailed(clEnqueueMarkerWithWaitList(
-        queue,
-        has_wait_list ? static_cast<cl_uint>(wait_list->size()) : 0,
-        has_wait_list ? wait_list->data() : NULL,
+        mQueue,
+        hasWaitList ? static_cast<cl_uint>(waitList->size()) : 0,
+        hasWaitList ? waitList->data() : NULL,
         (event != NULL) ? &tmp : NULL));
     if (event != NULL) {
         *event = tmp;
@@ -121,15 +121,15 @@ void DeviceObject::QueueMarker(
 /// command queue to complete.
 ///
 void DeviceObject::QueueBarrier(
-    const std::vector<cl_event> *wait_list,
+    const std::vector<cl_event> *waitList,
     cl_event *event) const
 {
-    bool has_wait_list = (wait_list && !wait_list->empty());
+    bool hasWaitList = (waitList && !waitList->empty());
     cl_event tmp;
     ThrowIfFailed(clEnqueueBarrierWithWaitList(
-        queue,
-        has_wait_list ? static_cast<cl_uint>(wait_list->size()) : 0,
-        has_wait_list ? wait_list->data() : NULL,
+        mQueue,
+        hasWaitList ? static_cast<cl_uint>(waitList->size()) : 0,
+        hasWaitList ? waitList->data() : NULL,
         (event != NULL) ? &tmp : NULL));
     if (event != NULL) {
         *event = tmp;

@@ -94,7 +94,7 @@ void Model::ComputeGpu()
 {
     // Run the pi kernel.
     {
-        mKernels[KernelPi]->SetArg(0, &mBuffers[BufferGroupSums]->id);
+        mKernels[KernelPi]->SetArg(0, &mBuffers[BufferGroupSums]->mId);
         mKernels[KernelPi]->SetArg(1, kWorkGroupSize * sizeof(cl_double), NULL);
         mKernels[KernelPi]->SetArg(2, &kNumIters);
         mKernels[KernelPi]->SetArg(3, &kStepSize);

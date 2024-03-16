@@ -14,12 +14,6 @@
 namespace Graphics {
 
 ///
-/// @brief Camera constants
-///
-const float Camera::kMoveDistance = 0.1f;
-const float Camera::kRotateAngle = 0.001f * M_PI;
-
-///
 /// @brief Camera keyboard and mouse events.
 ///
 void Camera::Keyboard(int code, int scancode, int action, int mods)
@@ -27,22 +21,22 @@ void Camera::Keyboard(int code, int scancode, int action, int mods)
     if (IsEnabled()) {
         switch (code) {
         case GLFW_KEY_W:
-            Move(Camera::kMoveDistance * speed);
+            Move(mMoveSpeed);
             break;
         case GLFW_KEY_S:
-            Move(-Camera::kMoveDistance * speed);
+            Move(-mMoveSpeed);
             break;
         case GLFW_KEY_A:
-            Strafe(-Camera::kMoveDistance * speed);
+            Strafe(-mMoveSpeed);
             break;
         case GLFW_KEY_D:
-            Strafe( Camera::kMoveDistance * speed);
+            Strafe( mMoveSpeed);
             break;
         case GLFW_KEY_Q:
-            Lift(-Camera::kMoveDistance * speed);
+            Lift(-mMoveSpeed);
             break;
         case GLFW_KEY_E:
-            Lift( Camera::kMoveDistance * speed);
+            Lift( mMoveSpeed);
             break;
         default:
             break;
@@ -54,8 +48,8 @@ void Camera::MouseMove(double xpos, double ypos)
 {
     static math::vec2f sMousePosition = {};
     if (IsEnabled()) {
-        Yaw((sMousePosition.x - xpos) * Camera::kRotateAngle * speed);
-        Pitch((sMousePosition.y - ypos) * Camera::kRotateAngle * speed);
+        Yaw((sMousePosition.x - xpos) * mRotateSpeed);
+        Pitch((sMousePosition.y - ypos) * mRotateSpeed);
     }
     sMousePosition = {static_cast<float>(xpos), static_cast<float>(ypos)};
 }
@@ -76,7 +70,7 @@ void Camera::MouseButton(int button, int action, int mods)
 ///
 void Camera::Move(float step)
 {
-    position += look * step;
+    mPosition += mLook * step;
 }
 
 ///
@@ -84,8 +78,8 @@ void Camera::Move(float step)
 ///
 void Camera::Strafe(float step)
 {
-    math::vec3f right = math::normalize(math::cross(look, up));
-    position += right * step;
+    math::vec3f right = math::normalize(math::cross(mLook, mUp));
+    mPosition += right * step;
 }
 
 ///
@@ -93,9 +87,9 @@ void Camera::Strafe(float step)
 ///
 void Camera::Lift(float step)
 {
-    math::vec3f right = math::normalize(math::cross(look, up));
-    math::vec3f upward = math::normalize(math::cross(right, look));
-    position += upward * step;
+    math::vec3f right = math::normalize(math::cross(mLook, mUp));
+    math::vec3f upward = math::normalize(math::cross(right, mLook));
+    mPosition += upward * step;
 }
 
 ///
@@ -103,7 +97,7 @@ void Camera::Lift(float step)
 ///
 void Camera::Pitch(float angle)
 {
-    math::vec3f right = math::normalize(math::cross(look, up));
+    math::vec3f right = math::normalize(math::cross(mLook, mUp));
     Rotate(math::rotate(right, angle));
 }
 
@@ -112,8 +106,8 @@ void Camera::Pitch(float angle)
 ///
 void Camera::Yaw(float angle)
 {
-    math::vec3f right = math::normalize(math::cross(look, up));
-    math::vec3f upward = math::normalize(math::cross(right, look));
+    math::vec3f right = math::normalize(math::cross(mLook, mUp));
+    math::vec3f upward = math::normalize(math::cross(right, mLook));
     Rotate(math::rotate(upward, angle));
 }
 
@@ -122,9 +116,9 @@ void Camera::Yaw(float angle)
 ///
 void Camera::Rotate(const math::mat4f &rot)
 {
-    math::vec4f d = {look.x, look.y, look.z, 0.0f};
+    math::vec4f d = {mLook.x, mLook.y, mLook.z, 0.0f};
     d = math::dot(rot, d);
-    look = math::vec3f{d.x, d.y, d.z};
+    mLook = math::vec3f{d.x, d.y, d.z};
 }
 
 ///
@@ -132,18 +126,10 @@ void Camera::Rotate(const math::mat4f &rot)
 ///
 void Camera::Zoom(float scale)
 {
-    static const float max_fovy = 0.999f*M_PI;
-    static const float min_fovy = 0.001f*M_PI;
-    fovy *= scale;
-    fovy = std::min(std::max(fovy, min_fovy), max_fovy);
-}
-
-///
-/// Set camera speed value.
-///
-void Camera::Speed(float value)
-{
-    speed = value;
+    static const float kMaxFovy = 0.999f*M_PI;
+    static const float kMinFovy = 0.001f*M_PI;
+    mFovy *= scale;
+    mFovy = std::min(std::max(mFovy, kMinFovy), kMaxFovy);
 }
 
 ///
@@ -151,7 +137,7 @@ void Camera::Speed(float value)
 ///
 math::mat4f Camera::View()
 {
-    return math::lookat(position, position + look, up);
+    return math::lookat(mPosition, mPosition + mLook, mUp);
 }
 
 ///
@@ -159,31 +145,25 @@ math::mat4f Camera::View()
 ///
 math::mat4f Camera::Proj()
 {
-    return math::perspective(fovy, aspect, znear, zfar);
+    return math::perspective(mFovy, mAspect, mZnear, mZfar);
 }
 
 ///
 /// @brief Create a camera with a specified local coordinate system and frustum.
 ///
-Camera CreateCamera(
-    const math::vec3f &position,
-    const math::vec3f &ctr,
-    const math::vec3f &up,
-    const float fovy,
-    const float aspect,
-    const float znear,
-    const float zfar)
+Camera CreateCamera(const CameraCreateInfo &info)
 {
     Camera camera = {};
-    camera.position = position;
-    camera.look = math::normalize(ctr - position);
-    camera.up = up;
-    camera.fovy = fovy;
-    camera.aspect = aspect;
-    camera.znear = znear;
-    camera.zfar = zfar;
-    camera.speed = 1.0f;
-    camera.enabled = false;
+    camera.mPosition = info.position;
+    camera.mLook = math::normalize(info.ctr - info.position);
+    camera.mUp = info.up;
+    camera.mFovy = info.fovy;
+    camera.mAspect = info.aspect;
+    camera.mZnear = info.znear;
+    camera.mZfar = info.zfar;
+    camera.mMoveSpeed = info.moveSpeed;
+    camera.mRotateSpeed = info.rotateSpeed;
+    camera.mEnabled = false;
     return camera;
 }
 

@@ -61,9 +61,7 @@ using XUniquePtr = std::unique_ptr<X, XPtrDeleter>;
 ///
 void test_core_memory()
 {
-    //
     // Test align_unique_ptr
-    //
     {
         XPtrDeleter del;
         std::vector<XUniquePtr> vector_data;

@@ -11,31 +11,26 @@
 #define GRAPHICS_CAMERA_H_
 
 #include "core/math/math.h"
-#include "core/graphics/common.h"
+#include "common.h"
 
 namespace Graphics {
 
 struct Camera {
-    // Camera constants.
-    static const float kMoveDistance;
-    static const float kRotateAngle;
+    // Camera coordinate system, frustum and movement properties.
+    math::vec3f mPosition;      // camera position
+    math::vec3f mLook;          // look-direction vector
+    math::vec3f mUp;            // up-direction vector
+    float mFovy;                // y-direction field fo view
+    float mAspect;              // camera aspect ratio
+    float mZnear;               // near z-plane position
+    float mZfar;                // far z-plane position
+    float mMoveSpeed;           // camera translation speed
+    float mRotateSpeed;         // camera rotation speed
 
-    // Camera coordinate system.
-    math::vec3f position;     // camera position
-    math::vec3f look;         // look-direction vector
-    math::vec3f up;           // up-direction vector
+    // Is the camera enabled?
+    bool mEnabled;
 
-    // Camera frustum properties.
-    float fovy;             // y-direction field fo view
-    float aspect;           // camera aspect ratio
-    float znear;            // near z-plane position
-    float zfar;             // far z-plane position
-
-    // Camera status properties.
-    float speed;            // Camera speed rate
-    bool enabled;           // Is the camera enabled?
-
-    // Camera keyboard and mouse events.
+    // Keyboard and mouse events.
     void Keyboard(int code, int scancode, int action, int mods);
     void MouseMove(double xpos, double ypos);
     void MouseButton(int button, int action, int mods);
@@ -44,19 +39,14 @@ struct Camera {
     void Move(float step);
     void Strafe(float step);
     void Lift(float step);
-
     void Pitch(float angle);
     void Yaw(float angle);
-
     void Rotate(const math::mat4f &rot);
-
     void Zoom(float scale);
 
-    void Speed(float value);
-
-    void Enable() { enabled = true; }
-    void Disable() { enabled = false; }
-    bool IsEnabled() const { return enabled; }
+    void Enable() { mEnabled = true; }
+    void Disable() { mEnabled = false; }
+    bool IsEnabled() const { return mEnabled; }
 
     // Compute the camera transform matrices.
     math::mat4f View();
@@ -64,14 +54,18 @@ struct Camera {
 };
 
 // Create a camera with a specified local coordinate system and frustum.
-Camera CreateCamera(
-    const math::vec3f &position,
-    const math::vec3f &ctr,
-    const math::vec3f &up,
-    const float fovy,
-    const float aspect,
-    const float znear,
-    const float zfar);
+struct CameraCreateInfo {
+    math::vec3f position{0.0f, 0.0f,  0.0f};    // eye-position
+    math::vec3f ctr{0.0f, 0.0f, -1.0f};         // view-direction
+    math::vec3f up{0.0f, 1.0f,  0.0f};          // up-direction
+    float fovy{0.5f * M_PI};                    // y-fov
+    float aspect{1.0};                          // aspect ratio
+    float znear{0.1};                           // z-near
+    float zfar{10.0};                           // z-far
+    float moveSpeed{0.01f};                    // translation speed
+    float rotateSpeed{0.01f * M_PI};           // rotation speed
+};
+Camera CreateCamera(const CameraCreateInfo &info);
 
 } // Graphics
 

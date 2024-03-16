@@ -12,16 +12,47 @@
 #include <external/tinyobjloader/tiny_obj_loader.h>
 
 #include <cmath>
-#include <cassert>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <unordered_map>
-
-#include "core/graphics/graphics.h"
 #include "mesh.h"
+#include "helpers.h"
 
 namespace Graphics {
+
+///
+/// @brief Copy mesh vertex data onto the gpu.
+///
+void MeshObject::Copy() const
+{
+    GLsizeiptr size = mVertices.size() * sizeof(MeshObject::Vertex);
+    mVbo->Copy(0, size, mVertices.data());
+}
+
+///
+/// @brief Bind/unbind the mesh vertex and element buffer objects.
+///
+void MeshObject::Bind() const
+{
+    mVbo->Bind();
+    mEbo->Bind();
+}
+
+void MeshObject::Unbind() const
+{
+    mVbo->Unbind();
+    mEbo->Unbind();
+}
+
+///
+/// @brief Render the mesh.
+///
+void MeshObject::Render() const
+{
+    GLsizei numElements = mIndices.size();
+    glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_INT, (GLvoid *) 0);
+}
 
 ///
 /// @brief A mesh grid with (n1 * n2) vertices along the first and second
@@ -42,12 +73,11 @@ namespace Graphics {
 /// The first triangle is represented by indices {k0, k0 + 1, k1} and the second
 /// triangle is represented by  {k1 + 1, k1, k0 + 1}.
 ///
-std::vector<Mesh::Index> CreateGrid(const size_t n1, const size_t n2)
+std::vector<MeshObject::Index> CreateGrid(const size_t n1, const size_t n2)
 {
-    assert(n1 > 1 && n2 > 1);
+    ThrowIfNot(n1 > 1 && n2 > 1);
 
-    std::vector<Mesh::Index> indices(6 * (n1 - 1) * (n2 - 1));
-
+    std::vector<MeshObject::Index> indices(6 * (n1 - 1) * (n2 - 1));
     size_t k = 0;
     for (size_t j = 0; j < n2 - 1; ++j) {
         size_t k0 = j * n1;     // first row
@@ -64,7 +94,6 @@ std::vector<Mesh::Index> CreateGrid(const size_t n1, const size_t n2)
             indices[k++] = k0 + 1;
         }
     }
-
     return indices;
 }
 
@@ -77,40 +106,40 @@ std::vector<Mesh::Index> CreateGrid(const size_t n1, const size_t n2)
 /// to have the following vertex attributes active:
 ///  {position, normal, color, texcoord}
 ///
-/// Every mesh has a name prefixeing the vertex attributes. For example, if the
+/// Every mesh has a name prefixing the vertex attributes. For example, if the
 /// mesh name is ball, the names of the vertex attribute variables are:
 ///   {ball_position, ball_normal, ball_color, ball_texcoord}
 ///
 Mesh CreateMesh(
     const std::string &name,
-    const std::vector<Mesh::Vertex> &vertices,
-    const std::vector<Mesh::Index> &indices)
+    const std::vector<MeshObject::Vertex> &vertices,
+    const std::vector<MeshObject::Index> &indices)
 {
     // Create a new mesh and given name from a list of vertices and indices.
-    Mesh mesh;
-    mesh.name = name;
-    mesh.vertices = vertices;
-    mesh.indices = indices;
+    MeshObject *mesh = new MeshObject;
+    mesh->mName = name;
+    mesh->mVertices = vertices;
+    mesh->mIndices = indices;
 
     // Specify vertex attributes description.
     {
-        std::string name_position = mesh.name + std::string("_position");
-        std::string name_normal = mesh.name + std::string("_normal");
-        std::string name_color = mesh.name + std::string("_color");
-        std::string name_texcoord = mesh.name + std::string("_texcoord");
+        std::string positionName = mesh->mName + std::string("_position");
+        std::string normalName = mesh->mName + std::string("_normal");
+        std::string colorName = mesh->mName + std::string("_color");
+        std::string texcoordName = mesh->mName + std::string("_texcoord");
 
-        GLsizei stride = sizeof(Mesh::Vertex);
+        GLsizei stride = sizeof(MeshObject::Vertex);
 
-        GLsizeiptr offset_position = offsetof(Mesh::Vertex, position);
-        GLsizeiptr offset_normal = offsetof(Mesh::Vertex, normal);
-        GLsizeiptr offset_color = offsetof(Mesh::Vertex, color);
-        GLsizeiptr offset_texcoord = offsetof(Mesh::Vertex, texcoord);
+        GLsizeiptr positionOffset = offsetof(MeshObject::Vertex, position);
+        GLsizeiptr normalOffset = offsetof(MeshObject::Vertex, normal);
+        GLsizeiptr colorOffset = offsetof(MeshObject::Vertex, color);
+        GLsizeiptr texcoordOffset = offsetof(MeshObject::Vertex, texcoord);
 
-        mesh.attributes = std::vector<VertexAttributeDescription>{
-            {name_position, GL_FLOAT, GL_FLOAT_VEC3, stride, offset_position, false, 0},
-            {name_normal,   GL_FLOAT, GL_FLOAT_VEC3, stride, offset_normal,   false, 0},
-            {name_color,    GL_FLOAT, GL_FLOAT_VEC3, stride, offset_color,    false, 0},
-            {name_texcoord, GL_FLOAT, GL_FLOAT_VEC2, stride, offset_texcoord, false, 0},
+        mesh->mAttributes = std::vector<AttributeDescription>{
+            {positionName, GL_FLOAT, GL_FLOAT_VEC3, stride, positionOffset, false, 0},
+            {normalName,   GL_FLOAT, GL_FLOAT_VEC3, stride, normalOffset,   false, 0},
+            {colorName,    GL_FLOAT, GL_FLOAT_VEC3, stride, colorOffset,    false, 0},
+            {texcoordName, GL_FLOAT, GL_FLOAT_VEC2, stride, texcoordOffset, false, 0},
         };
     }
 
@@ -118,65 +147,25 @@ Mesh CreateMesh(
     {
         BufferCreateInfo info = {};
         info.target = GL_ARRAY_BUFFER;
-        info.size = mesh.vertices.size() * sizeof(Mesh::Vertex);
+        info.size = mesh->mVertices.size() * sizeof(MeshObject::Vertex);
         info.usage = GL_STATIC_DRAW;
 
-        mesh.vbo = CreateBuffer(info);
-        glBindBuffer(info.target, mesh.vbo);
-        glBufferSubData(info.target, 0, info.size, mesh.vertices.data());
-        glBindBuffer(info.target, 0);
+        mesh->mVbo = CreateBuffer(info);
+        mesh->mVbo->Copy(0, info.size , mesh->mVertices.data());
     }
 
     // Create a buffer storage for face indices with layout {(i0,i1,i2),...}.
     {
         BufferCreateInfo info = {};
         info.target = GL_ELEMENT_ARRAY_BUFFER;
-        info.size = mesh.indices.size() * sizeof(Mesh::Index);
+        info.size = mesh->mIndices.size() * sizeof(MeshObject::Index);
         info.usage = GL_STATIC_DRAW;
 
-        mesh.ebo = CreateBuffer(info);
-        glBindBuffer(info.target, mesh.ebo);
-        glBufferSubData(info.target, 0, info.size, mesh.indices.data());
-        glBindBuffer(info.target, 0);
+        mesh->mEbo = CreateBuffer(info);
+        mesh->mEbo->Copy(0, info.size , mesh->mIndices.data());
     }
 
-    return mesh;
-}
-
-///
-/// @brief Destroy a mesh.
-///
-void DestroyMesh(Mesh &mesh)
-{
-    DestroyBuffer(mesh.ebo);
-    DestroyBuffer(mesh.vbo);
-    mesh.attributes.clear();
-    mesh.vertices.clear();
-    mesh.indices.clear();
-}
-
-///
-/// @brief Upload mesh vertex data onto the gpu.
-///
-void UpdateMesh(const Mesh &mesh)
-{
-    GLsizeiptr vertex_data_size = mesh.vertices.size() * sizeof(Mesh::Vertex);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh.vbo);
-    glBufferSubData(
-        GL_ARRAY_BUFFER,
-        0,
-        vertex_data_size,
-        mesh.vertices.data());
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-///
-/// @brief Render the mesh.
-///
-void RenderMesh(const Mesh &mesh)
-{
-    GLsizei n_elements = mesh.indices.size();
-    glDrawElements(GL_TRIANGLES, n_elements, GL_UNSIGNED_INT, (GLvoid *) 0);
+    return Mesh(mesh);
 }
 
 ///
@@ -186,10 +175,9 @@ void RenderMesh(const Mesh &mesh)
 ///
 /// The vertex coordinates (x, y) are linearly interpolated between (xlo, ylo)
 /// and (xhi, yhi) positions along the n1 and n2 lattice directions.
-/// The normal of each vertex points in the (0,0,1) direction.
-/// The vertex colors (r, g, b) map texture coordinates to a rg-colormap.
-/// The vertex texture coordinates (u,v) are linearly interpolated between (0,0)
-/// and (1,1).
+/// Vertex normals point in the (0,0,1) direction.
+/// Vertex colors map the texture coordinates to a (r,g)-colormap.
+/// Vertex texture coordinates are linearly interpolated between (0,0) and (1,1).
 ///
 Mesh CreatePlane(
     const std::string &name,
@@ -200,11 +188,11 @@ Mesh CreatePlane(
     GLfloat ylo,
     GLfloat yhi)
 {
-    assert(n1 > 1 && n2 > 1);
-    assert(xlo < xhi && ylo < yhi);
+    ThrowIfNot(n1 > 1 && n2 > 1);
+    ThrowIfNot(xlo < xhi && ylo < yhi);
 
     // Create mesh vertices.
-    std::vector<Mesh::Vertex> vertices(n1 * n2);
+    std::vector<MeshObject::Vertex> vertices(n1 * n2);
 
     GLfloat dx = (xhi - xlo) / (GLfloat) (n1 - 1);
     GLfloat dy = (yhi - ylo) / (GLfloat) (n2 - 1);
@@ -238,7 +226,7 @@ Mesh CreatePlane(
     }
 
     // Create mesh indexed index set.
-    std::vector<Mesh::Index> indices = CreateGrid(n1, n2);
+    std::vector<MeshObject::Index> indices = CreateGrid(n1, n2);
 
     // Create mesh.
     return CreateMesh(name, vertices, indices);
@@ -246,37 +234,36 @@ Mesh CreatePlane(
 
 ///
 /// @brief Create a mesh with (n1 * n2) vertices, mapping vertex positions onto
-/// a region in a sphere with a specified radius and bounded by lower (theta_lo,
-/// phi_lo) and upper (theta_hi, phi_hi) spherical coordinates.
+/// a region in a sphere with a specified radius and bounded by lower
+/// (thetaLo, phiLo) and upper (thetaHi, phiHi) spherical coordinates.
 ///
-/// The vertex coordinates are linearly interpolated between (theta_lo, phi_lo)
-/// and (theta_hi, phi_hi) points along n1 and n2 lattice directions.
-/// The normal of each vertex points in outward radial direction as defined by
-/// its spherical coordinates.
-/// The vertex colors (r, g, b) map the texture coordinates to a rg-colormap.
-/// The vertex texture coordinates (u,v) are linearly interpolated between (0,0)
-/// and (1,1).
+/// Vertex coordinates are linearly interpolated between (thetaLo, phiLo) and
+/// (thetaHi, phiHi) points along n1 and n2 lattice directions.
+/// Vertex normals point in outward radial direction as defined by its spherical
+/// coordinates.
+/// Vertex colors map the texture coordinates to a (r,g)-colormap.
+/// Vertex texture coordinates are linearly interpolated between (0,0) and (1,1).
 ///
 Mesh CreateSphere(
     const std::string &name,
     size_t n1,
     size_t n2,
     GLfloat radius,
-    GLfloat theta_lo,
-    GLfloat theta_hi,
-    GLfloat phi_lo,
-    GLfloat phi_hi)
+    GLfloat thetaLo,
+    GLfloat thetaHi,
+    GLfloat phiLo,
+    GLfloat phiHi)
 {
-    assert(n1 > 1 && n2 > 1);
-    assert(radius > 0.0);
-    assert(theta_lo < theta_hi);
-    assert(phi_lo < phi_hi);
+    ThrowIfNot(n1 > 1 && n2 > 1);
+    ThrowIfNot(radius > 0.0);
+    ThrowIfNot(thetaLo < thetaHi);
+    ThrowIfNot(phiLo < phiHi);
 
     // Create mesh vertices.
-    std::vector<Mesh::Vertex> vertices(n1 * n2);
+    std::vector<MeshObject::Vertex> vertices(n1 * n2);
 
-    GLfloat dtheta = (theta_hi - theta_lo) / (GLfloat) (n2 - 1);
-    GLfloat dphi = (phi_hi - phi_lo) / (GLfloat) (n1 - 1);
+    GLfloat dtheta = (thetaHi - thetaLo) / (GLfloat) (n2 - 1);
+    GLfloat dphi = (phiHi - phiLo) / (GLfloat) (n1 - 1);
 
     GLfloat du = 1.0f / (GLfloat) (n1 - 1);
     GLfloat dv = 1.0f / (GLfloat) (n2 - 1);
@@ -286,8 +273,8 @@ Mesh CreateSphere(
             size_t k = i + j * n1;
 
             // Compute the spherical coordinates
-            GLfloat theta = theta_hi - (GLfloat) j * dtheta;
-            GLfloat phi = phi_lo + (GLfloat) i * dphi;
+            GLfloat theta = thetaHi - (GLfloat) j * dtheta;
+            GLfloat phi = phiLo + (GLfloat) i * dphi;
 
             // Vertex positions are just the normal scaled by the radius.
             vertices[k].position[0] = radius * std::sin(theta) * std::cos(phi);
@@ -311,7 +298,7 @@ Mesh CreateSphere(
     }
 
     // Create mesh indexed index set.
-    std::vector<Mesh::Index> indices = CreateGrid(n1, n2);
+    std::vector<MeshObject::Index> indices = CreateGrid(n1, n2);
 
     // Create mesh.
     return CreateMesh(name, vertices, indices);
@@ -342,7 +329,7 @@ Mesh LoadMesh(const std::string &name, const std::string &filename)
         std::cerr << "Load reader warning: " << reader.Warning() << "\n";
     }
 
-    assert(ret);
+    ThrowIfNot(ret);
 
     // Retrieve all vertices and indices from model data. Iterate over all the
     // shapes and combine all of the faces iinto a single mesh data structure.
@@ -361,7 +348,7 @@ Mesh LoadMesh(const std::string &name, const std::string &filename)
         return (seed ^ hash);
     };
 
-    auto hash = [&hash_combine] (const Mesh::Vertex &vertex) -> size_t {
+    auto hash = [&hash_combine] (const MeshObject::Vertex &vertex) -> size_t {
         std::hash<GLfloat> hasher;
         size_t seed = 0;
 
@@ -383,7 +370,7 @@ Mesh LoadMesh(const std::string &name, const std::string &filename)
         return seed;
     };
 
-    auto comp = [] (const Mesh::Vertex &lhs, const Mesh::Vertex &rhs) -> bool {
+    auto comp = [] (const MeshObject::Vertex &lhs, const MeshObject::Vertex &rhs) -> bool {
         return (lhs.position[0] == rhs.position[0] &&
                 lhs.position[1] == rhs.position[1] &&
                 lhs.position[2] == rhs.position[2] &&
@@ -398,7 +385,7 @@ Mesh LoadMesh(const std::string &name, const std::string &filename)
     };
 
     std::unordered_map<
-        Mesh::Vertex,
+        MeshObject::Vertex,
         GLuint,
         decltype(hash),
         decltype(comp)> indexmap(3, hash, comp);
@@ -406,12 +393,12 @@ Mesh LoadMesh(const std::string &name, const std::string &filename)
     const tinyobj::attrib_t &attrib = reader.GetAttrib();
     const std::vector<tinyobj::shape_t> &shapes = reader.GetShapes();
 
-    std::vector<Mesh::Vertex> vertices;
-    std::vector<Mesh::Index> indices;
+    std::vector<MeshObject::Vertex> vertices;
+    std::vector<MeshObject::Index> indices;
 
     for (const auto &shape : shapes) {
         for (const auto &index : shape.mesh.indices) {
-            Mesh::Vertex vertex{};
+            MeshObject::Vertex vertex{};
 
             // Vertex position and color data.
             {

@@ -7,6 +7,9 @@
 // https://opensource.org/licenses/MIT.
 //
 
+#include <string>
+#include <vector>
+#include <iostream>
 #include "core/graphics/graphics.h"
 
 /// -----------------------------------------------------------------------------
@@ -37,22 +40,22 @@ static const std::vector<std::string> kImageFilenames = {
 ///
 int main(int argc, char const *argv[])
 {
-    // ---- Test image factory functions ------------------------------------
+    // ---- Test image factory functions ----------------------------------------
     {
         Graphics::Image img8  = Graphics::CreateImage(kWidth, kHeight, 8);
-        std::cout << Graphics::GetImagePropertiesString(img8, "bpp = 8") << "\n";
+        std::cout << Graphics::GetImageInfo(img8, "bpp = 8") << "\n";
 
         Graphics::Image img16 = Graphics::CreateImage(kWidth, kHeight, 16);
-        std::cout << Graphics::GetImagePropertiesString(img16, "bpp = 16") << "\n";
+        std::cout << Graphics::GetImageInfo(img16, "bpp = 16") << "\n";
 
         Graphics::Image img24 = Graphics::CreateImage(kWidth, kHeight, 24);
-        std::cout << Graphics::GetImagePropertiesString(img24, "bpp = 24") << "\n";
+        std::cout << Graphics::GetImageInfo(img24, "bpp = 24") << "\n";
 
         Graphics::Image img32 = Graphics::CreateImage(kWidth, kHeight, 32);
-        std::cout << Graphics::GetImagePropertiesString(img32, "bpp = 32") << "\n";
+        std::cout << Graphics::GetImageInfo(img32, "bpp = 32") << "\n";
     }
 
-    // ---- Test red images -------------------------------------------------
+    // ---- Test red images -----------------------------------------------------
     {
         std::string filename("color-wheel-80x80-red.png");
         std::string out_png(kOutPrefix + "color-wheel-80x80-red.png");
@@ -60,7 +63,7 @@ int main(int argc, char const *argv[])
         std::string out_ppmb(kOutPrefix + "color-wheel-80x80-red_p6.ppm");
 
         Graphics::Image image = Graphics::LoadImage(kReadDir + filename);
-        std::cout << Graphics::GetImagePropertiesString(image,
+        std::cout << Graphics::GetImageInfo(image,
             "color-wheel-80x80-red") << "\n";
         Graphics::SaveImagePng(image, kWriteDir + out_png);
         Graphics::SaveImagePpma(image, kWriteDir + out_ppma);
@@ -74,14 +77,13 @@ int main(int argc, char const *argv[])
         std::string out_ppmb(kOutPrefix + "color-wheel-80x80-reda-reda_p6.ppm");
 
         Graphics::Image image = Graphics::LoadImage(kReadDir + filename);
-        std::cout << Graphics::GetImagePropertiesString(image,
-            "color-wheel-80x80-reda") << "\n";
+        std::cout << Graphics::GetImageInfo(image, "color-wheel-80x80-reda") << "\n";
         Graphics::SaveImagePng(image, kWriteDir + out_png);
         Graphics::SaveImagePpma(image, kWriteDir + out_ppma);
         Graphics::SaveImagePpmb(image, kWriteDir + out_ppmb);
     }
 
-    // ---- Test blue images ------------------------------------------------
+    // ---- Test blue images ----------------------------------------------------
     {
         std::string filename("color-wheel-80x80-blue.png");
         std::string out_png(kOutPrefix + "color-wheel-80x80-blue.png");
@@ -89,8 +91,7 @@ int main(int argc, char const *argv[])
         std::string out_ppmb(kOutPrefix + "color-wheel-80x80-blue_p6.ppm");
 
         Graphics::Image image = Graphics::LoadImage(kReadDir + filename);
-        std::cout << Graphics::GetImagePropertiesString(image,
-            "color-wheel-80x80-blue") << "\n";
+        std::cout << Graphics::GetImageInfo(image, "color-wheel-80x80-blue") << "\n";
         Graphics::SaveImagePng(image, kWriteDir + out_png);
         Graphics::SaveImagePpma(image, kWriteDir + out_ppma);
         Graphics::SaveImagePpmb(image, kWriteDir + out_ppmb);
@@ -103,14 +104,13 @@ int main(int argc, char const *argv[])
         std::string out_ppmb(kOutPrefix + "color-wheel-80x80-bluea-bluea_p6.ppm");
 
         Graphics::Image image = Graphics::LoadImage(kReadDir + filename);
-        std::cout << Graphics::GetImagePropertiesString(image,
-            "color-wheel-80x80-bluea") << "\n";
+        std::cout << Graphics::GetImageInfo(image, "color-wheel-80x80-bluea") << "\n";
         Graphics::SaveImagePng(image, kWriteDir + out_png);
         Graphics::SaveImagePpma(image, kWriteDir + out_ppma);
         Graphics::SaveImagePpmb(image, kWriteDir + out_ppmb);
     }
 
-    // ---- Test image load -------------------------------------------------
+    // ---- Test image load -----------------------------------------------------
     {
         for (auto &filename : kImageFilenames) {
             std::string out_png = kOutPrefix + "" + filename + ".png";
@@ -118,9 +118,7 @@ int main(int argc, char const *argv[])
             std::string out_ppmb = kOutPrefix + "" + filename + "_p6.ppm";
 
             Graphics::Image image = Graphics::LoadImage(kReadDir + filename);
-
-            std::cout << Graphics::GetImagePropertiesString(image,
-                filename.c_str()) << "\n";
+            std::cout << Graphics::GetImageInfo(image, filename.c_str()) << "\n";
             Graphics::SaveImagePng(image, kWriteDir + out_png);
             Graphics::SaveImagePpma(image, kWriteDir + out_ppma);
             Graphics::SaveImagePpmb(image, kWriteDir + out_ppmb);

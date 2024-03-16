@@ -29,11 +29,11 @@ Kernel CreateKernel(const Program &program, const std::string &name)
     KernelObject *kernel = new KernelObject;
     {
         // Store the device object.
-        kernel->device = program->device;
+        kernel->mDevice = program->mDevice;
 
         // Create the kernel object.
         cl_int err;
-        kernel->id = clCreateKernel(program->id, name.c_str(), &err);
+        kernel->mId = clCreateKernel(program->mId, name.c_str(), &err);
         ThrowIfFailed(err);
     }
     return Kernel(kernel, KernelDeleter());
@@ -42,29 +42,29 @@ Kernel CreateKernel(const Program &program, const std::string &name)
 ///
 /// @brief Run the kernel object.
 ///
-void KernelObject::Run(const std::vector<cl_event> *wait_list, cl_event *event)
+void KernelObject::Run(const std::vector<cl_event> *waitList, cl_event *event)
 {
-    bool has_wait_list = (wait_list && !wait_list->empty());
+    bool hasWaitList = (waitList && !waitList->empty());
 
-    size_t dimension = ndrange.dimension;
-    size_t *offset = (ndrange.offset[0] > 0
-                   && ndrange.offset[1] > 0
-                   && ndrange.offset[2] > 0) ? &ndrange.offset[0] : NULL;
-    size_t *global = &ndrange.global[0];
-    size_t *local = (ndrange.local[0] > 0
-                  && ndrange.local[1] > 0
-                  && ndrange.local[2] > 0) ? &ndrange.local[0] : NULL;
+    size_t dimension = mNDRange.mDimension;
+    size_t *offset = (mNDRange.mOffset[0] > 0
+                   && mNDRange.mOffset[1] > 0
+                   && mNDRange.mOffset[2] > 0) ? &mNDRange.mOffset[0] : NULL;
+    size_t *global = &mNDRange.mGlobal[0];
+    size_t *local = (mNDRange.mLocal[0] > 0
+                  && mNDRange.mLocal[1] > 0
+                  && mNDRange.mLocal[2] > 0) ? &mNDRange.mLocal[0] : NULL;
 
     cl_event tmp;
     ThrowIfFailed(clEnqueueNDRangeKernel(
-        device->queue,
-        id,
+        mDevice->mQueue,
+        mId,
         dimension,
         offset,
         global,
         local,
-        has_wait_list ? static_cast<cl_uint>(wait_list->size()) : 0,
-        has_wait_list ? wait_list->data() : NULL,
+        hasWaitList ? static_cast<cl_uint>(waitList->size()) : 0,
+        hasWaitList ? waitList->data() : NULL,
         (event != NULL) ? &tmp : NULL));
     if (event != NULL) {
         *event = tmp;
@@ -76,15 +76,15 @@ void KernelObject::Run(const std::vector<cl_event> *wait_list, cl_event *event)
 /// clEnqueueNDRangeKernel with dim = 1, offset = NULL, global[0] set to 1,
 /// and local[0] set to 1.
 ///
-void KernelObject::Task(const std::vector<cl_event> *wait_list, cl_event *event)
+void KernelObject::Task(const std::vector<cl_event> *waitList, cl_event *event)
 {
-    bool has_wait_list = (wait_list && !wait_list->empty());
+    bool hasWaitList = (waitList && !waitList->empty());
     cl_event tmp;
     ThrowIfFailed(clEnqueueTask(
-        device->queue,
-        id,
-        has_wait_list ? static_cast<cl_uint>(wait_list->size()) : 0,
-        has_wait_list ? wait_list->data() : NULL,
+        mDevice->mQueue,
+        mId,
+        hasWaitList ? static_cast<cl_uint>(waitList->size()) : 0,
+        hasWaitList ? waitList->data() : NULL,
         (event != NULL) ? &tmp : NULL));
     if (event != NULL) {
         *event = tmp;
@@ -95,12 +95,12 @@ void KernelObject::Task(const std::vector<cl_event> *wait_list, cl_event *event)
 /// @brief Specify the 1-dimensional kernel ranges.
 ///
 void KernelObject::SetRanges1d(
-    const std::array<size_t,1> &num_work_items,
-    const std::array<size_t,1> &work_group_size)
+    const std::array<size_t,1> &numWorkItems,
+    const std::array<size_t,1> &workGroupSize)
 {
-    ndrange = CreateNDRange(
-        RoundupRange(num_work_items[0], work_group_size[0]),
-        work_group_size[0],
+    mNDRange = CreateNDRange(
+        RoundupRange(numWorkItems[0], workGroupSize[0]),
+        workGroupSize[0],
         0);
 }
 
@@ -108,14 +108,14 @@ void KernelObject::SetRanges1d(
 /// @brief Specify the 2-dimensional kernel ranges.
 ///
 void KernelObject::SetRanges2d(
-    const std::array<size_t,2> &num_work_items,
-    const std::array<size_t,2> &work_group_size)
+    const std::array<size_t,2> &numWorkItems,
+    const std::array<size_t,2> &workGroupSize)
 {
-    ndrange = CreateNDRange(
-        RoundupRange(num_work_items[0], work_group_size[0]),
-        RoundupRange(num_work_items[1], work_group_size[1]),
-        work_group_size[0],
-        work_group_size[1],
+    mNDRange = CreateNDRange(
+        RoundupRange(numWorkItems[0], workGroupSize[0]),
+        RoundupRange(numWorkItems[1], workGroupSize[1]),
+        workGroupSize[0],
+        workGroupSize[1],
         0,
         0);
 }
@@ -124,16 +124,16 @@ void KernelObject::SetRanges2d(
 /// @brief Specify the 3-dimensional kernel ranges.
 ///
 void KernelObject::SetRanges3d(
-    const std::array<size_t,3> &num_work_items,
-    const std::array<size_t,3> &work_group_size)
+    const std::array<size_t,3> &numWorkItems,
+    const std::array<size_t,3> &workGroupSize)
 {
-    ndrange = CreateNDRange(
-        RoundupRange(num_work_items[0], work_group_size[0]),
-        RoundupRange(num_work_items[1], work_group_size[1]),
-        RoundupRange(num_work_items[2], work_group_size[2]),
-        work_group_size[0],
-        work_group_size[1],
-        work_group_size[2],
+    mNDRange = CreateNDRange(
+        RoundupRange(numWorkItems[0], workGroupSize[0]),
+        RoundupRange(numWorkItems[1], workGroupSize[1]),
+        RoundupRange(numWorkItems[2], workGroupSize[2]),
+        workGroupSize[0],
+        workGroupSize[1],
+        workGroupSize[2],
         0,
         0,
         0);
@@ -146,7 +146,7 @@ void KernelObject::SetRanges3d(
 ///
 void KernelObject::SetArg(cl_uint index, size_t size, const void *value)
 {
-    ThrowIfFailed(clSetKernelArg(id, index, size, value));
+    ThrowIfFailed(clSetKernelArg(mId, index, size, value));
 }
 
 void KernelObject::SetArg(cl_uint index, const cl_mem *mem)

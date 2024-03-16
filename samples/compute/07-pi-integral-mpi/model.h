@@ -21,8 +21,8 @@ struct Model {
         cl_double PiGpu;
         cl_double xlo;
         cl_double xhi;
-        cl_int proc_id;
-        cl_int n_procs;
+        cl_int procId;
+        cl_int nProcs;
     } mData;
 
     // OpenCL data

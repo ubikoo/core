@@ -14,36 +14,33 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <external/stb/stb_image_write.h>
 
-#include <cassert>
 #include <cstring>
 #include <array>
 #include <string>
 #include <sstream>
 #include <fstream>
-
-#include "core/graphics/graphics.h"
 #include "image.h"
+#include "texture.h"
+#include "helpers.h"
 
 namespace Graphics {
 
 /// -----------------------------------------------------------------------------
 /// @brief Return a string with image properties.
 ///
-std::string GetImagePropertiesString(
-    const Image &image,
-    const char *comment)
+std::string GetImageInfo(const Image &image, const char *comment)
 {
     std::ostringstream ss;
     if (comment != nullptr) {
         ss << comment << "\n";
     }
-    ss << "width:    " << image.width       << "\n"
-       << "height:   " << image.height      << "\n"
-       << "bpp:      " << image.bpp         << "\n"
-       << "channels: " << (image.bpp >> 3)  << "\n"
-       << "pitch:    " << image.pitch       << "\n"
-       << "size:     " << image.size        << "\n"
-       << "bitmap:   " << static_cast<const void*>(&image.bitmap[0]) << "\n";
+    ss << "width:    " << image->mWidth       << "\n"
+       << "height:   " << image->mHeight      << "\n"
+       << "bpp:      " << image->mBpp         << "\n"
+       << "channels: " << (image->mBpp >> 3)  << "\n"
+       << "pitch:    " << image->mPitch       << "\n"
+       << "size:     " << image->mSize        << "\n"
+       << "bitmap:   " << static_cast<const void*>(&image->mBitmap[0]) << "\n";
     return ss.str();
 }
 
@@ -55,9 +52,9 @@ Image CreateImage(
     const uint32_t height,
     const uint32_t bpp)
 {
-    assert(width > 0);
-    assert(height > 0);
-    assert(bpp == 8 || bpp == 16 || bpp == 24 || bpp == 32);
+    ThrowIfNot(width > 0);
+    ThrowIfNot(height > 0);
+    ThrowIfNot(bpp == 8 || bpp == 16 || bpp == 24 || bpp == 32);
 
     //
     // Set the image width and height in pixel units.
@@ -65,33 +62,32 @@ Image CreateImage(
     // Set the bitmap row stride in bytes, rounded to the next 32-bit boundary,
     // and with a buffer size in bytes.
     //
-    Image image;
-    image.width = width;
-    image.height = height;
-    image.bpp = bpp;
-    image.format = (bpp ==  8 ? GL_RED  :
-                    bpp == 16 ? GL_RG   :
-                    bpp == 24 ? GL_RGB  :
-                    bpp == 32 ? GL_RGBA : GL_NONE);
-    image.pitch = 4 * (((width * bpp) + 31) / 32);
-    image.size = height * image.pitch;
-    image.bitmap.resize(image.size);
-    return image;
+    ImageObject *image = new ImageObject;
+    image->mWidth = width;
+    image->mHeight = height;
+    image->mBpp = bpp;
+    image->mFormat = (bpp ==  8 ? GL_RED  :
+                     bpp == 16 ? GL_RG   :
+                     bpp == 24 ? GL_RGB  :
+                     bpp == 32 ? GL_RGBA : GL_NONE);
+    image->mPitch = 4 * (((width * bpp) + 31) / 32);
+    image->mSize = height * image->mPitch;
+    image->mBitmap.resize(image->mSize);
+    return Image(image);
 }
 
 /// -----------------------------------------------------------------------------
 /// @brief Load an image bitmap from a file.
-/// @param flip_vertically Flip image vertically.
-/// @param n_channels load n pixel components (0 = load all components)
+/// @param flipVertically Flip image vertically.
+/// @param nChannels load n pixel components (0 = load all components)
 ///
 Image LoadImage(
     const std::string &filename,
-    const bool flip_vertically,
-    const int32_t n_channels)
+    const bool flipVertically,
+    const int32_t nChannels)
 {
-    assert(!filename.empty());
+    ThrowIf(filename.empty());
 
-    //
     // Load image data from the file using stb image loader:
     //  x = width
     //  y = height
@@ -108,29 +104,23 @@ Image LoadImage(
     //     2           grey, alpha
     //     3           red, green, blue
     //     4           red, green, blue, alpha
-    //
-    stbi_set_flip_vertically_on_load(flip_vertically ? 1 : 0);
+    stbi_set_flip_vertically_on_load(flipVertically ? 1 : 0);
     int w, h, n;
-    uint8_t *data = stbi_load(filename.c_str(), &w, &h, &n, n_channels);
-    assert(data != NULL);
+    uint8_t *data = stbi_load(filename.c_str(), &w, &h, &n, nChannels);
+    ThrowIf(data == NULL);
 
-    //
     // Create an image from the data. There is no padding between scanlines or
     // between pixels of a stb image, so we just use the image width to specify
     // its byte size.
-    //
     uint32_t width = (uint32_t) w;
     uint32_t height = (uint32_t) h;
-    uint32_t bpp = (uint32_t) (8 * (n_channels == 0 ? n : n_channels));
+    uint32_t bpp = (uint32_t) (8 * (nChannels == 0 ? n : nChannels));
 
     Image image = CreateImage(width, height, bpp);
-
     uint32_t size = width * height * bpp / 8;
-    std::memcpy(&image.bitmap[0], data, size);
+    std::memcpy(&image->mBitmap[0], data, size);
 
-    //
     // Free image data.
-    //
     stbi_image_free(data);
 
     return image;
@@ -138,26 +128,26 @@ Image LoadImage(
 
 /// -----------------------------------------------------------------------------
 /// @brief Save an image bitmap to a png file.
-/// @param flip_vertically Flip image vertically.
-/// @param n_channels load n pixel components (0 = load all components)
+/// @param flipVertically Flip image vertically.
+/// @param nChannels load n pixel components (0 = load all components)
 ///
 void SaveImagePng(
     const Image &image,
     const std::string &filename,
-    const bool flip_vertically)
+    const bool flipVertically)
 {
-    assert(!filename.empty());
+    ThrowIf(filename.empty());
 
     // Function stbi_write_png returns 0 on failure and non-0 on success.
-    stbi_flip_vertically_on_write(flip_vertically ? 1 : 0);
+    stbi_flip_vertically_on_write(flipVertically ? 1 : 0);
     int ret = stbi_write_png(
         filename.c_str(),           // name of the file
-        image.width,                // image width
-        image.height,               // image height
-        (image.bpp >> 3),           // # components per pixel
-        &image.bitmap[0],           // bitmap data
-        image.pitch);               // scanline stride in bytes
-    assert(ret != 0);
+        image->mWidth,                // image width
+        image->mHeight,               // image height
+        (image->mBpp >> 3),           // # components per pixel
+        &image->mBitmap[0],           // bitmap data
+        image->mPitch);               // scanline stride in bytes
+    ThrowIf(ret == 0);
 }
 
 ///
@@ -180,28 +170,28 @@ void SaveImagePng(
 void SaveImagePpma(
     const Image &image,
     const std::string &filename,
-    const bool flip_vertically)
+    const bool flipVertically)
 {
-    assert(!filename.empty());
+    ThrowIf(filename.empty());
 
     std::ostringstream buffer;
 
     // Write header.
     buffer << "P3\n"
-           << image.width   << "#width\n"
-           << image.height  << "#height\n"
+           << image->mWidth   << "#width\n"
+           << image->mHeight  << "#height\n"
            << 255           << "#colors\n";
 
     // Write bitmap data.
-    for (uint32_t y = 0; y < image.height; ++y) {
-        for (uint32_t x = 0; x < image.width; ++x) {
-            const uint8_t *px = flip_vertically
-                ? image(x, image.height - 1 - y)
-                : image(x, y);
+    for (uint32_t y = 0; y < image->mHeight; ++y) {
+        for (uint32_t x = 0; x < image->mWidth; ++x) {
+            const uint8_t *px = flipVertically
+                ? image->Pixel(x, image->mHeight - 1 - y)
+                : image->Pixel(x, y);
 
             uint8_t r = *px;
-            uint8_t g = image.bpp > 8  ? *(px + 1) : 0;
-            uint8_t b = image.bpp > 16 ? *(px + 2) : 0;
+            uint8_t g = image->mBpp > 8  ? *(px + 1) : 0;
+            uint8_t b = image->mBpp > 16 ? *(px + 2) : 0;
 
             buffer << static_cast<uint32_t>(r) << " "
                    << static_cast<uint32_t>(g) << " "
@@ -242,15 +232,15 @@ void SaveImagePpma(
 void SaveImagePpmb(
     const Image &image,
     const std::string &filename,
-    const bool flip_vertically)
+    const bool flipVertically)
 {
-    assert(!filename.empty());
+    ThrowIf(filename.empty());
 
     // Write header.
     std::ostringstream header;
     header << "P6\n"
-           << image.width   << "#width\n"
-           << image.height  << "#height\n"
+           << image->mWidth   << "#width\n"
+           << image->mHeight  << "#height\n"
            << 255           << "#colors\n";
 
     std::ofstream file(filename, std::ios::binary);
@@ -259,15 +249,15 @@ void SaveImagePpmb(
     }
 
     // Write bitmap data.
-    for (uint32_t y = 0; y < image.height; ++y) {
-        for (uint32_t x = 0; x < image.width; ++x) {
-            const uint8_t *px = flip_vertically
-                ? image(x, image.height - 1 - y)
-                : image(x, y);
+    for (uint32_t y = 0; y < image->mHeight; ++y) {
+        for (uint32_t x = 0; x < image->mWidth; ++x) {
+            const uint8_t *px = flipVertically
+                ? image->Pixel(x, image->mHeight - 1 - y)
+                : image->Pixel(x, y);
 
             uint8_t r = px[0];
-            uint8_t g = image.bpp > 8  ? px[1] : 0;
-            uint8_t b = image.bpp > 16 ? px[2] : 0;
+            uint8_t g = image->mBpp > 8  ? px[1] : 0;
+            uint8_t b = image->mBpp > 16 ? px[2] : 0;
 
             if (file) {
                 std::array<uint8_t, 3> col = {r, g, b};
@@ -278,18 +268,19 @@ void SaveImagePpmb(
 }
 
 /// -----------------------------------------------------------------------------
-/// @brief Generate an OpenGL 2d-texture from the specified image.
+/// @brief Create an OpenGL 2d-texture from the specified image.
 ///
-GLuint CreateTextureFromImage(Image &image)
+Texture CreateTextureFromImage(Image &image)
 {
-    Texture2dCreateInfo info = {};
-    info.width = image.width;
-    info.height = image.height;
+    TextureCreateInfo info = {};
+    info.target = GL_TEXTURE_2D;
+    info.width = image->mWidth;
+    info.height = image->mHeight;
     info.internalformat = GL_RGBA8;
-    info.pixelformat = image.format;
+    info.pixelformat = image->mFormat;
     info.pixeltype = GL_UNSIGNED_BYTE;
-    info.pixels = static_cast<GLvoid *>(&image.bitmap[0]);
-    return CreateTexture2d(info);
+    info.pixels = static_cast<GLvoid *>(&image->mBitmap[0]);
+    return CreateTexture(info);
 }
 
 } // Graphics

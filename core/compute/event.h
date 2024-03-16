@@ -19,12 +19,12 @@ namespace Compute {
 /// @brief Create an interface to a OpenCL synchronization event object.
 ///
 struct EventObject {
-    DeviceObject *device{NULL};
-    cl_event id{NULL};
+    DeviceObject *mDevice{NULL};
+    cl_event mId{NULL};
 };
 struct EventDeleter {
     void operator()(EventObject *obj) {
-        if (obj) { clReleaseEvent(obj->id); };
+        if (obj) { clReleaseEvent(obj->mId); };
         delete obj;
     }
 };
@@ -40,12 +40,12 @@ void WaitForEvent(const cl_event &event);
 /// @brief Register a callback function for a specific command execution status.
 void SetEventCallback(
     const cl_event &event,
-    cl_int command_exec_callback_type,
-  	void (CL_CALLBACK *pfn_event_notify) (
+    cl_int commandExecCallbackType,
+    void (CL_CALLBACK *pfn_event_notify) (
         cl_event event,
-        cl_int event_command_exec_status,
-        void *user_data),
-  	void *user_data);
+        cl_int eventCommandExecStatus,
+        void *userData),
+    void *userData);
 
 /// @brief Return a 64-bit value representing the current time counter in
 /// nanoseconds when the command identified by the event starts execution.

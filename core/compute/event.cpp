@@ -23,10 +23,10 @@ Event CreateEvent(const Device &device)
 {
     EventObject *event = new EventObject;
     {
-        event->device = device.get();
+        event->mDevice = device.get();
 
         cl_int err;
-        event->id = clCreateUserEvent(device->context, &err);
+        event->mId = clCreateUserEvent(device->mContext, &err);
         ThrowIfFailed(err);
     }
     return Event(event, EventDeleter());
@@ -37,8 +37,7 @@ Event CreateEvent(const Device &device)
 ///
 void WaitForEvents(const std::vector<cl_event> &events)
 {
-    ThrowIfFailed(clWaitForEvents(
-        static_cast<cl_uint>(events.size()),
+    ThrowIfFailed(clWaitForEvents(static_cast<cl_uint>(events.size()),
         events.data()));
 }
 
@@ -55,18 +54,18 @@ void WaitForEvent(const cl_event &event)
 ///
 void SetEventCallback(
     const cl_event &event,
-    cl_int command_exec_callback_type,
-  	void (CL_CALLBACK *pfn_event_notify) (
+    cl_int commandExecCallbackType,
+    void (CL_CALLBACK *pfn_event_notify) (
         cl_event event,
-        cl_int event_command_exec_status,
-        void *user_data),
-  	void *user_data)
+        cl_int eventCommandExecStatus,
+        void *userData),
+    void *userData)
 {
     ThrowIfFailed(clSetEventCallback(
         event,
-        command_exec_callback_type,
+        commandExecCallbackType,
         pfn_event_notify,
-        user_data));
+        userData));
 }
 
 ///
@@ -75,14 +74,14 @@ void SetEventCallback(
 ///
 cl_ulong GetCommandStart(const cl_event &event)
 {
-    cl_ulong time_start;
+    cl_ulong timeStart;
     ThrowIfFailed(clGetEventProfilingInfo(
         event,
         CL_PROFILING_COMMAND_START,
-        sizeof(time_start),
-        &time_start,
+        sizeof(timeStart),
+        &timeStart,
         NULL));
-    return time_start;
+    return timeStart;
 }
 
 ///
@@ -91,14 +90,14 @@ cl_ulong GetCommandStart(const cl_event &event)
 ///
 cl_ulong GetCommandEnd(const cl_event &event)
 {
-    cl_ulong time_end;
+    cl_ulong timeEnb;
     ThrowIfFailed(clGetEventProfilingInfo(
         event,
         CL_PROFILING_COMMAND_END,
-        sizeof(time_end),
-        &time_end,
+        sizeof(timeEnb),
+        &timeEnb,
         NULL));
-    return time_end;
+    return timeEnb;
 }
 
 } // Compute

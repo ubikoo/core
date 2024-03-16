@@ -36,14 +36,14 @@ Program CreateProgramWithSource(
     ProgramObject *program = new ProgramObject;
     {
         // Store the device object.
-        program->device = device.get();
+        program->mDevice = device.get();
 
         // Create the program object.
         const char *str = source.c_str();
         size_t length = source.length();
         cl_int err;
-        program->id = clCreateProgramWithSource(
-            device->context,    // OpenCL context
+        program->mId = clCreateProgramWithSource(
+            device->mContext,   // OpenCL context
             1,                  // one null-terminated character string
             &str,               // pointer to the character string
             &length,            // length of the character string
@@ -54,9 +54,9 @@ Program CreateProgramWithSource(
     // Build the program executable on the OpenCL device.
     {
         cl_int err = clBuildProgram(
-            program->id,
+            program->mId,
             1,
-            &device->id,
+            &device->mId,
             options.c_str(),
             NULL,               // no callback, wait until completion
             NULL);              // don't pass callback user data
@@ -64,8 +64,8 @@ Program CreateProgramWithSource(
         if (err != CL_SUCCESS) {
             size_t infolen;
             clGetProgramBuildInfo(
-                program->id,
-                device->id,
+                program->mId,
+                device->mId,
                 CL_PROGRAM_BUILD_LOG,
                 0,
                 NULL,
@@ -73,8 +73,8 @@ Program CreateProgramWithSource(
 
             std::string infolog(infolen+1, '\0');
             clGetProgramBuildInfo(
-                program->id,
-                device->id,
+                program->mId,
+                device->mId,
                 CL_PROGRAM_BUILD_LOG,
                 infolen,
                 &infolog[0],
@@ -116,16 +116,16 @@ std::string LoadProgramSource(const std::string &filename)
 ///
 std::vector<cl_device_id> ProgramObject::GetDevices() const
 {
-    size_t param_size;
-    ThrowIfFailed(clGetProgramInfo(id, CL_PROGRAM_DEVICES,
-        0, NULL, &param_size));
+    size_t paramSize;
+    ThrowIfFailed(clGetProgramInfo(mId, CL_PROGRAM_DEVICES,
+        0, NULL, &paramSize));
 
-    size_t devices_size = param_size / sizeof(cl_device_id);
-    ThrowIfNot(devices_size > 0);
+    size_t devicesSize = paramSize / sizeof(cl_device_id);
+    ThrowIfNot(devicesSize > 0);
 
-    std::vector<cl_device_id> devices(devices_size);
-    ThrowIfFailed(clGetProgramInfo(id, CL_PROGRAM_DEVICES,
-        param_size, &devices[0], NULL));
+    std::vector<cl_device_id> devices(devicesSize);
+    ThrowIfFailed(clGetProgramInfo(mId, CL_PROGRAM_DEVICES,
+        paramSize, &devices[0], NULL));
 
     return devices;
 }
@@ -135,16 +135,16 @@ std::vector<cl_device_id> ProgramObject::GetDevices() const
 ///
 std::string ProgramObject::GetSource() const
 {
-    size_t param_size;
-    ThrowIfFailed(clGetProgramInfo(id, CL_PROGRAM_SOURCE,
-        0, NULL, &param_size));
+    size_t paramSize;
+    ThrowIfFailed(clGetProgramInfo(mId, CL_PROGRAM_SOURCE,
+        0, NULL, &paramSize));
 
-    size_t source_size = param_size / sizeof(char);
-    ThrowIfNot(source_size > 0);
+    size_t sourceSize = paramSize / sizeof(char);
+    ThrowIfNot(sourceSize > 0);
 
-    std::string source(source_size, '\0');
-    ThrowIfFailed(clGetProgramInfo(id, CL_PROGRAM_SOURCE,
-        param_size, &source[0], NULL));
+    std::string source(sourceSize, '\0');
+    ThrowIfFailed(clGetProgramInfo(mId, CL_PROGRAM_SOURCE,
+        paramSize, &source[0], NULL));
 
     return source;
 }
@@ -154,16 +154,16 @@ std::string ProgramObject::GetSource() const
 ///
 std::string ProgramObject::GetKernelNames() const
 {
-    size_t param_size;
-    ThrowIfFailed(clGetProgramInfo(id, CL_PROGRAM_KERNEL_NAMES,
-        0, NULL, &param_size));
+    size_t paramSize;
+    ThrowIfFailed(clGetProgramInfo(mId, CL_PROGRAM_KERNEL_NAMES,
+        0, NULL, &paramSize));
 
-    size_t kernel_names_size = param_size / sizeof(char);
-    ThrowIfNot(kernel_names_size > 0);
+    size_t kernelNamesSize = paramSize / sizeof(char);
+    ThrowIfNot(kernelNamesSize > 0);
 
-    std::string kernel_names(kernel_names_size, '\0');
-    ThrowIfFailed(clGetProgramInfo(id, CL_PROGRAM_KERNEL_NAMES,
-        param_size, &kernel_names[0], NULL));
+    std::string kernel_names(kernelNamesSize, '\0');
+    ThrowIfFailed(clGetProgramInfo(mId, CL_PROGRAM_KERNEL_NAMES,
+        paramSize, &kernel_names[0], NULL));
 
     return kernel_names;
 }

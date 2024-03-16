@@ -24,15 +24,15 @@ void Run(int *argc, char ***argv)
 {
     // Initialize MPI context.
     MPI_Init(argc, argv);
-    int proc_id;
-    MPI_Comm_rank(MPI_COMM_WORLD, &proc_id);
-    int n_procs;
-    MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
+    int procId;
+    MPI_Comm_rank(MPI_COMM_WORLD, &procId);
+    int nProcs;
+    MPI_Comm_size(MPI_COMM_WORLD, &nProcs);
 
     // Create a model with associated OpenCL context and run the kernel.
-    Model model(proc_id, n_procs);
+    Model model(procId, nProcs);
     for (cl_ulong iter = 0; iter < kNumIters; ++iter) {
-        if (proc_id == kMasterId) {
+        if (procId == kMasterId) {
             std::cout << "\niter " << iter << " of " << kNumIters << "\n";
         }
         model.Run();

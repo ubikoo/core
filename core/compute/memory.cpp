@@ -33,19 +33,19 @@ Buffer CreateBuffer(const Device &device, size_t size, cl_mem_flags flags)
     BufferObject *buffer = new BufferObject;
     {
         // Store the device object.
-        buffer->device = device.get();
+        buffer->mDevice = device.get();
 
         // Create the buffer memory object.
         cl_int err;
-        buffer->id = clCreateBuffer(device->context, flags, size, NULL, &err);
+        buffer->mId = clCreateBuffer(device->mContext, flags, size, NULL, &err);
         ThrowIfFailed(err);
 
         // Store actual size of the buffer data store.
         ThrowIfFailed(clGetMemObjectInfo(
-            buffer->id,
+            buffer->mId,
             CL_MEM_SIZE,
             sizeof(size_t),
-            &buffer->size,
+            &buffer->mSize,
             NULL));
     }
     return Buffer(buffer, BufferDeleter());
@@ -56,23 +56,23 @@ Buffer CreateBuffer(const Device &device, size_t size, cl_mem_flags flags)
 /// Blocking command, it will not return until it completes.
 ///
 void BufferObject::Read(
-    size_t buffer_offset,
-    size_t buffer_size,
+    size_t bufferOffset,
+    size_t bufferSize,
     void *ptr,
-    const std::vector<cl_event> *wait_list,
+    const std::vector<cl_event> *waitList,
     cl_event *event)
 {
-    bool has_wait_list = (wait_list && !wait_list->empty());
+    bool hasWaitList = (waitList && !waitList->empty());
     cl_event tmp;
     ThrowIfFailed(clEnqueueReadBuffer(
-        device->queue,
-        id,
+        mDevice->mQueue,
+        mId,
         CL_TRUE,
-        buffer_offset,
-        buffer_size,
+        bufferOffset,
+        bufferSize,
         ptr,
-        has_wait_list ? static_cast<cl_uint>(wait_list->size()) : 0,
-        has_wait_list ? wait_list->data() : NULL,
+        hasWaitList ? static_cast<cl_uint>(waitList->size()) : 0,
+        hasWaitList ? waitList->data() : NULL,
         (event != NULL) ? &tmp : NULL));
     if (event != NULL) {
         *event = tmp;
@@ -84,10 +84,10 @@ void BufferObject::Read(
 ///
 void BufferObject::Read(
     void *ptr,
-    const std::vector<cl_event> *wait_list,
+    const std::vector<cl_event> *waitList,
     cl_event *event)
 {
-    Read(0, size, ptr, wait_list, event);
+    Read(0, mSize, ptr, waitList, event);
 }
 
 ///
@@ -95,23 +95,23 @@ void BufferObject::Read(
 /// Blocking command, it will not return until it completes.
 ///
 void BufferObject::Write(
-    size_t buffer_offset,
-    size_t buffer_size,
+    size_t bufferOffset,
+    size_t bufferSize,
     void *ptr,
-    const std::vector<cl_event> *wait_list,
+    const std::vector<cl_event> *waitList,
     cl_event *event)
 {
-    bool has_wait_list = (wait_list && !wait_list->empty());
+    bool hasWaitList = (waitList && !waitList->empty());
     cl_event tmp;
     ThrowIfFailed(clEnqueueWriteBuffer(
-        device->queue,
-        id,
+        mDevice->mQueue,
+        mId,
         CL_TRUE,
-        buffer_offset,
-        buffer_size,
+        bufferOffset,
+        bufferSize,
         ptr,
-        has_wait_list ? static_cast<cl_uint>(wait_list->size()) : 0,
-        has_wait_list ? wait_list->data() : NULL,
+        hasWaitList ? static_cast<cl_uint>(waitList->size()) : 0,
+        hasWaitList ? waitList->data() : NULL,
         (event != NULL) ? &tmp : NULL));
     if (event != NULL) {
         *event = tmp;
@@ -123,10 +123,10 @@ void BufferObject::Write(
 ///
 void BufferObject::Write(
     void *ptr,
-    const std::vector<cl_event> *wait_list,
+    const std::vector<cl_event> *waitList,
     cl_event *event)
 {
-    Write(0, size, ptr, wait_list, event);
+    Write(0, mSize, ptr, waitList, event);
 }
 
 ///
@@ -135,23 +135,23 @@ void BufferObject::Write(
 ///
 void BufferObject::Fill(
     const void *pattern,
-    size_t pattern_size,
-    size_t buffer_offset,
-    size_t buffer_size,
-    const std::vector<cl_event> *wait_list,
+    size_t patternSize,
+    size_t bufferOffset,
+    size_t bufferSize,
+    const std::vector<cl_event> *waitList,
     cl_event *event)
 {
-    bool has_wait_list = (wait_list && !wait_list->empty());
+    bool hasWaitList = (waitList && !waitList->empty());
     cl_event tmp;
     ThrowIfFailed(clEnqueueFillBuffer(
-        device->queue,
-        id,
+        mDevice->mQueue,
+        mId,
         pattern,
-        pattern_size,
-        buffer_offset,
-        buffer_size,
-        has_wait_list ? static_cast<cl_uint>(wait_list->size()) : 0,
-        has_wait_list ? wait_list->data() : NULL,
+        patternSize,
+        bufferOffset,
+        bufferSize,
+        hasWaitList ? static_cast<cl_uint>(waitList->size()) : 0,
+        hasWaitList ? waitList->data() : NULL,
         (event != NULL) ? &tmp : NULL));
     if (event != NULL) {
         *event = tmp;
@@ -163,11 +163,11 @@ void BufferObject::Fill(
 ///
 void BufferObject::Fill(
     const void *pattern,
-    size_t pattern_size,
-    const std::vector<cl_event> *wait_list,
+    size_t patternSize,
+    const std::vector<cl_event> *waitList,
     cl_event *event)
 {
-    Fill(pattern, pattern_size, 0, size, wait_list, event);
+    Fill(pattern, patternSize, 0, mSize, waitList, event);
 }
 
 ///
@@ -176,21 +176,21 @@ void BufferObject::Fill(
 ///
 void *BufferObject::Map(
     cl_map_flags flags,
-    const std::vector<cl_event> *wait_list,
+    const std::vector<cl_event> *waitList,
     cl_event *event)
 {
-    bool has_wait_list = (wait_list && !wait_list->empty());
+    bool hasWaitList = (waitList && !waitList->empty());
     cl_event tmp;
     cl_int err;
     void *pointer = clEnqueueMapBuffer(
-        device->queue,
-        id,
+        mDevice->mQueue,
+        mId,
         CL_TRUE,
         flags,
         0,
-        size,
-        has_wait_list ? static_cast<cl_uint>(wait_list->size()) : 0,
-        has_wait_list ? wait_list->data() : NULL,
+        mSize,
+        hasWaitList ? static_cast<cl_uint>(waitList->size()) : 0,
+        hasWaitList ? waitList->data() : NULL,
         (event != NULL) ? &tmp : NULL,
         &err);
     ThrowIfFailed(err);
@@ -205,17 +205,17 @@ void *BufferObject::Map(
 ///
 void BufferObject::Unmap(
     void *pointer,
-    const std::vector<cl_event> *wait_list,
+    const std::vector<cl_event> *waitList,
     cl_event *event)
 {
-    bool has_wait_list = (wait_list && !wait_list->empty());
+    bool hasWaitList = (waitList && !waitList->empty());
     cl_event tmp;
     ThrowIfFailed(clEnqueueUnmapMemObject(
-        device->queue,
-        id,
+        mDevice->mQueue,
+        mId,
         pointer,
-        has_wait_list ? static_cast<cl_uint>(wait_list->size()) : 0,
-        has_wait_list ? wait_list->data() : NULL,
+        hasWaitList ? static_cast<cl_uint>(waitList->size()) : 0,
+        hasWaitList ? waitList->data() : NULL,
         (event != NULL) ? &tmp : NULL));
     if (event != NULL) {
         *event = tmp;
@@ -239,7 +239,7 @@ Image CreateImage1d(
     ImageObject *image = new ImageObject;
     {
         // Store the device object.
-        image->device = device.get();
+        image->mDevice = device.get();
 
         // Image descriptor describing type and dimensions of a 1d-image.
         // Row pitch and slice pitch must be set to 0 when host ptr is NULL.
@@ -257,18 +257,18 @@ Image CreateImage1d(
 
         // Create image object.
         cl_int err;
-        image->id = clCreateImage(device->context, flags, &format, &desc,
+        image->mId = clCreateImage(device->mContext, flags, &format, &desc,
             NULL, &err);
         ThrowIfFailed(err);
 
         // Store image origin and region.
-        image->origin = {0, 0, 0};
-        ThrowIfFailed(clGetImageInfo(image->id, CL_IMAGE_WIDTH, sizeof(size_t),
-            &image->region[0], NULL));
-        ThrowIfFailed(clGetImageInfo(image->id, CL_IMAGE_HEIGHT, sizeof(size_t),
-            &image->region[1], NULL));
-        ThrowIfFailed(clGetImageInfo(image->id, CL_IMAGE_DEPTH, sizeof(size_t),
-            &image->region[2], NULL));
+        image->mOrigin = {0, 0, 0};
+        ThrowIfFailed(clGetImageInfo(image->mId, CL_IMAGE_WIDTH, sizeof(size_t),
+            &image->mRegion[0], NULL));
+        ThrowIfFailed(clGetImageInfo(image->mId, CL_IMAGE_HEIGHT, sizeof(size_t),
+            &image->mRegion[1], NULL));
+        ThrowIfFailed(clGetImageInfo(image->mId, CL_IMAGE_DEPTH, sizeof(size_t),
+            &image->mRegion[2], NULL));
     }
     return Image(image, ImageDeleter());
 }
@@ -291,7 +291,7 @@ Image CreateImage2d(
     ImageObject *image = new ImageObject;
     {
         // Store the device object.
-        image->device = device.get();
+        image->mDevice = device.get();
 
         // Image descriptor describing type and dimensions of a 2d-image.
         // Row pitch and slice pitch must be set to 0 when host ptr is NULL.
@@ -309,18 +309,18 @@ Image CreateImage2d(
 
         // Create image object.
         cl_int err;
-        image->id = clCreateImage(device->context, flags, &format, &desc,
+        image->mId = clCreateImage(device->mContext, flags, &format, &desc,
             NULL, &err);
         ThrowIfFailed(err);
 
         // Store image origin and region.
-        image->origin = {0, 0, 0};
-        ThrowIfFailed(clGetImageInfo(image->id, CL_IMAGE_WIDTH, sizeof(size_t),
-            &image->region[0], NULL));
-        ThrowIfFailed(clGetImageInfo(image->id, CL_IMAGE_HEIGHT, sizeof(size_t),
-            &image->region[1], NULL));
-        ThrowIfFailed(clGetImageInfo(image->id, CL_IMAGE_DEPTH, sizeof(size_t),
-            &image->region[2], NULL));
+        image->mOrigin = {0, 0, 0};
+        ThrowIfFailed(clGetImageInfo(image->mId, CL_IMAGE_WIDTH, sizeof(size_t),
+            &image->mRegion[0], NULL));
+        ThrowIfFailed(clGetImageInfo(image->mId, CL_IMAGE_HEIGHT, sizeof(size_t),
+            &image->mRegion[1], NULL));
+        ThrowIfFailed(clGetImageInfo(image->mId, CL_IMAGE_DEPTH, sizeof(size_t),
+            &image->mRegion[2], NULL));
     }
     return Image(image, ImageDeleter());
 }
@@ -344,7 +344,7 @@ Image CreateImage3d(
     ImageObject *image = new ImageObject;
     {
         // Store the device object.
-        image->device = device.get();
+        image->mDevice = device.get();
 
         // Image descriptor describing type and dimensions of a 3d-image.
         // Row pitch and slice pitch must be set to 0 when host ptr is NULL.
@@ -362,18 +362,18 @@ Image CreateImage3d(
 
         // Create image object.
         cl_int err;
-        image->id = clCreateImage(device->context, flags, &format, &desc,
+        image->mId = clCreateImage(device->mContext, flags, &format, &desc,
             NULL, &err);
         ThrowIfFailed(err);
 
         // Store image origin and region.
-        image->origin = {0, 0, 0};
-        ThrowIfFailed(clGetImageInfo(image->id, CL_IMAGE_WIDTH, sizeof(size_t),
-            &image->region[0], NULL));
-        ThrowIfFailed(clGetImageInfo(image->id, CL_IMAGE_HEIGHT, sizeof(size_t),
-            &image->region[1], NULL));
-        ThrowIfFailed(clGetImageInfo(image->id, CL_IMAGE_DEPTH, sizeof(size_t),
-            &image->region[2], NULL));
+        image->mOrigin = {0, 0, 0};
+        ThrowIfFailed(clGetImageInfo(image->mId, CL_IMAGE_WIDTH, sizeof(size_t),
+            &image->mRegion[0], NULL));
+        ThrowIfFailed(clGetImageInfo(image->mId, CL_IMAGE_HEIGHT, sizeof(size_t),
+            &image->mRegion[1], NULL));
+        ThrowIfFailed(clGetImageInfo(image->mId, CL_IMAGE_DEPTH, sizeof(size_t),
+            &image->mRegion[2], NULL));
     }
     return Image(image, ImageDeleter());
 }
@@ -384,22 +384,22 @@ Image CreateImage3d(
 ///
 void ImageObject::Read(
     void *ptr,
-    const std::vector<cl_event> *wait_list,
+    const std::vector<cl_event> *waitList,
     cl_event *event)
 {
-    bool has_wait_list = (wait_list && !wait_list->empty());
+    bool hasWaitList = (waitList && !waitList->empty());
     cl_event tmp;
     ThrowIfFailed(clEnqueueReadImage(
-        device->queue,
-        id,
+        mDevice->mQueue,
+        mId,
         CL_TRUE,
-        &origin[0],
-        &region[0],
+        &mOrigin[0],
+        &mRegion[0],
         0,
         0,
         ptr,
-        has_wait_list ? static_cast<cl_uint>(wait_list->size()) : 0,
-        has_wait_list ? wait_list->data() : NULL,
+        hasWaitList ? static_cast<cl_uint>(waitList->size()) : 0,
+        hasWaitList ? waitList->data() : NULL,
         (event != NULL) ? &tmp : NULL));
     if (event != NULL) {
         *event = tmp;
@@ -412,22 +412,22 @@ void ImageObject::Read(
 ///
 void ImageObject::Write(
     void *ptr,
-    const std::vector<cl_event> *wait_list,
+    const std::vector<cl_event> *waitList,
     cl_event *event)
 {
-    bool has_wait_list = (wait_list && !wait_list->empty());
+    bool hasWaitList = (waitList && !waitList->empty());
     cl_event tmp;
     ThrowIfFailed(clEnqueueWriteImage(
-        device->queue,
-        id,
+        mDevice->mQueue,
+        mId,
         CL_TRUE,
-        &origin[0],
-        &region[0],
+        &mOrigin[0],
+        &mRegion[0],
         0,
         0,
         ptr,
-        has_wait_list ? static_cast<cl_uint>(wait_list->size()) : 0,
-        has_wait_list ? wait_list->data() : NULL,
+        hasWaitList ? static_cast<cl_uint>(waitList->size()) : 0,
+        hasWaitList ? waitList->data() : NULL,
         (event != NULL) ? &tmp : NULL));
     if (event != NULL) {
         *event = tmp;
@@ -442,19 +442,19 @@ void ImageObject::Write(
 ///
 void ImageObject::Fill(
     const cl_float4 fill_color,
-    const std::vector<cl_event> *wait_list,
+    const std::vector<cl_event> *waitList,
     cl_event *event)
 {
-    bool has_wait_list = (wait_list && !wait_list->empty());
+    bool hasWaitList = (waitList && !waitList->empty());
     cl_event tmp;
     ThrowIfFailed(clEnqueueFillImage(
-        device->queue,
-        id,
+        mDevice->mQueue,
+        mId,
         static_cast<const void *>(&fill_color),
-        &origin[0],
-        &region[0],
-        has_wait_list ? static_cast<cl_uint>(wait_list->size()) : 0,
-        has_wait_list ? wait_list->data() : NULL,
+        &mOrigin[0],
+        &mRegion[0],
+        hasWaitList ? static_cast<cl_uint>(waitList->size()) : 0,
+        hasWaitList ? waitList->data() : NULL,
         (event != NULL) ? &tmp : NULL));
     if (event != NULL) {
         *event = tmp;
@@ -469,19 +469,19 @@ void ImageObject::Fill(
 ///
 void ImageObject::Fill(
     const cl_int4 fill_color,
-    const std::vector<cl_event> *wait_list,
+    const std::vector<cl_event> *waitList,
     cl_event *event)
 {
-    bool has_wait_list = (wait_list && !wait_list->empty());
+    bool hasWaitList = (waitList && !waitList->empty());
     cl_event tmp;
     ThrowIfFailed(clEnqueueFillImage(
-        device->queue,
-        id,
+        mDevice->mQueue,
+        mId,
         static_cast<const void *>(&fill_color),
-        &origin[0],
-        &region[0],
-        has_wait_list ? static_cast<cl_uint>(wait_list->size()) : 0,
-        has_wait_list ? wait_list->data() : NULL,
+        &mOrigin[0],
+        &mRegion[0],
+        hasWaitList ? static_cast<cl_uint>(waitList->size()) : 0,
+        hasWaitList ? waitList->data() : NULL,
         (event != NULL) ? &tmp : NULL));
     if (event != NULL) {
         *event = tmp;
@@ -496,19 +496,19 @@ void ImageObject::Fill(
 ///
 void ImageObject::Fill(
     const cl_uint4 fill_color,
-    const std::vector<cl_event> *wait_list,
+    const std::vector<cl_event> *waitList,
     cl_event *event)
 {
-    bool has_wait_list = (wait_list && !wait_list->empty());
+    bool hasWaitList = (waitList && !waitList->empty());
     cl_event tmp;
     ThrowIfFailed(clEnqueueFillImage(
-        device->queue,
-        id,
+        mDevice->mQueue,
+        mId,
         static_cast<const void *>(&fill_color),
-        &origin[0],
-        &region[0],
-        has_wait_list ? static_cast<cl_uint>(wait_list->size()) : 0,
-        has_wait_list ? wait_list->data() : NULL,
+        &mOrigin[0],
+        &mRegion[0],
+        hasWaitList ? static_cast<cl_uint>(waitList->size()) : 0,
+        hasWaitList ? waitList->data() : NULL,
         (event != NULL) ? &tmp : NULL));
     if (event != NULL) {
         *event = tmp;
@@ -521,24 +521,24 @@ void ImageObject::Fill(
 ///
 void *ImageObject::Map(
     cl_map_flags flags,
-    const std::vector<cl_event> *wait_list,
+    const std::vector<cl_event> *waitList,
     cl_event *event)
 {
-    bool has_wait_list = (wait_list && !wait_list->empty());
+    bool hasWaitList = (waitList && !waitList->empty());
 
     cl_event tmp;
     cl_int err;
     void *pointer = clEnqueueMapImage(
-        device->queue,
-        id,
+        mDevice->mQueue,
+        mId,
         CL_TRUE,
         flags,
-        &origin[0],
-        &region[0],
+        &mOrigin[0],
+        &mRegion[0],
         0,
         0,
-        has_wait_list ? static_cast<cl_uint>(wait_list->size()) : 0,
-        has_wait_list ? wait_list->data() : NULL,
+        hasWaitList ? static_cast<cl_uint>(waitList->size()) : 0,
+        hasWaitList ? waitList->data() : NULL,
         (event != NULL) ? &tmp : NULL,
         &err);
     ThrowIfFailed(err);
@@ -553,17 +553,17 @@ void *ImageObject::Map(
 ///
 void ImageObject::Unmap(
     void *pointer,
-    const std::vector<cl_event> *wait_list,
+    const std::vector<cl_event> *waitList,
     cl_event *event)
 {
-    bool has_wait_list = (wait_list && !wait_list->empty());
+    bool hasWaitList = (waitList && !waitList->empty());
     cl_event tmp;
     ThrowIfFailed(clEnqueueUnmapMemObject(
-        device->queue,
-        id,
+        mDevice->mQueue,
+        mId,
         pointer,
-        has_wait_list ? static_cast<cl_uint>(wait_list->size()) : 0,
-        has_wait_list ? wait_list->data() : NULL,
+        hasWaitList ? static_cast<cl_uint>(waitList->size()) : 0,
+        hasWaitList ? waitList->data() : NULL,
         (event != NULL) ? &tmp : NULL));
     if (event != NULL) {
         *event = tmp;

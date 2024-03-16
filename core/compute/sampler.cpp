@@ -16,32 +16,32 @@ namespace Compute {
 
 ///
 /// @brief Create an interface to a OpenCL sampler object on the device.
-/// @param normalized_coords Are image coordinates are normalized?
-/// @param addressing_mode Specify how out-of-range image coordinates are
+/// @param normalizedCoords Are image coordinates are normalized?
+/// @param addressingMode Specify how out-of-range image coordinates are
 /// handled when reading from an image:
 ///  CL_ADDRESS_MIRRORED_REPEAT, CL_ADDRESS_REPEAT, CL_ADDRESS_CLAMP_TO_EDGE,
 ///  CL_ADDRESS_CLAMP, CL_ADDRESS_NONE.
-/// @param filter_mode Specify the filter type when reading an image:
+/// @param filterMode Specify the filter type when reading an image:
 ///  CL_FILTER_NEAREST, CL_FILTER_LINEAR.
 ///
 Sampler CreateSampler(
     const Device &device,
-    cl_bool normalized_coords,
-    cl_addressing_mode addressing_mode,
-    cl_filter_mode filter_mode)
+    cl_bool normalizedCoords,
+    cl_addressing_mode addressingMode,
+    cl_filter_mode filterMode)
 {
     SamplerObject *sampler = new SamplerObject;
     {
         // Store the device object.
-        sampler->device = device.get();
+        sampler->mDevice = device.get();
 
         // Create the sampler object.
         cl_int err;
-        sampler->id = clCreateSampler(
-            device->context,
-            normalized_coords,
-            addressing_mode,
-            filter_mode,
+        sampler->mId = clCreateSampler(
+            device->mContext,
+            normalizedCoords,
+            addressingMode,
+            filterMode,
             &err);
         ThrowIfFailed(err);
     }

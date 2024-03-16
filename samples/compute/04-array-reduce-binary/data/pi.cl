@@ -33,11 +33,9 @@ __kernel void pi(
         local_sums[local_id] = 0.5 * mid_y * del_x;
     }
 
-    //
     // Sum the array using a divide and conquer algorithm:
     //  - partition the work group in two halves.
     //  - add the upper half of the work group to the lower half.
-    //
     for (ulong stride = local_size / 2; stride > 0; stride >>=1) {
         // Ensure all work item writes are complete before adding again.
         barrier(CLK_LOCAL_MEM_FENCE);

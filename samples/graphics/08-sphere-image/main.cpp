@@ -9,26 +9,25 @@
 
 #include <iostream>
 #include <exception>
-
+#include <vector>
 #include "core/graphics/graphics.h"
-#include "sphere.h"
 
+/// -----------------------------------------------------------------------------
+static const std::string kImageFilename = "../assets/equirectangular.png";
+static const size_t kMeshNodes = 1024;
+
+struct Sphere {
+    math::mat4f ModelView;
+    Graphics::Mesh Mesh;
+    Graphics::Image Image;
+    Graphics::Texture Texture;
+    Graphics::Pipeline Pipeline;
+};
 Sphere gSphere;
 
-///
-/// @brief Renderer callback functions.
-///
-void Graphics::OnResize(int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
-
+/// -----------------------------------------------------------------------------
 void Graphics::OnKeyboard(int code, int scancode, int action, int mods)
-{
-    if (code == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-        Graphics::Close();
-    }
-}
+{}
 
 void Graphics::OnMouseMove(double xpos, double ypos)
 {}
@@ -38,47 +37,121 @@ void Graphics::OnMouseButton(int button, int action, int mods)
 
 void Graphics::OnInitialize()
 {
-    gSphere.Initialize();
+    // Initialize mvp matrix and create a mesh over a rectangle.
+    {
+        gSphere.ModelView = math::mat4f::eye;
+        gSphere.Mesh = Graphics::CreateSphere(
+            "sphere",                   // vertex attributes prefix
+            kMeshNodes,                 // n1 vertices
+            kMeshNodes,                 // n2 vertices
+            1.0,                        // radius
+            0.0,                        // theta_lo
+            M_PI,                       // theta_hi
+            -M_PI,                      // phi_lo
+            M_PI);                      // phi_hi
+    }
+
+    // Load the 2d-image from the specified filename
+    {
+        gSphere.Image = Graphics::LoadImage(kImageFilename, true, 4);
+
+        Graphics::TextureCreateInfo info = {};
+        info.target = GL_TEXTURE_2D;
+        info.width = gSphere.Image->mWidth;
+        info.height = gSphere.Image->mHeight;
+        info.internalformat = GL_RGBA8;
+        info.pixelformat = gSphere.Image->mFormat;
+        info.pixeltype = GL_UNSIGNED_BYTE;
+        info.pixels = &gSphere.Image->mBitmap[0];
+        info.generateMipmap = GL_TRUE;
+        info.minFilter = GL_LINEAR;
+        info.magFilter = GL_LINEAR;
+        info.wrapS = GL_CLAMP_TO_EDGE;
+        info.wrapT = GL_CLAMP_TO_EDGE;
+        gSphere.Texture = Graphics::CreateTexture(info);
+    }
+
+    // Create the quad rendering pipeline.
+    {
+        Graphics::PipelineCreateInfo info = {};
+        info.polygonMode = GL_FILL;
+        info.enableCullFace = GL_FALSE;
+        info.cullFaceMode = GL_BACK;
+        info.frontFaceMode = GL_CCW;
+        info.enableDepthTest = GL_TRUE;
+        info.depthFunc = GL_LESS;
+        info.clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+        info.clearColor = {0.5f, 0.5f, 0.5f, 1.0f};
+        info.clearDepth = 1.0f;
+        info.lineWidth = 1.0f;
+        info.pointSize = 1.0f;
+        info.shaders = {
+            Graphics::CreateShaderFromFile(GL_VERTEX_SHADER, "data/sphere.vert"),
+            Graphics::CreateShaderFromFile(GL_FRAGMENT_SHADER, "data/sphere.frag")};
+
+        gSphere.Pipeline = Graphics::CreatePipeline(info);
+        gSphere.Pipeline->Bind();
+        gSphere.Mesh->Bind();
+        gSphere.Pipeline->SetAttribute(gSphere.Mesh->mAttributes);
+        gSphere.Pipeline->Unbind();
+    }
 }
 
 void Graphics::OnTerminate()
-{
-    gSphere.Cleanup();
-}
+{}
 
-void Graphics::OnUpdate()
+void Graphics::OnMainLoop()
 {
-    static const uint32_t kMaxFrames = 360;
-    static uint32_t FrameCount = 0;
-    if (++FrameCount >= kMaxFrames) {
-        Graphics::Close();
+    auto viewport = Graphics::GetViewport();
+
+    // Update the sphere.
+    {
+        // Update the ModelView matrix
+        float time = (float) glfwGetTime();
+
+        math::mat4f m = math::mat4f::eye;
+        m = math::rotate(m, math::vec3f{1.0f, 0.0f, 0.0f}, (float) (0.5*M_PI));
+
+        math::vec4f dir_y = math::dot(m, math::vec4f{0.0, 1.0, 0.0, 1.0});
+        m = math::rotate(m, math::vec3f{dir_y.x, dir_y.y, dir_y.z}, 0.2f*time);
+
+        math::vec4f dir_z = math::dot(m, math::vec4f{0.0, 0.0, 1.0, 1.0});
+        m = math::rotate(m, math::vec3f{dir_z.x, dir_z.y, dir_z.z}, 0.8f*time);
+
+        float ratio = viewport.width / viewport.height;
+        math::mat4f p = math::orthographic(-ratio, ratio, -1.0f, 1.0f, -1.0f, 1.0f);
+        gSphere.ModelView = math::dot(p, m);
     }
-    gSphere.Update();
+
+    // Render the sphere.
+    {
+        GLenum texunit = 0;
+        gSphere.Pipeline->Use();
+        gSphere.Pipeline->SetUniform("u_width",  GL_FLOAT, &viewport.width);
+        gSphere.Pipeline->SetUniform("u_height", GL_FLOAT, &viewport.height);
+        gSphere.Pipeline->SetUniformMatrix(
+            "u_mvp", GL_FLOAT_MAT4, true, gSphere.ModelView.data);
+        gSphere.Pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
+        gSphere.Texture->Bind(texunit);
+        gSphere.Pipeline->Clear();
+        gSphere.Mesh->Render();
+    }
 }
 
-void Graphics::OnRender()
-{
-    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-    glClearDepth(1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    gSphere.Render();
-}
-
-///
-/// @brief main application client.
-///
+/// -----------------------------------------------------------------------------
 int main(int argc, char const *argv[])
 {
-    Graphics::RenderDesc desc =  {};
-    desc.WindowTitle = "08-sphere-image";
-    desc.WindowWidth = 800;
-    desc.WindowHeight = 800;
-    desc.GLVersionMajor = 3;
-    desc.GLVersionMinor = 3;
-    desc.PollTimeout = 0.01;
+    Graphics::Settings settings = {};
+    settings.WindowTitle = "08-sphere-image";
+    settings.WindowWidth = 800;
+    settings.WindowHeight = 800;
+    settings.GLVersionMajor = 3;
+    settings.GLVersionMinor = 3;
+    settings.PollTimeout = 0.01;
+    settings.MaxFrames = 600;
 
     try {
-        Graphics::RenderLoop(desc);
+        Graphics::MainLoop(settings);
     } catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;

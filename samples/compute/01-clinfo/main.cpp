@@ -21,16 +21,16 @@
 void Run()
 {
     // Query information about all available platforms.
-    auto platform_ids = Compute::GetPlatformIDs();
-    std::cout << "Number of Platforms " << platform_ids.size() << "\n\n";
-    for (auto &platform : platform_ids) {
+    auto platformIds = Compute::GetPlatformIDs();
+    std::cout << "Number of Platforms " << platformIds.size() << "\n\n";
+    for (auto &platform : platformIds) {
         auto info = Compute::GetPlatformInfo(platform);
         std::cout << Compute::ToString(info) << "\n";
 
-        auto device_ids = Compute::GetDeviceIDs(platform, CL_DEVICE_TYPE_ALL);
-        std::cout << "Number of Devices " << device_ids.size() << "\n\n";
+        auto deviceIds = Compute::GetDeviceIDs(platform, CL_DEVICE_TYPE_ALL);
+        std::cout << "Number of Devices " << deviceIds.size() << "\n\n";
         size_t count = 0;
-        for (auto &device :device_ids) {
+        for (auto &device :deviceIds) {
             auto info = Compute::GetDeviceInfo(device);
             std::cout << "Device # " << count++ << "\n"
                       << Compute::ToString(info) << "\n";

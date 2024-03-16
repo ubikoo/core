@@ -12,6 +12,7 @@
 
 #include <string>
 #include <vector>
+#include <exception>
 #include "common.h"
 
 namespace Compute {
@@ -63,36 +64,36 @@ cl_device_id GetDeviceID(const cl_platform_id &platform, std::string name);
 
 /// @brief Query information about a specified device.
 struct DeviceInfo {
-    std::string name;                               // CL_DEVICE_NAME
-    std::string vendor;                             // CL_DEVICE_VENDOR
-    std::string version;                            // CL_DEVICE_VERSION
-    std::string extensions;                         // CL_DEVICE_EXTENSIONS
-    cl_device_type type;                            // CL_DEVICE_TYPE
+    std::string deviceName;                         // CL_DEVICE_NAME
+    std::string deviceVendor;                       // CL_DEVICE_VENDOR
+    std::string deviceVersion;                      // CL_DEVICE_VERSION
+    std::string deviceExtensions;                   // CL_DEVICE_EXTENSIONS
+    cl_device_type deviceType;                      // CL_DEVICE_TYPE
 
-    cl_ulong global_mem_cache_size;                 // CL_DEVICE_GLOBAL_MEM_CACHE_SIZE
-    cl_device_mem_cache_type global_mem_cache_type; // CL_DEVICE_GLOBAL_MEM_CACHE_TYPE
-    cl_uint global_mem_cacheline_size;              // CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE
-    cl_ulong global_mem_size;                       // CL_DEVICE_GLOBAL_MEM_SIZE
-    cl_ulong local_mem_size;                        // CL_DEVICE_LOCAL_MEM_SIZE
-    cl_device_local_mem_type local_mem_type;        // CL_DEVICE_LOCAL_MEM_TYPE
+    cl_ulong globalMemCacheSize;                    // CL_DEVICE_GLOBAL_MEM_CACHE_SIZE
+    cl_device_mem_cache_type globalMemCacheType;    // CL_DEVICE_GLOBAL_MEM_CACHE_TYPE
+    cl_uint globalMemCachelineSize;                 // CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE
+    cl_ulong globalMemSize;                         // CL_DEVICE_GLOBAL_MEM_SIZE
+    cl_ulong localMemSize;                          // CL_DEVICE_LOCAL_MEM_SIZE
+    cl_device_local_mem_type localMemType;          // CL_DEVICE_LOCAL_MEM_TYPE
 
-    cl_uint max_clock_frequency;                    // CL_DEVICE_MAX_CLOCK_FREQUENCY
-    cl_ulong max_constant_buffer_size;              // CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE
-    cl_ulong max_mem_alloc_size;                    // CL_DEVICE_MAX_MEM_ALLOC_SIZE
-    cl_ulong max_parameter_size;                    // CL_DEVICE_MAX_PARAMETER_SIZE
-    cl_uint max_compute_units;                      // CL_DEVICE_MAX_COMPUTE_UNITS
-    size_t max_work_group_size;                     // CL_DEVICE_MAX_WORK_GROUP_SIZE
-    cl_uint max_work_item_dimensions;               // CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS
-    std::vector<size_t> max_work_item_sizes;        // CL_DEVICE_MAX_WORK_ITEM_SIZES
+    cl_uint maxClockFrequency;                      // CL_DEVICE_MAX_CLOCK_FREQUENCY
+    cl_ulong maxConstantBufferSize;                 // CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE
+    cl_ulong maxMemAllocSize;                       // CL_DEVICE_MAX_MEM_ALLOC_SIZE
+    cl_ulong maxParameterSize;                      // CL_DEVICE_MAX_PARAMETER_SIZE
+    cl_uint maxComputeUnits;                        // CL_DEVICE_MAX_COMPUTE_UNITS
+    size_t maxWorkGroupSize;                        // CL_DEVICE_MAX_WORK_GROUP_SIZE
+    cl_uint maxWorkItemDimensions;                  // CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS
+    std::vector<size_t> maxWorkItemSizes;           // CL_DEVICE_MAX_WORK_ITEM_SIZES
 
-    bool image_support;                             // CL_DEVICE_IMAGE_SUPPORT
-    size_t image2d_max_width;                       // CL_DEVICE_IMAGE2D_MAX_WIDTH
-    size_t image2d_max_height;                      // CL_DEVICE_IMAGE2D_MAX_HEIGHT
-    size_t image3d_max_width;                       // CL_DEVICE_IMAGE3D_MAX_WIDTH
-    size_t image3d_max_height;                      // CL_DEVICE_IMAGE3D_MAX_HEIGHT
-    size_t image3d_max_depth;                       // CL_DEVICE_IMAGE3D_MAX_DEPTH
-    size_t image_max_buffer_size;                   // CL_DEVICE_IMAGE_MAX_BUFFER_SIZE
-    size_t image_max_array_size;                    // CL_DEVICE_IMAGE_MAX_ARRAY_SIZE
+    bool imageSupport;                              // CL_DEVICE_IMAGE_SUPPORT
+    size_t image2dMaxWidth;                         // CL_DEVICE_IMAGE2D_MAX_WIDTH
+    size_t image2dMaxHeight;                        // CL_DEVICE_IMAGE2D_MAX_HEIGHT
+    size_t image3dMaxWidth;                         // CL_DEVICE_IMAGE3D_MAX_WIDTH
+    size_t image3dMaxHeight;                        // CL_DEVICE_IMAGE3D_MAX_HEIGHT
+    size_t image3dMaxDepth;                         // CL_DEVICE_IMAGE3D_MAX_DEPTH
+    size_t imageMaxBufferSize;                      // CL_DEVICE_IMAGE_MAX_BUFFER_SIZE
+    size_t imageMaxArraySize;                       // CL_DEVICE_IMAGE_MAX_ARRAY_SIZE
 };
 DeviceInfo GetDeviceInfo(const cl_device_id &device);
 

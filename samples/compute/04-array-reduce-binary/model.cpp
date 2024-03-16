@@ -84,9 +84,9 @@ void Model::ComputeCpu()
     {
         cl_double sum = 0.0;
         for (size_t i = 0; i < mData.Points.size() - 1; ++i) {
-            double del_x = mData.Points[i + 1].x - mData.Points[i].x;
-            double mid_y = mData.Points[i + 1].y + mData.Points[i].y;
-            sum += 0.5 * mid_y * del_x;
+            double delX = mData.Points[i + 1].x - mData.Points[i].x;
+            double midY = mData.Points[i + 1].y + mData.Points[i].y;
+            sum += 0.5 * midY * delX;
         }
         mData.PiCpu = sum;
     }
@@ -108,9 +108,9 @@ void Model::ComputeGpu()
     // Run the pi kernel.
     {
         mBuffers[BufferPoints]->Write(&mData.Points[0]);
-        mKernels[KernelPi]->SetArg(0, &mBuffers[BufferGroupSums]->id);
+        mKernels[KernelPi]->SetArg(0, &mBuffers[BufferGroupSums]->mId);
         mKernels[KernelPi]->SetArg(1, kWorkGroupSize * sizeof(cl_double), NULL);
-        mKernels[KernelPi]->SetArg(2, &mBuffers[BufferPoints]->id);
+        mKernels[KernelPi]->SetArg(2, &mBuffers[BufferPoints]->mId);
         mKernels[KernelPi]->SetArg(3, &kNumPoints);
         mKernels[KernelPi]->SetRanges1d({kNumWorkItems}, {kWorkGroupSize});
         mKernels[KernelPi]->Run();

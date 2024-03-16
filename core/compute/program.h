@@ -20,8 +20,8 @@ namespace Compute {
 /// @brief Create an interface to a OpenCL program object on the device.
 ///
 struct ProgramObject {
-    DeviceObject *device{NULL};
-    cl_program id{NULL};
+    DeviceObject *mDevice{NULL};
+    cl_program mId{NULL};
 
     std::vector<cl_device_id> GetDevices() const;
     std::string GetSource() const;
@@ -29,7 +29,7 @@ struct ProgramObject {
 };
 struct ProgramDeleter {
     void operator()(ProgramObject *obj) {
-        if (obj) { clReleaseProgram(obj->id); };
+        if (obj) { clReleaseProgram(obj->mId); };
         delete obj;
     }
 };

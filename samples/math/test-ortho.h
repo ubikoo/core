@@ -20,67 +20,67 @@
 template<typename T>
 inline bool test_ortho_is_valid(const math::ortho<T> &o)
 {
-    //
     // Check norm
-    //
-    T norm_u = std::fabs(math::norm(o.u));
-    if (!math::iseq(norm_u, (T) 1)) {
-        std::cerr << "norm_u " << norm_u << "\n";
-        return false;
+    {
+        T norm_u = std::fabs(math::norm(o.u));
+        if (!math::iseq(norm_u, (T) 1)) {
+            std::cerr << "norm_u " << norm_u << "\n";
+            return false;
+        }
+
+        T norm_v = std::fabs(math::norm(o.v));
+        if (!math::iseq(norm_v, (T) 1)) {
+            std::cerr << "norm_v " << norm_v << "\n";
+            return false;
+        }
+
+        T norm_w = std::fabs(math::norm(o.w));
+        if (!math::iseq(norm_w, (T) 1)) {
+            std::cerr << "norm_w " << norm_w << "\n";
+            return false;
+        }
     }
 
-    T norm_v = std::fabs(math::norm(o.v));
-    if (!math::iseq(norm_v, (T) 1)) {
-        std::cerr << "norm_v " << norm_v << "\n";
-        return false;
-    }
-
-    T norm_w = std::fabs(math::norm(o.w));
-    if (!math::iseq(norm_w, (T) 1)) {
-        std::cerr << "norm_w " << norm_w << "\n";
-        return false;
-    }
-
-    //
     // Check orthogonality
-    //
-    T dot_uv = std::fabs(math::dot(o.u, o.v));
-    if (!math::iseq(dot_uv, (T) 0)) {
-        std::cerr << "dot_uv " << dot_uv << "\n";
-        return false;
+    {
+        T dot_uv = std::fabs(math::dot(o.u, o.v));
+        if (!math::iseq(dot_uv, (T) 0)) {
+            std::cerr << "dot_uv " << dot_uv << "\n";
+            return false;
+        }
+
+        T dot_uw = std::fabs(math::dot(o.u, o.w));
+        if (!math::iseq(dot_uw, (T) 0)) {
+            std::cerr << "dot_uw " << dot_uw << "\n";
+            return false;
+        }
+
+        T dot_vw = std::fabs(math::dot(o.v, o.w));
+        if (!math::iseq(dot_vw, (T) 0)) {
+            std::cerr << "dot_vw " << dot_vw << "\n";
+            return false;
+        }
     }
 
-    T dot_uw = std::fabs(math::dot(o.u, o.w));
-    if (!math::iseq(dot_uw, (T) 0)) {
-         std::cerr << "dot_uw " << dot_uw << "\n";
-        return false;
-    }
-
-    T dot_vw = std::fabs(math::dot(o.v, o.w));
-    if (!math::iseq(dot_vw, (T) 0)) {
-        std::cerr << "dot_vw " << dot_vw << "\n";
-        return false;
-    }
-
-    //
     // Check cross products
-    //
-    T dot_wuv = math::dot(o.w, cross(o.u, o.v));
-    if (!math::iseq(dot_wuv, (T) 1)) {
-        std::cerr << "dot_wuv " << dot_wuv << "\n";
-        return false;
-    }
+    {
+        T dot_wuv = math::dot(o.w, cross(o.u, o.v));
+        if (!math::iseq(dot_wuv, (T) 1)) {
+            std::cerr << "dot_wuv " << dot_wuv << "\n";
+            return false;
+        }
 
-    T dot_uvw = math::dot(o.u, cross(o.v, o.w));
-    if (!math::iseq(dot_uvw, (T) 1)) {
-        std::cerr << "dot_uvw " << dot_uvw << "\n";
-        return false;
-    }
+        T dot_uvw = math::dot(o.u, cross(o.v, o.w));
+        if (!math::iseq(dot_uvw, (T) 1)) {
+            std::cerr << "dot_uvw " << dot_uvw << "\n";
+            return false;
+        }
 
-    T dot_vwu = math::dot(o.v, cross(o.w, o.u));
-    if (!math::iseq(dot_vwu, (T) 1)) {
-        std::cerr << "dot_vwu " << dot_vwu << "\n";
-        return false;
+        T dot_vwu = math::dot(o.v, cross(o.w, o.u));
+        if (!math::iseq(dot_vwu, (T) 1)) {
+            std::cerr << "dot_vwu " << dot_vwu << "\n";
+            return false;
+        }
     }
 
     return true;

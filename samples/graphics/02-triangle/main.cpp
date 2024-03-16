@@ -9,26 +9,19 @@
 
 #include <iostream>
 #include <exception>
-
+#include <vector>
 #include "core/graphics/graphics.h"
-#include "triangle.h"
 
+/// -----------------------------------------------------------------------------
+struct Triangle {
+    Graphics::Buffer Vbo;               // vertex buffer object
+    Graphics::Pipeline Pipeline;        // program rendering pipeline
+};
 Triangle gTriangle;
 
-///
-/// @brief Renderer callback functions.
-///
-void Graphics::OnResize(int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
-
+/// -----------------------------------------------------------------------------
 void Graphics::OnKeyboard(int code, int scancode, int action, int mods)
-{
-    if (code == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-        Graphics::Close();
-    }
-}
+{}
 
 void Graphics::OnMouseMove(double xpos, double ypos)
 {}
@@ -38,47 +31,94 @@ void Graphics::OnMouseButton(int button, int action, int mods)
 
 void Graphics::OnInitialize()
 {
-    gTriangle.Initialize();
+    // Vertex position and color attributes with layout:
+    // {(xyzw)_1, (xyzw)_2, ..., (rgba)_1, (rgba)_2}
+    const std::vector<GLfloat> vertex_data = {
+        // positions
+        -0.5f, -0.5f, 0.0f, 1.0f,   // bottom left
+         0.5f, -0.5f, 0.0f, 1.0f,   // bottom right
+        -0.5f,  0.5f, 0.0f, 1.0f,   // top left
+         0.5f,  0.5f, 0.0f, 1.0f,   // top right
+        // colors
+         0.0f,  0.0f, 1.0f, 1.0f,   // bottom left
+         0.0f,  1.0f, 0.0f, 1.0f,   // bottom right
+         1.0f,  0.0f, 0.0f, 1.0f,   // top left
+         1.0f,  0.0f, 0.0f, 1.0f};  // top right
+    const GLsizeiptr vertex_data_size = vertex_data.size() * sizeof(GLfloat);
+
+    // Create buffer storage for vertex position and color and specify how OpenGL
+    // interprets the vertex attributes.
+    {
+        Graphics::BufferCreateInfo info = {};
+        info.target = GL_ARRAY_BUFFER;
+        info.size = vertex_data_size;
+        info.usage = GL_STATIC_DRAW;
+
+        gTriangle.Vbo = Graphics::CreateBuffer(info);
+        gTriangle.Vbo->Copy(0, vertex_data_size, &vertex_data[0]);
+    }
+
+    // Create the triangle rendering pipeline.
+    {
+        Graphics::PipelineCreateInfo info = {};
+        info.polygonMode = GL_FILL;
+        info.enableCullFace = GL_TRUE;
+        info.cullFaceMode = GL_BACK;
+        info.frontFaceMode = GL_CCW;
+        info.enableDepthTest = GL_TRUE;
+        info.depthFunc = GL_LESS;
+        info.clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+        info.clearColor = {0.5f, 0.5f, 0.5f, 1.0f};
+        info.clearDepth = 1.0f;
+        info.lineWidth = 1.0f;
+        info.pointSize = 1.0f;
+        info.shaders = {
+            Graphics::CreateShaderFromFile(GL_VERTEX_SHADER, "data/triangle.vert"),
+            Graphics::CreateShaderFromFile(GL_FRAGMENT_SHADER, "data/triangle.frag")};
+
+        gTriangle.Pipeline = Graphics::CreatePipeline(info);
+        gTriangle.Pipeline->Bind();
+        gTriangle.Vbo->Bind();
+        GLsizei stride = 4 * sizeof(GLfloat);
+        GLsizeiptr offset_pos = 0;
+        GLsizeiptr offset_col = vertex_data_size / 2;
+        std::vector<Graphics::AttributeDescription> attributes{
+            {"a_pos", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_pos, false, 0},
+            {"a_col", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_col, false, 0}};
+        gTriangle.Pipeline->SetAttribute(attributes);
+        gTriangle.Pipeline->Unbind();
+    }
 }
 
 void Graphics::OnTerminate()
+{}
+
+void Graphics::OnMainLoop()
 {
-    gTriangle.Cleanup();
+    Graphics::Viewport viewport = Graphics::GetViewport();
+
+    // Render the triangle.
+    gTriangle.Pipeline->Use();
+    gTriangle.Pipeline->SetUniform("u_width", GL_FLOAT, &viewport.width);
+    gTriangle.Pipeline->SetUniform("u_height", GL_FLOAT, &viewport.height);
+    gTriangle.Pipeline->Clear();
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
-void Graphics::OnUpdate()
-{
-    static const uint32_t kMaxFrames = 360;
-    static uint32_t FrameCount = 0;
-    if (++FrameCount >= kMaxFrames) {
-        Graphics::Close();
-    }
-    gTriangle.Update();
-}
-
-void Graphics::OnRender()
-{
-    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-    glClearDepth(1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    gTriangle.Render();
-}
-
-///
-/// @brief main application client.
-///
+/// -----------------------------------------------------------------------------
 int main(int argc, char const *argv[])
 {
-    Graphics::RenderDesc desc = {};
-    desc.WindowTitle = "02-triangle";
-    desc.WindowWidth = 800;
-    desc.WindowHeight = 800;
-    desc.GLVersionMajor = 3;
-    desc.GLVersionMinor = 3;
-    desc.PollTimeout = 0.01;
+    Graphics::Settings settings = {};
+    settings.WindowTitle = "02-triangle";
+    settings.WindowWidth = 800;
+    settings.WindowHeight = 800;
+    settings.GLVersionMajor = 3;
+    settings.GLVersionMinor = 3;
+    settings.PollTimeout = 0.01;
+    settings.MaxFrames = 600;
 
     try {
-        Graphics::RenderLoop(desc);
+        Graphics::MainLoop(settings);
     } catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;

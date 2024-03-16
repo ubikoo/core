@@ -1,36 +1,33 @@
 add_library(coregraphics STATIC
-    gl/buffer.cpp
-    gl/error.cpp
-    gl/framebuffer.cpp
-    gl/renderbuffer.cpp
-    gl/texture.cpp
-    gl/vertexarray.cpp
-    gl/buffer.h
-    gl/error.h
-    gl/framebuffer.h
-    gl/renderbuffer.h
-    gl/texture.h
-    gl/vertexarray.h
-    glsl/attribute.cpp
-    glsl/datatype.cpp
-    glsl/program.cpp
-    glsl/shader.cpp
-    glsl/uniform.cpp
-    glsl/attribute.h
-    glsl/datatype.h
-    glsl/program.h
-    glsl/shader.h
-    glsl/uniform.h
+    attribute.cpp
+    buffer.cpp
     camera.cpp
+    framebuffer.cpp
+    graphics.cpp
+    helpers.cpp
     image.cpp
     mesh.cpp
-    render.cpp
+    pipeline.cpp
+    program.cpp
+    renderbuffer.cpp
+    texture.cpp
+    uniform.cpp
+    vertexarray.cpp
+    attribute.h
+    buffer.h
     camera.h
+    common.h
+    framebuffer.h
+    graphics.h
+    helpers.h
     image.h
     mesh.h
-    render.h
-    common.h
-    graphics.h)
+    pipeline.h
+    program.h
+    renderbuffer.h
+    texture.h
+    uniform.h
+    vertexarray.h)
 
 target_include_directories(coregraphics PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 

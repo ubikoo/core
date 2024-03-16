@@ -99,9 +99,9 @@ cl_ ## T ## 2 operator+(const cl_ ## T ## 2 &lhs) \
 inline \
 cl_ ## T ## 2 operator-(const cl_ ## T ## 2 &lhs) \
 { \
-    constexpr cl_ ## T minus_one = (cl_ ## T) (-1); \
+    constexpr cl_ ## T kMinusOne = (cl_ ## T) (-1); \
     cl_ ## T ## 2 result = lhs; \
-    result *= minus_one; \
+    result *= kMinusOne; \
     return result; \
 }
 
@@ -112,16 +112,16 @@ cl_ ## T ## 2 operator-(const cl_ ## T ## 2 &lhs) \
 inline \
 cl_ ## T ## 2 &operator++(cl_ ## T ## 2 &lhs) \
 { \
-    constexpr cl_ ## T one = (cl_ ## T) 1; \
-    lhs += one; \
+    constexpr cl_ ## T kOne = (cl_ ## T) 1; \
+    lhs += kOne; \
     return lhs; \
 } \
 \
 inline \
 cl_ ## T ## 2 &operator--(cl_ ## T ## 2 &lhs) \
 { \
-    constexpr cl_ ## T one = (cl_ ## T) 1; \
-    lhs -= one; \
+    constexpr cl_ ## T kOne = (cl_ ## T) 1; \
+    lhs -= kOne; \
     return lhs; \
 } \
 \
@@ -377,9 +377,9 @@ cl_ ## T ## 4 operator+(const cl_ ## T ## 4 &lhs) \
 inline \
 cl_ ## T ## 4 operator-(const cl_ ## T ## 4 &lhs) \
 { \
-    constexpr cl_ ## T minus_one = (cl_ ## T) (-1); \
+    constexpr cl_ ## T kMinusOne = (cl_ ## T) (-1); \
     cl_ ## T ## 4 result = lhs; \
-    result *= minus_one; \
+    result *= kMinusOne; \
     return result; \
 }
 
@@ -390,16 +390,16 @@ cl_ ## T ## 4 operator-(const cl_ ## T ## 4 &lhs) \
 inline \
 cl_ ## T ## 4 &operator++(cl_ ## T ## 4 &lhs) \
 { \
-    constexpr cl_ ## T one = (cl_ ## T) 1; \
-    lhs += one; \
+    constexpr cl_ ## T kOne = (cl_ ## T) 1; \
+    lhs += kOne; \
     return lhs; \
 } \
 \
 inline \
 cl_ ## T ## 4 &operator--(cl_ ## T ## 4 &lhs) \
 { \
-    constexpr cl_ ## T one = (cl_ ## T) 1; \
-    lhs -= one; \
+    constexpr cl_ ## T kOne = (cl_ ## T) 1; \
+    lhs -= kOne; \
     return lhs; \
 } \
 \
@@ -687,9 +687,9 @@ cl_ ## T ## 8 operator+(const cl_ ## T ## 8 &lhs) \
 inline \
 cl_ ## T ## 8 operator-(const cl_ ## T ## 8 &lhs) \
 { \
-    constexpr cl_ ## T minus_one = (cl_ ## T) (-1); \
+    constexpr cl_ ## T kMinusOne = (cl_ ## T) (-1); \
     cl_ ## T ## 8 result = lhs; \
-    result *= minus_one; \
+    result *= kMinusOne; \
     return result; \
 }
 
@@ -700,16 +700,16 @@ cl_ ## T ## 8 operator-(const cl_ ## T ## 8 &lhs) \
 inline \
 cl_ ## T ## 8 &operator++(cl_ ## T ## 8 &lhs) \
 { \
-    constexpr cl_ ## T one = (cl_ ## T) 1; \
-    lhs += one; \
+    constexpr cl_ ## T kOne = (cl_ ## T) 1; \
+    lhs += kOne; \
     return lhs; \
 } \
 \
 inline \
 cl_ ## T ## 8 &operator--(cl_ ## T ## 8 &lhs) \
 { \
-    constexpr cl_ ## T one = (cl_ ## T) 1; \
-    lhs -= one; \
+    constexpr cl_ ## T kOne = (cl_ ## T) 1; \
+    lhs -= kOne; \
     return lhs; \
 } \
 \
@@ -1061,9 +1061,9 @@ cl_ ## T ## 16 operator+(const cl_ ## T ## 16 &lhs) \
 inline \
 cl_ ## T ## 16 operator-(const cl_ ## T ## 16 &lhs) \
 { \
-    constexpr cl_ ## T minus_one = (cl_ ## T) (-1); \
+    constexpr cl_ ## T kMinusOne = (cl_ ## T) (-1); \
     cl_ ## T ## 16 result = lhs; \
-    result *= minus_one; \
+    result *= kMinusOne; \
     return result; \
 }
 
@@ -1074,16 +1074,16 @@ cl_ ## T ## 16 operator-(const cl_ ## T ## 16 &lhs) \
 inline \
 cl_ ## T ## 16 &operator++(cl_ ## T ## 16 &lhs) \
 { \
-    constexpr cl_ ## T one = (cl_ ## T) 1; \
-    lhs += one; \
+    constexpr cl_ ## T kOne = (cl_ ## T) 1; \
+    lhs += kOne; \
     return lhs; \
 } \
 \
 inline \
 cl_ ## T ## 16 &operator--(cl_ ## T ## 16 &lhs) \
 { \
-    constexpr cl_ ## T one = (cl_ ## T) 1; \
-    lhs -= one; \
+    constexpr cl_ ## T kOne = (cl_ ## T) 1; \
+    lhs -= kOne; \
     return lhs; \
 } \
 \
@@ -1256,10 +1256,10 @@ inline \
 cl_ ## T ## 2 sign(const cl_ ## T ## 2 &v) \
 { \
     constexpr cl_ ## T zero = (cl_ ## T) 0; \
-    constexpr cl_ ## T one = (cl_ ## T) 1; \
+    constexpr cl_ ## T kOne = (cl_ ## T) 1; \
     return cl_ ## T ## 2{ \
-        (v.s[0] < zero) ? -one : (v.s[0] > zero) ? one : zero, \
-        (v.s[1] < zero) ? -one : (v.s[1] > zero) ? one : zero}; \
+        (v.s[0] < zero) ? -kOne : (v.s[0] > zero) ? kOne : zero, \
+        (v.s[1] < zero) ? -kOne : (v.s[1] > zero) ? kOne : zero}; \
 } \
  \
 inline \
@@ -1297,10 +1297,10 @@ cl_ ## T ## 2 clamp(const cl_ ## T ## 2 &v, const cl_ ## T lo, const cl_ ## T hi
 inline \
 cl_ ## T ## 2 lerp(const cl_ ## T ## 2 &lo, const cl_ ## T ## 2 &hi, const cl_ ## T alpha) \
 { \
-    constexpr cl_ ## T one = (cl_ ## T) 1; \
+    constexpr cl_ ## T kOne = (cl_ ## T) 1; \
     return cl_ ## T ## 2{ \
-        (one - alpha) * lo.s[0] + alpha * hi.s[0], \
-        (one - alpha) * lo.s[1] + alpha * hi.s[1]}; \
+        (kOne - alpha) * lo.s[0] + alpha * hi.s[0], \
+        (kOne - alpha) * lo.s[1] + alpha * hi.s[1]}; \
 }
 
 COMPUTE_VEC2_ARITHMETIC(float)
@@ -1356,12 +1356,12 @@ inline \
 cl_ ## T ## 4 sign(const cl_ ## T ## 4 &v) \
 { \
     constexpr cl_ ## T zero = (cl_ ## T) 0; \
-    constexpr cl_ ## T one = (cl_ ## T) 1; \
+    constexpr cl_ ## T kOne = (cl_ ## T) 1; \
     return cl_ ## T ## 4{ \
-        (v.s[0] < zero) ? -one : (v.s[0] > zero) ? one : zero, \
-        (v.s[1] < zero) ? -one : (v.s[1] > zero) ? one : zero, \
-        (v.s[2] < zero) ? -one : (v.s[2] > zero) ? one : zero, \
-        (v.s[3] < zero) ? -one : (v.s[3] > zero) ? one : zero}; \
+        (v.s[0] < zero) ? -kOne : (v.s[0] > zero) ? kOne : zero, \
+        (v.s[1] < zero) ? -kOne : (v.s[1] > zero) ? kOne : zero, \
+        (v.s[2] < zero) ? -kOne : (v.s[2] > zero) ? kOne : zero, \
+        (v.s[3] < zero) ? -kOne : (v.s[3] > zero) ? kOne : zero}; \
 } \
  \
 inline \
@@ -1407,12 +1407,12 @@ cl_ ## T ## 4 clamp(const cl_ ## T ## 4 &v, const cl_ ## T lo, const cl_ ## T hi
 inline \
 cl_ ## T ## 4 lerp(const cl_ ## T ## 4 &lo, const cl_ ## T ## 4 &hi, const cl_ ## T alpha) \
 { \
-    constexpr cl_ ## T one = (cl_ ## T) 1; \
+    constexpr cl_ ## T kOne = (cl_ ## T) 1; \
     return cl_ ## T ## 4{ \
-        (one - alpha) * lo.s[0] + alpha * hi.s[0], \
-        (one - alpha) * lo.s[1] + alpha * hi.s[1], \
-        (one - alpha) * lo.s[2] + alpha * hi.s[2], \
-        (one - alpha) * lo.s[3] + alpha * hi.s[3]}; \
+        (kOne - alpha) * lo.s[0] + alpha * hi.s[0], \
+        (kOne - alpha) * lo.s[1] + alpha * hi.s[1], \
+        (kOne - alpha) * lo.s[2] + alpha * hi.s[2], \
+        (kOne - alpha) * lo.s[3] + alpha * hi.s[3]}; \
 }
 
 COMPUTE_VEC4_ARITHMETIC(float)
@@ -1474,16 +1474,16 @@ inline \
 cl_ ## T ## 8 sign(const cl_ ## T ## 8 &v) \
 { \
     constexpr cl_ ## T zero = (cl_ ## T) 0; \
-    constexpr cl_ ## T one = (cl_ ## T) 1; \
+    constexpr cl_ ## T kOne = (cl_ ## T) 1; \
     return cl_ ## T ## 8{ \
-        (v.s[0] < zero) ? -one : (v.s[0] > zero) ? one : zero, \
-        (v.s[1] < zero) ? -one : (v.s[1] > zero) ? one : zero, \
-        (v.s[2] < zero) ? -one : (v.s[2] > zero) ? one : zero, \
-        (v.s[3] < zero) ? -one : (v.s[3] > zero) ? one : zero, \
-        (v.s[4] < zero) ? -one : (v.s[4] > zero) ? one : zero, \
-        (v.s[5] < zero) ? -one : (v.s[5] > zero) ? one : zero, \
-        (v.s[6] < zero) ? -one : (v.s[6] > zero) ? one : zero, \
-        (v.s[7] < zero) ? -one : (v.s[7] > zero) ? one : zero}; \
+        (v.s[0] < zero) ? -kOne : (v.s[0] > zero) ? kOne : zero, \
+        (v.s[1] < zero) ? -kOne : (v.s[1] > zero) ? kOne : zero, \
+        (v.s[2] < zero) ? -kOne : (v.s[2] > zero) ? kOne : zero, \
+        (v.s[3] < zero) ? -kOne : (v.s[3] > zero) ? kOne : zero, \
+        (v.s[4] < zero) ? -kOne : (v.s[4] > zero) ? kOne : zero, \
+        (v.s[5] < zero) ? -kOne : (v.s[5] > zero) ? kOne : zero, \
+        (v.s[6] < zero) ? -kOne : (v.s[6] > zero) ? kOne : zero, \
+        (v.s[7] < zero) ? -kOne : (v.s[7] > zero) ? kOne : zero}; \
 } \
  \
 inline \
@@ -1545,16 +1545,16 @@ cl_ ## T ## 8 clamp(const cl_ ## T ## 8 &v, const cl_ ## T lo, const cl_ ## T hi
 inline \
 cl_ ## T ## 8 lerp(const cl_ ## T ## 8 &lo, const cl_ ## T ## 8 &hi, const cl_ ## T alpha) \
 { \
-    constexpr cl_ ## T one = (cl_ ## T) 1; \
+    constexpr cl_ ## T kOne = (cl_ ## T) 1; \
     return cl_ ## T ## 8{ \
-        (one - alpha) * lo.s[0] + alpha * hi.s[0], \
-        (one - alpha) * lo.s[1] + alpha * hi.s[1], \
-        (one - alpha) * lo.s[2] + alpha * hi.s[2], \
-        (one - alpha) * lo.s[3] + alpha * hi.s[3], \
-        (one - alpha) * lo.s[4] + alpha * hi.s[4], \
-        (one - alpha) * lo.s[5] + alpha * hi.s[5], \
-        (one - alpha) * lo.s[6] + alpha * hi.s[6], \
-        (one - alpha) * lo.s[7] + alpha * hi.s[7]}; \
+        (kOne - alpha) * lo.s[0] + alpha * hi.s[0], \
+        (kOne - alpha) * lo.s[1] + alpha * hi.s[1], \
+        (kOne - alpha) * lo.s[2] + alpha * hi.s[2], \
+        (kOne - alpha) * lo.s[3] + alpha * hi.s[3], \
+        (kOne - alpha) * lo.s[4] + alpha * hi.s[4], \
+        (kOne - alpha) * lo.s[5] + alpha * hi.s[5], \
+        (kOne - alpha) * lo.s[6] + alpha * hi.s[6], \
+        (kOne - alpha) * lo.s[7] + alpha * hi.s[7]}; \
 }
 
 COMPUTE_VEC8_ARITHMETIC(float)
@@ -1628,24 +1628,24 @@ inline \
 cl_ ## T ## 16 sign(const cl_ ## T ## 16 &v) \
 { \
     constexpr cl_ ## T zero = (cl_ ## T) 0; \
-    constexpr cl_ ## T one = (cl_ ## T) 1; \
+    constexpr cl_ ## T kOne = (cl_ ## T) 1; \
     return cl_ ## T ## 16{ \
-        (v.s[0] < zero) ? -one : (v.s[0] > zero) ? one : zero, \
-        (v.s[1] < zero) ? -one : (v.s[1] > zero) ? one : zero, \
-        (v.s[2] < zero) ? -one : (v.s[2] > zero) ? one : zero, \
-        (v.s[3] < zero) ? -one : (v.s[3] > zero) ? one : zero, \
-        (v.s[4] < zero) ? -one : (v.s[4] > zero) ? one : zero, \
-        (v.s[5] < zero) ? -one : (v.s[5] > zero) ? one : zero, \
-        (v.s[6] < zero) ? -one : (v.s[6] > zero) ? one : zero, \
-        (v.s[7] < zero) ? -one : (v.s[7] > zero) ? one : zero, \
-        (v.s[8] < zero) ? -one : (v.s[8] > zero) ? one : zero, \
-        (v.s[9] < zero) ? -one : (v.s[9] > zero) ? one : zero, \
-        (v.s[10] < zero) ? -one : (v.s[10] > zero) ? one : zero, \
-        (v.s[11] < zero) ? -one : (v.s[11] > zero) ? one : zero, \
-        (v.s[12] < zero) ? -one : (v.s[12] > zero) ? one : zero, \
-        (v.s[13] < zero) ? -one : (v.s[13] > zero) ? one : zero, \
-        (v.s[14] < zero) ? -one : (v.s[14] > zero) ? one : zero, \
-        (v.s[15] < zero) ? -one : (v.s[15] > zero) ? one : zero}; \
+        (v.s[0] < zero) ? -kOne : (v.s[0] > zero) ? kOne : zero, \
+        (v.s[1] < zero) ? -kOne : (v.s[1] > zero) ? kOne : zero, \
+        (v.s[2] < zero) ? -kOne : (v.s[2] > zero) ? kOne : zero, \
+        (v.s[3] < zero) ? -kOne : (v.s[3] > zero) ? kOne : zero, \
+        (v.s[4] < zero) ? -kOne : (v.s[4] > zero) ? kOne : zero, \
+        (v.s[5] < zero) ? -kOne : (v.s[5] > zero) ? kOne : zero, \
+        (v.s[6] < zero) ? -kOne : (v.s[6] > zero) ? kOne : zero, \
+        (v.s[7] < zero) ? -kOne : (v.s[7] > zero) ? kOne : zero, \
+        (v.s[8] < zero) ? -kOne : (v.s[8] > zero) ? kOne : zero, \
+        (v.s[9] < zero) ? -kOne : (v.s[9] > zero) ? kOne : zero, \
+        (v.s[10] < zero) ? -kOne : (v.s[10] > zero) ? kOne : zero, \
+        (v.s[11] < zero) ? -kOne : (v.s[11] > zero) ? kOne : zero, \
+        (v.s[12] < zero) ? -kOne : (v.s[12] > zero) ? kOne : zero, \
+        (v.s[13] < zero) ? -kOne : (v.s[13] > zero) ? kOne : zero, \
+        (v.s[14] < zero) ? -kOne : (v.s[14] > zero) ? kOne : zero, \
+        (v.s[15] < zero) ? -kOne : (v.s[15] > zero) ? kOne : zero}; \
 } \
  \
 inline \
@@ -1739,24 +1739,24 @@ cl_ ## T ## 16 clamp(const cl_ ## T ## 16 &v, const cl_ ## T lo, const cl_ ## T 
 inline \
 cl_ ## T ## 16 lerp(const cl_ ## T ## 16 &lo, const cl_ ## T ## 16 &hi, const cl_ ## T alpha) \
 { \
-    constexpr cl_ ## T one = (cl_ ## T) 1; \
+    constexpr cl_ ## T kOne = (cl_ ## T) 1; \
     return cl_ ## T ## 16{ \
-        (one - alpha) * lo.s[0] + alpha * hi.s[0], \
-        (one - alpha) * lo.s[1] + alpha * hi.s[1], \
-        (one - alpha) * lo.s[2] + alpha * hi.s[2], \
-        (one - alpha) * lo.s[3] + alpha * hi.s[3], \
-        (one - alpha) * lo.s[4] + alpha * hi.s[4], \
-        (one - alpha) * lo.s[5] + alpha * hi.s[5], \
-        (one - alpha) * lo.s[6] + alpha * hi.s[6], \
-        (one - alpha) * lo.s[7] + alpha * hi.s[7], \
-        (one - alpha) * lo.s[8] + alpha * hi.s[8], \
-        (one - alpha) * lo.s[9] + alpha * hi.s[9], \
-        (one - alpha) * lo.s[10] + alpha * hi.s[10], \
-        (one - alpha) * lo.s[11] + alpha * hi.s[11], \
-        (one - alpha) * lo.s[12] + alpha * hi.s[12], \
-        (one - alpha) * lo.s[13] + alpha * hi.s[13], \
-        (one - alpha) * lo.s[14] + alpha * hi.s[14], \
-        (one - alpha) * lo.s[15] + alpha * hi.s[15]}; \
+        (kOne - alpha) * lo.s[0] + alpha * hi.s[0], \
+        (kOne - alpha) * lo.s[1] + alpha * hi.s[1], \
+        (kOne - alpha) * lo.s[2] + alpha * hi.s[2], \
+        (kOne - alpha) * lo.s[3] + alpha * hi.s[3], \
+        (kOne - alpha) * lo.s[4] + alpha * hi.s[4], \
+        (kOne - alpha) * lo.s[5] + alpha * hi.s[5], \
+        (kOne - alpha) * lo.s[6] + alpha * hi.s[6], \
+        (kOne - alpha) * lo.s[7] + alpha * hi.s[7], \
+        (kOne - alpha) * lo.s[8] + alpha * hi.s[8], \
+        (kOne - alpha) * lo.s[9] + alpha * hi.s[9], \
+        (kOne - alpha) * lo.s[10] + alpha * hi.s[10], \
+        (kOne - alpha) * lo.s[11] + alpha * hi.s[11], \
+        (kOne - alpha) * lo.s[12] + alpha * hi.s[12], \
+        (kOne - alpha) * lo.s[13] + alpha * hi.s[13], \
+        (kOne - alpha) * lo.s[14] + alpha * hi.s[14], \
+        (kOne - alpha) * lo.s[15] + alpha * hi.s[15]}; \
 }
 
 COMPUTE_VEC16_ARITHMETIC(float)

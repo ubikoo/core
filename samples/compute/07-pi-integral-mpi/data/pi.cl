@@ -68,11 +68,9 @@ void reduce(__global double *group_sums, __local double *local_sums)
     const uint local_size = get_local_size(0);
     const uint group_id = get_group_id(0);
 
-    //
     // Sum the array using a divide and conquer algorithm:
     //  - partition the work group in two halves.
     //  - add the upper half of the work group to the lower half.
-    //
     for (uint stride = local_size / 2; stride > 0; stride >>=1) {
         // Ensure all work item writes are complete before adding again.
         barrier(CLK_LOCAL_MEM_FENCE);

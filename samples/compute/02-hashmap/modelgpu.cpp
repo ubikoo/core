@@ -72,8 +72,8 @@ void ModelGpu::Run(std::vector<Point> &points)
 
     // Run hashmap insert kernel.
     {
-        mKernels[KernelHashmap]->SetArg(0, &mBuffers[BufferHashmap]->id);
-        mKernels[KernelHashmap]->SetArg(1, &mBuffers[BufferPoints]->id);
+        mKernels[KernelHashmap]->SetArg(0, &mBuffers[BufferHashmap]->mId);
+        mKernels[KernelHashmap]->SetArg(1, &mBuffers[BufferPoints]->mId);
         mKernels[KernelHashmap]->SetArg(2, &kCapacity);
         mKernels[KernelHashmap]->SetArg(3, &kNumPoints);
         mKernels[KernelHashmap]->SetArg(4, &kNumCells);
