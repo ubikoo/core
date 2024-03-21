@@ -12,7 +12,7 @@
 #include "core/graphics/graphics.h"
 
 /// -----------------------------------------------------------------------------
-void Graphics::OnKeyboard(int code, int scancode, int action, int mods)
+void OnKeyboard(int code, int scancode, int action, int mods)
 {
     std::cout << __func__ << " "
         << "code " << code << " "
@@ -21,14 +21,14 @@ void Graphics::OnKeyboard(int code, int scancode, int action, int mods)
         << "mods " << mods << "\n";
 }
 
-void Graphics::OnMouseMove(double xpos, double ypos)
+void OnMouseMove(double xpos, double ypos)
 {
     std::cout << __func__ << " "
         << "xpos " << xpos << " "
         << "ypos " << ypos << "\n";
 }
 
-void Graphics::OnMouseButton(int button, int action, int mods)
+void OnMouseButton(int button, int action, int mods)
 {
     std::cout << __func__ << " "
         << "button " << button << " "
@@ -36,21 +36,19 @@ void Graphics::OnMouseButton(int button, int action, int mods)
         << "mods " << mods << "\n";
 }
 
-void Graphics::OnInitialize()
+void OnInitialize()
 {}
 
-void Graphics::OnTerminate()
+void OnTerminate()
 {}
 
-void Graphics::OnMainLoop()
+void OnMainLoop()
 {
-    // Clear the framebuffer.
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClearDepth(1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-/// -----------------------------------------------------------------------------
 int main(int argc, char const *argv[])
 {
     Graphics::Settings settings = {};
@@ -61,6 +59,12 @@ int main(int argc, char const *argv[])
     settings.GLVersionMinor = 3;
     settings.PollTimeout = 0.01;
     settings.MaxFrames = 600;
+    settings.OnKeyboard = OnKeyboard;
+    settings.OnMouseMove = OnMouseMove;
+    settings.OnMouseButton = OnMouseButton;
+    settings.OnInitialize = OnInitialize;
+    settings.OnTerminate = OnTerminate;
+    settings.OnMainLoop = OnMainLoop;
 
     try {
         Graphics::MainLoop(settings);

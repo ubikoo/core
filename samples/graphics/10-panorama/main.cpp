@@ -27,22 +27,22 @@ struct Panorama {
 Panorama gPanorama;
 
 /// -----------------------------------------------------------------------------
-void Graphics::OnKeyboard(int code, int scancode, int action, int mods)
+void OnKeyboard(int code, int scancode, int action, int mods)
 {
     gPanorama.Camera.Keyboard(code, scancode, action, mods);
 }
 
-void Graphics::OnMouseMove(double xpos, double ypos)
+void OnMouseMove(double xpos, double ypos)
 {
     gPanorama.Camera.MouseMove(xpos, ypos);
 }
 
-void Graphics::OnMouseButton(int button, int action, int mods)
+void OnMouseButton(int button, int action, int mods)
 {
     gPanorama.Camera.MouseButton(button, action, mods);
 }
 
-void Graphics::OnInitialize()
+void OnInitialize()
 {
     // Create panorama camera and initialize projection matrix.
     {
@@ -143,10 +143,7 @@ void Graphics::OnInitialize()
     }
 }
 
-void Graphics::OnTerminate()
-{}
-
-void Graphics::OnMainLoop()
+void OnMainLoop()
 {
     // Update the panorama camera view.
     {
@@ -172,7 +169,6 @@ void Graphics::OnMainLoop()
     }
 }
 
-/// -----------------------------------------------------------------------------
 int main(int argc, char const *argv[])
 {
     Graphics::Settings settings = {};
@@ -183,6 +179,11 @@ int main(int argc, char const *argv[])
     settings.GLVersionMinor = 3;
     settings.PollTimeout = 0.1;
     settings.MaxFrames = 600;
+    settings.OnKeyboard = OnKeyboard;
+    settings.OnMouseMove = OnMouseMove;
+    settings.OnMouseButton = OnMouseButton;
+    settings.OnInitialize = OnInitialize;
+    settings.OnMainLoop = OnMainLoop;
 
     try {
         Graphics::MainLoop(settings);

@@ -256,8 +256,8 @@ void Drawable::Render()
     }
 }
 
-// -----------------------------------------------------------------------------
-void Graphics::OnKeyboard(int code, int scancode, int action, int mods)
+/// -----------------------------------------------------------------------------
+void OnKeyboard(int code, int scancode, int action, int mods)
 {
     if (code == GLFW_KEY_X && action == GLFW_RELEASE) {
         gDrawable.Rotate = Drawable::RotateMode::X;
@@ -272,29 +272,19 @@ void Graphics::OnKeyboard(int code, int scancode, int action, int mods)
     }
 }
 
-void Graphics::OnMouseMove(double xpos, double ypos)
-{}
-
-void Graphics::OnMouseButton(int button, int action, int mods)
-{}
-
-void Graphics::OnInitialize()
+void OnInitialize()
 {
     gDrawable.InitializeSphere();
     gDrawable.InitializeQuad();
     gDrawable.InitalizeFramebuffer();
 }
 
-void Graphics::OnTerminate()
-{}
-
-void Graphics::OnMainLoop()
+void OnMainLoop()
 {
     gDrawable.Update();
     gDrawable.Render();
 }
 
-/// -----------------------------------------------------------------------------
 int main(int argc, char const *argv[])
 {
     Graphics::Settings settings = {};
@@ -305,6 +295,9 @@ int main(int argc, char const *argv[])
     settings.GLVersionMinor = 3;
     settings.PollTimeout = 0.01;
     settings.MaxFrames = 600;
+    settings.OnKeyboard = OnKeyboard;
+    settings.OnInitialize = OnInitialize;
+    settings.OnMainLoop = OnMainLoop;
 
     try {
         Graphics::MainLoop(settings);

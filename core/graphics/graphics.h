@@ -52,6 +52,12 @@ struct Settings {
     int32_t GLVersionMinor{3};
     double PollTimeout{0.1};
     uint32_t MaxFrames{static_cast<uint32_t>(-1)};
+    void (*OnKeyboard)(int code, int scancode, int action, int mods){nullptr};
+    void (*OnMouseMove)(double xpos, double ypos){nullptr};
+    void (*OnMouseButton)(int button, int action, int mods){nullptr};
+    void (*OnInitialize)(){nullptr};
+    void (*OnTerminate)(){nullptr};
+    void (*OnMainLoop)(){nullptr};
 };
 
 void MainLoop(const Settings &settings);
@@ -60,13 +66,6 @@ void Terminate();
 void Close();
 bool ShouldClose();
 void Present();
-
-void OnKeyboard(int code, int scancode, int action, int mods);
-void OnMouseMove(double xpos, double ypos);
-void OnMouseButton(int button, int action, int mods);
-void OnInitialize();
-void OnTerminate();
-void OnMainLoop();
 
 } // Graphics
 

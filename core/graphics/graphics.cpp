@@ -49,18 +49,25 @@ static void OnKeyboardCallback(GLFWwindow *window,
     if (code == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
         Close();
     }
-    OnKeyboard(code, scancode, action, mods);
+
+    if (gSettings.OnKeyboard) {
+        gSettings.OnKeyboard(code, scancode, action, mods);
+    }
 }
 
 static void OnMouseMoveCallback(GLFWwindow *window, double xpos, double ypos)
 {
-    OnMouseMove(xpos, ypos);
+    if (gSettings.OnMouseMove) {
+        gSettings.OnMouseMove(xpos, ypos);
+    }
 }
 
 static void OnMouseButtonCallback(GLFWwindow *window,
     int button, int action, int mods)
 {
-    OnMouseButton(button, action, mods);
+    if (gSettings.OnMouseButton) {
+        gSettings.OnMouseButton(button, action, mods);
+    }
 }
 
 ///
@@ -70,12 +77,18 @@ void MainLoop(const Settings &settings)
 {
     gSettings = settings;
     Initialize();
-    OnInitialize();
+    if (gSettings.OnInitialize) {
+        gSettings.OnInitialize();
+    }
     while (!ShouldClose()) {
-        OnMainLoop();
+        if (gSettings.OnMainLoop) {
+            gSettings.OnMainLoop();
+        }
         Present();
     }
-    OnTerminate();
+    if (gSettings.OnTerminate) {
+        gSettings.OnTerminate();
+    }
     Terminate();
 }
 

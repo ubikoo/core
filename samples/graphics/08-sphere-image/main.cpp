@@ -26,16 +26,7 @@ struct Sphere {
 Sphere gSphere;
 
 /// -----------------------------------------------------------------------------
-void Graphics::OnKeyboard(int code, int scancode, int action, int mods)
-{}
-
-void Graphics::OnMouseMove(double xpos, double ypos)
-{}
-
-void Graphics::OnMouseButton(int button, int action, int mods)
-{}
-
-void Graphics::OnInitialize()
+void OnInitialize()
 {
     // Initialize mvp matrix and create a mesh over a rectangle.
     {
@@ -97,10 +88,7 @@ void Graphics::OnInitialize()
     }
 }
 
-void Graphics::OnTerminate()
-{}
-
-void Graphics::OnMainLoop()
+void OnMainLoop()
 {
     auto viewport = Graphics::GetViewport();
 
@@ -138,7 +126,6 @@ void Graphics::OnMainLoop()
     }
 }
 
-/// -----------------------------------------------------------------------------
 int main(int argc, char const *argv[])
 {
     Graphics::Settings settings = {};
@@ -149,6 +136,8 @@ int main(int argc, char const *argv[])
     settings.GLVersionMinor = 3;
     settings.PollTimeout = 0.01;
     settings.MaxFrames = 600;
+    settings.OnInitialize = OnInitialize;
+    settings.OnMainLoop = OnMainLoop;
 
     try {
         Graphics::MainLoop(settings);
