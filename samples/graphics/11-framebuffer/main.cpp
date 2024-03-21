@@ -25,18 +25,22 @@ struct Drawable {
         Graphics::Mesh mesh;            // image and texture
         Graphics::Texture texture;      // sphere texture
         Graphics::Pipeline pipeline;    // rendering pipeline
-    } mSphere;
+    } mSphere;                          // sphere draw pass.
+
 
     struct {
         math::mat4f mvp;                // quad mvp matrix
         Graphics::Mesh mesh;            // image and texture
         Graphics::Pipeline pipeline;    // rendering pipeline
-    } mQuad;
+    } mQuad;                            // quad draw pass.
 
     GLsizei mWidth;                     // drawable width
     GLsizei mHeight;                    // drawable height
     Graphics::Framebuffer mFbo;         // drawable framebuffer
 
+    static void OnKeyboard(int code, int scancode, int action, int mods);
+
+    void Initialize();
     void InitializeSphere();
     void InitializeQuad();
     void InitalizeFramebuffer();
@@ -45,9 +49,28 @@ struct Drawable {
 };
 Drawable gDrawable;
 
-///
-/// @brief Initialize the sphere draw pass.
-///
+void Drawable::OnKeyboard(int code, int scancode, int action, int mods)
+{
+    if (code == GLFW_KEY_X && action == GLFW_RELEASE) {
+        gDrawable.Rotate = Drawable::RotateMode::X;
+    }
+
+    if (code == GLFW_KEY_Y && action == GLFW_RELEASE) {
+        gDrawable.Rotate = Drawable::RotateMode::Y;
+    }
+
+    if (code == GLFW_KEY_Z && action == GLFW_RELEASE) {
+        gDrawable.Rotate = Drawable::RotateMode::Z;
+    }
+}
+
+void Drawable::Initialize()
+{
+    InitializeSphere();
+    InitializeQuad();
+    InitalizeFramebuffer();
+}
+
 void Drawable::InitializeSphere()
 {
     mSphere.mvp = math::mat4f::eye;
@@ -102,9 +125,6 @@ void Drawable::InitializeSphere()
     mSphere.pipeline->Unbind();
 }
 
-///
-/// @brief Initialize the quad drawable.
-///
 void Drawable::InitializeQuad()
 {
     mQuad.mvp = math::mat4f::eye;
@@ -139,9 +159,6 @@ void Drawable::InitializeQuad()
     mQuad.pipeline->Unbind();
 }
 
-///
-/// @brief Create a framebuffer with color and depth attachments.
-///
 void Drawable::InitalizeFramebuffer()
 {
     Graphics::FramebufferCreateInfo fboInfo = {};
@@ -160,9 +177,6 @@ void Drawable::InitalizeFramebuffer()
     mFbo = Graphics::CreateFramebuffer(fboInfo);
 }
 
-///
-/// @brief Update the drawable.
-///
 void Drawable::Update()
 {
     // Compute the orthographic projection matrix
@@ -209,9 +223,6 @@ void Drawable::Update()
     }
 }
 
-///
-/// @brief Render the drawable.
-///
 void Drawable::Render()
 {
     // Render into the framebuffer rendertexture
@@ -247,7 +258,8 @@ void Drawable::Render()
 
         GLenum texunit = 0;
         mQuad.pipeline->Use();
-        mQuad.pipeline->SetUniformMatrix("u_mvp", GL_FLOAT_MAT4, true, mQuad.mvp.data);
+        mQuad.pipeline->SetUniformMatrix("u_mvp", GL_FLOAT_MAT4, true,
+            mQuad.mvp.data);
         mQuad.pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
         mFbo->mColorAttachments[0]->Bind(texunit);
         mQuad.pipeline->Clear();
@@ -257,34 +269,6 @@ void Drawable::Render()
 }
 
 /// -----------------------------------------------------------------------------
-void OnKeyboard(int code, int scancode, int action, int mods)
-{
-    if (code == GLFW_KEY_X && action == GLFW_RELEASE) {
-        gDrawable.Rotate = Drawable::RotateMode::X;
-    }
-
-    if (code == GLFW_KEY_Y && action == GLFW_RELEASE) {
-        gDrawable.Rotate = Drawable::RotateMode::Y;
-    }
-
-    if (code == GLFW_KEY_Z && action == GLFW_RELEASE) {
-        gDrawable.Rotate = Drawable::RotateMode::Z;
-    }
-}
-
-void OnInitialize()
-{
-    gDrawable.InitializeSphere();
-    gDrawable.InitializeQuad();
-    gDrawable.InitalizeFramebuffer();
-}
-
-void OnMainLoop()
-{
-    gDrawable.Update();
-    gDrawable.Render();
-}
-
 int main(int argc, char const *argv[])
 {
     Graphics::Settings settings = {};
@@ -295,16 +279,19 @@ int main(int argc, char const *argv[])
     settings.GLVersionMinor = 3;
     settings.PollTimeout = 0.01;
     settings.MaxFrames = 600;
-    settings.OnKeyboard = OnKeyboard;
-    settings.OnInitialize = OnInitialize;
-    settings.OnMainLoop = OnMainLoop;
+    settings.OnKeyboard = Drawable::OnKeyboard;
+    settings.OnMouseMove = nullptr;
+    settings.OnMouseButton = nullptr;
+    Graphics::Initialize(settings);
 
-    try {
-        Graphics::MainLoop(settings);
-    } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
+    gDrawable.Initialize();
+    while (!Graphics::ShouldClose()) {
+        gDrawable.Update();
+        gDrawable.Render();
+        Graphics::Present();
     }
+
+    Graphics::Terminate();
 
     return EXIT_SUCCESS;
 }

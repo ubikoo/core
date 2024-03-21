@@ -71,28 +71,6 @@ static void OnMouseButtonCallback(GLFWwindow *window,
 }
 
 ///
-/// @brief Main render loop.
-///
-void MainLoop(const Settings &settings)
-{
-    gSettings = settings;
-    Initialize();
-    if (gSettings.OnInitialize) {
-        gSettings.OnInitialize();
-    }
-    while (!ShouldClose()) {
-        if (gSettings.OnMainLoop) {
-            gSettings.OnMainLoop();
-        }
-        Present();
-    }
-    if (gSettings.OnTerminate) {
-        gSettings.OnTerminate();
-    }
-    Terminate();
-}
-
-///
 /// @brief Initialize GLFW library and create a window with a OpenGL context.
 ///
 /// @note Only forward compatible core profile contexts for OpenGL versions 3.2
@@ -105,10 +83,13 @@ void MainLoop(const Settings &settings)
 /// function. The watertight method is to call gladLoadGLLoader after each and
 /// every context change.
 ///
-void Initialize()
+void Initialize(const Settings &settings)
 {
     // Ensure it is not initialized.
     ThrowIf(gWindow);
+
+    // Store graphics settings.
+    gSettings = settings;
 
     // Initialize the GLFW library and create a GLFWwindow.
     glfwSetErrorCallback(OnErrorCallback);

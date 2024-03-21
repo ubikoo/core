@@ -55,13 +55,9 @@ struct Settings {
     void (*OnKeyboard)(int code, int scancode, int action, int mods){nullptr};
     void (*OnMouseMove)(double xpos, double ypos){nullptr};
     void (*OnMouseButton)(int button, int action, int mods){nullptr};
-    void (*OnInitialize)(){nullptr};
-    void (*OnTerminate)(){nullptr};
-    void (*OnMainLoop)(){nullptr};
 };
 
-void MainLoop(const Settings &settings);
-void Initialize();
+void Initialize(const Settings &settings);
 void Terminate();
 void Close();
 bool ShouldClose();

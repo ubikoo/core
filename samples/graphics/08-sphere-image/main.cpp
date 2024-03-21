@@ -17,21 +17,23 @@ static const std::string kImageFilename = "../assets/equirectangular.png";
 static const size_t kMeshNodes = 1024;
 
 struct Sphere {
-    math::mat4f ModelView;
-    Graphics::Mesh Mesh;
-    Graphics::Image Image;
-    Graphics::Texture Texture;
-    Graphics::Pipeline Pipeline;
+    math::mat4f mModelView;
+    Graphics::Mesh mMesh;
+    Graphics::Image mImage;
+    Graphics::Texture mTexture;
+    Graphics::Pipeline mPipeline;
+
+    void Initialize();
+    void Render();
 };
 Sphere gSphere;
 
-/// -----------------------------------------------------------------------------
-void OnInitialize()
+void Sphere::Initialize()
 {
     // Initialize mvp matrix and create a mesh over a rectangle.
     {
-        gSphere.ModelView = math::mat4f::eye;
-        gSphere.Mesh = Graphics::CreateSphere(
+        mModelView = math::mat4f::eye;
+        mMesh = Graphics::CreateSphere(
             "sphere",                   // vertex attributes prefix
             kMeshNodes,                 // n1 vertices
             kMeshNodes,                 // n2 vertices
@@ -44,22 +46,22 @@ void OnInitialize()
 
     // Load the 2d-image from the specified filename
     {
-        gSphere.Image = Graphics::LoadImage(kImageFilename, true, 4);
+        mImage = Graphics::LoadImage(kImageFilename, true, 4);
 
         Graphics::TextureCreateInfo info = {};
         info.target = GL_TEXTURE_2D;
-        info.width = gSphere.Image->mWidth;
-        info.height = gSphere.Image->mHeight;
+        info.width = mImage->mWidth;
+        info.height = mImage->mHeight;
         info.internalFormat = GL_RGBA8;
-        info.pixelFormat = gSphere.Image->mFormat;
+        info.pixelFormat = mImage->mFormat;
         info.pixelType = GL_UNSIGNED_BYTE;
-        info.pixels = &gSphere.Image->mBitmap[0];
+        info.pixels = &mImage->mBitmap[0];
         info.generateMipmap = GL_TRUE;
         info.minFilter = GL_LINEAR;
         info.magFilter = GL_LINEAR;
         info.wrapS = GL_CLAMP_TO_EDGE;
         info.wrapT = GL_CLAMP_TO_EDGE;
-        gSphere.Texture = Graphics::CreateTexture(info);
+        mTexture = Graphics::CreateTexture(info);
     }
 
     // Create the quad rendering pipeline.
@@ -80,15 +82,15 @@ void OnInitialize()
             Graphics::CreateShaderFromFile(GL_VERTEX_SHADER, "data/sphere.vert"),
             Graphics::CreateShaderFromFile(GL_FRAGMENT_SHADER, "data/sphere.frag")};
 
-        gSphere.Pipeline = Graphics::CreatePipeline(info);
-        gSphere.Pipeline->Bind();
-        gSphere.Mesh->Bind();
-        gSphere.Pipeline->SetAttribute(gSphere.Mesh->mAttributes);
-        gSphere.Pipeline->Unbind();
+        mPipeline = Graphics::CreatePipeline(info);
+        mPipeline->Bind();
+        mMesh->Bind();
+        mPipeline->SetAttribute(mMesh->mAttributes);
+        mPipeline->Unbind();
     }
 }
 
-void OnMainLoop()
+void Sphere::Render()
 {
     auto viewport = Graphics::GetViewport();
 
@@ -108,24 +110,25 @@ void OnMainLoop()
 
         float ratio = viewport.width / viewport.height;
         math::mat4f p = math::orthographic(-ratio, ratio, -1.0f, 1.0f, -1.0f, 1.0f);
-        gSphere.ModelView = math::dot(p, m);
+        mModelView = math::dot(p, m);
     }
 
     // Render the sphere.
     {
         GLenum texunit = 0;
-        gSphere.Pipeline->Use();
-        gSphere.Pipeline->SetUniform("u_width",  GL_FLOAT, &viewport.width);
-        gSphere.Pipeline->SetUniform("u_height", GL_FLOAT, &viewport.height);
-        gSphere.Pipeline->SetUniformMatrix(
-            "u_mvp", GL_FLOAT_MAT4, true, gSphere.ModelView.data);
-        gSphere.Pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
-        gSphere.Texture->Bind(texunit);
-        gSphere.Pipeline->Clear();
-        gSphere.Mesh->Render();
+        mPipeline->Use();
+        mPipeline->SetUniform("u_width",  GL_FLOAT, &viewport.width);
+        mPipeline->SetUniform("u_height", GL_FLOAT, &viewport.height);
+        mPipeline->SetUniformMatrix("u_mvp", GL_FLOAT_MAT4, true,
+            mModelView.data);
+        mPipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
+        mTexture->Bind(texunit);
+        mPipeline->Clear();
+        mMesh->Render();
     }
 }
 
+/// -----------------------------------------------------------------------------
 int main(int argc, char const *argv[])
 {
     Graphics::Settings settings = {};
@@ -136,15 +139,18 @@ int main(int argc, char const *argv[])
     settings.GLVersionMinor = 3;
     settings.PollTimeout = 0.01;
     settings.MaxFrames = 600;
-    settings.OnInitialize = OnInitialize;
-    settings.OnMainLoop = OnMainLoop;
+    settings.OnKeyboard = nullptr;
+    settings.OnMouseMove = nullptr;
+    settings.OnMouseButton = nullptr;
+    Graphics::Initialize(settings);
 
-    try {
-        Graphics::MainLoop(settings);
-    } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
+    gSphere.Initialize();
+    while (!Graphics::ShouldClose()) {
+        gSphere.Render();
+        Graphics::Present();
     }
+
+    Graphics::Terminate();
 
     return EXIT_SUCCESS;
 }

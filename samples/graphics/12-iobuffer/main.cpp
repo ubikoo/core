@@ -39,15 +39,28 @@ struct Map {
         Graphics::Pipeline pipeline;
     } mEndPass;
 
+    static void OnKeyboard(int code, int scancode, int action, int mods);
+
     void Initialize();
-    void Update();
     void Render();
 };
 Map gMap;
 
-///
-/// @brief Initialize the map
-///
+void Map::OnKeyboard(int code, int scancode, int action, int mods)
+{
+    if (code == GLFW_KEY_UP) {
+        gMap.mNumIterations++;
+        std::cout << "mNumIterations " << gMap.mNumIterations << "\n";
+    }
+
+    if (code == GLFW_KEY_DOWN) {
+        if (gMap.mNumIterations > 0) {
+            gMap.mNumIterations--;
+            std::cout << "mNumIterations " << gMap.mNumIterations << "\n";
+        }
+    }
+}
+
 void Map::Initialize()
 {
     // Initialize the map input/output framebuffers.
@@ -189,14 +202,9 @@ void Map::Initialize()
     }
 }
 
-///
-/// @brief Begin by rendering the image to the map framebuffer.
-///        Run the map shader program over a double framebuffer.
-///        End by rendering the map framebuffer to the screen.
-///
 void Map::Render()
 {
-    // Map begin render pass.
+    // Begin by rendering the image to the map framebuffer.
     {
         std::swap(mReadIx, mWriteIx);
         mIOBuffer[mWriteIx]->Bind();
@@ -215,7 +223,7 @@ void Map::Render()
         Graphics::SetViewport(viewport);
     }
 
-    // Map run render pass.
+    // Iterate the map shader program over a double framebuffer.
     for (size_t iter = 0; iter < mNumIterations; ++iter) {
         std::swap(mReadIx, mWriteIx);
         mIOBuffer[mWriteIx]->Bind();
@@ -234,7 +242,7 @@ void Map::Render()
         Graphics::SetViewport(viewport);
     }
 
-    // Map end shader.
+    // End by rendering the map framebuffer to the screen.
     {
         std::swap(mReadIx, mWriteIx);
 
@@ -248,31 +256,6 @@ void Map::Render()
 }
 
 /// -----------------------------------------------------------------------------
-void OnKeyboard(int code, int scancode, int action, int mods)
-{
-    if (code == GLFW_KEY_UP) {
-        gMap.mNumIterations++;
-        std::cout << "mNumIterations " << gMap.mNumIterations << "\n";
-    }
-
-    if (code == GLFW_KEY_DOWN) {
-        if (gMap.mNumIterations > 0) {
-            gMap.mNumIterations--;
-            std::cout << "mNumIterations " << gMap.mNumIterations << "\n";
-        }
-    }
-}
-
-void OnInitialize()
-{
-    gMap.Initialize();
-}
-
-void OnMainLoop()
-{
-    gMap.Render();
-}
-
 int main(int argc, char const *argv[])
 {
     Graphics::Settings settings = {};
@@ -283,16 +266,18 @@ int main(int argc, char const *argv[])
     settings.GLVersionMinor = 3;
     settings.PollTimeout = 0.01;
     settings.MaxFrames = 600;
-settings.OnKeyboard = OnKeyboard;
-    settings.OnInitialize = OnInitialize;
-    settings.OnMainLoop = OnMainLoop;
+    settings.OnKeyboard = Map::OnKeyboard;
+    settings.OnMouseMove = nullptr;
+    settings.OnMouseButton = nullptr;
+    Graphics::Initialize(settings);
 
-    try {
-        Graphics::MainLoop(settings);
-    } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
+    gMap.Initialize();
+    while (!Graphics::ShouldClose()) {
+        gMap.Render();
+        Graphics::Present();
     }
+
+    Graphics::Terminate();
 
     return EXIT_SUCCESS;
 }

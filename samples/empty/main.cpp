@@ -15,6 +15,7 @@
 #include "core/compute/compute.h"
 #include "core/graphics/graphics.h"
 
+/// -----------------------------------------------------------------------------
 Graphics::Camera gCamera;
 
 void OnKeyboard(int code, int scancode, int action, int mods)
@@ -32,11 +33,12 @@ void OnMouseButton(int button, int action, int mods)
     gCamera.MouseButton(button, action, mods);
 }
 
-void OnInitialize()
+
+void Initialize()
 {
     // Initialize camera.
     {
-        Graphics::Viewport viewport = Graphics::GetViewport();
+        auto viewport = Graphics::GetViewport();
         Graphics::CameraCreateInfo info = {};
         info.position = {0.0f, 0.0f,  0.0f};
         info.ctr = {0.0f, 0.0f, -1.0f};
@@ -70,18 +72,17 @@ void OnInitialize()
     }
 }
 
-void OnTerminate()
-{}
-
-void OnMainLoop()
+void Render()
 {
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClearDepth(1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+/// -----------------------------------------------------------------------------
 int main(int argc, char const *argv[])
 {
+    // Initialize graphics before everything else.
     Graphics::Settings settings = {};
     settings.WindowTitle = "empty";
     settings.WindowWidth = 800;
@@ -93,16 +94,15 @@ int main(int argc, char const *argv[])
     settings.OnKeyboard = OnKeyboard;
     settings.OnMouseMove = OnMouseMove;
     settings.OnMouseButton = OnMouseButton;
-    settings.OnInitialize = OnInitialize;
-    settings.OnTerminate = OnTerminate;
-    settings.OnMainLoop = OnMainLoop;
+    Graphics::Initialize(settings);
 
-    try {
-        Graphics::MainLoop(settings);
-    } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
+    Initialize();
+    while (!Graphics::ShouldClose()) {
+        Render();
+        Graphics::Present();
     }
+
+    Graphics::Terminate();
 
     return EXIT_SUCCESS;
 }

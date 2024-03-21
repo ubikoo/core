@@ -18,60 +18,63 @@ static const std::vector<std::string> kFilenames = {
     "../assets/bunny.obj",
     "../assets/cumulus.obj"
 };
-
 static const float kScaleFactor = 1.05f;
 
 struct Model {
     enum RotateMode : uint8_t { X = 0, Y, Z };
-    uint8_t Rotate;
-    float Scale;
-    math::mat4f ModelView;
-    uint8_t CurrentMeshId;
-    std::vector<Graphics::Mesh> Mesh;
-    std::vector<Graphics::Pipeline> Pipeline;
+    uint8_t mRotate;
+    float mScale;
+    math::mat4f mModelView;
+    uint8_t mCurrentMeshId;
+    std::vector<Graphics::Mesh> mMesh;
+    std::vector<Graphics::Pipeline> mPipeline;
+
+    static void OnKeyboard(int code, int scancode, int action, int mods);
+
+    void Initialize();
+    void Render();
 };
 Model gModel;
 
-/// -----------------------------------------------------------------------------
-void OnKeyboard(int code, int scancode, int action, int mods)
+void Model::OnKeyboard(int code, int scancode, int action, int mods)
 {
     if (code == GLFW_KEY_1 && action == GLFW_RELEASE) {
-        gModel.CurrentMeshId = 0;
+        gModel.mCurrentMeshId = 0;
     }
 
     if (code == GLFW_KEY_2 && action == GLFW_RELEASE) {
-        gModel.CurrentMeshId = 1;
+        gModel.mCurrentMeshId = 1;
     }
 
     if (code == GLFW_KEY_X && action == GLFW_RELEASE) {
-        gModel.Rotate = Model::RotateMode::X;
+        gModel.mRotate = Model::RotateMode::X;
     }
 
     if (code == GLFW_KEY_Y && action == GLFW_RELEASE) {
-        gModel.Rotate = Model::RotateMode::Y;
+        gModel.mRotate = Model::RotateMode::Y;
     }
 
     if (code == GLFW_KEY_Z && action == GLFW_RELEASE) {
-        gModel.Rotate = Model::RotateMode::Z;
+        gModel.mRotate = Model::RotateMode::Z;
     }
 
     if (code == GLFW_KEY_UP && action == GLFW_REPEAT) {
-        gModel.Scale *= kScaleFactor;
+        gModel.mScale *= kScaleFactor;
     }
 
     if (code == GLFW_KEY_DOWN && action == GLFW_REPEAT) {
-        gModel.Scale /= kScaleFactor;
+        gModel.mScale /= kScaleFactor;
     }
 }
 
-void OnInitialize()
+void Model::Initialize()
 {
     // Initialize model parameters.
     {
-        gModel.Rotate = Model::RotateMode::X;
-        gModel.Scale = 1.0f;
-        gModel.ModelView = math::mat4f::eye;
-        gModel.CurrentMeshId = 0;
+        mRotate = Model::RotateMode::X;
+        mScale = 1.0f;
+        mModelView = math::mat4f::eye;
+        mCurrentMeshId = 0;
     }
 
     // Load the model meshes.
@@ -136,10 +139,10 @@ void OnInitialize()
 
         // Upload mesh data onto the gpu and store it.
         mesh->Copy();
-        gModel.Mesh.push_back(std::move(mesh));
+        mMesh.push_back(std::move(mesh));
     }
 
-    // Create a rendering pipeline for each mesh->
+    // Create a rendering pipeline for each mesh.
     {
         Graphics::PipelineCreateInfo info = {};
         info.polygonMode = GL_FILL;
@@ -157,48 +160,49 @@ void OnInitialize()
             Graphics::CreateShaderFromFile(GL_VERTEX_SHADER, "data/model.vert"),
             Graphics::CreateShaderFromFile(GL_FRAGMENT_SHADER, "data/model.frag")};
 
-        for (auto &mesh : gModel.Mesh) {
-            gModel.Pipeline.push_back(Graphics::CreatePipeline(info));
-            gModel.Pipeline.back()->Bind();
+        for (auto &mesh : mMesh) {
+            mPipeline.push_back(Graphics::CreatePipeline(info));
+            mPipeline.back()->Bind();
             mesh->Bind();
-            gModel.Pipeline.back()->SetAttribute(mesh->mAttributes);
-            gModel.Pipeline.back()->Unbind();
+            mPipeline.back()->SetAttribute(mesh->mAttributes);
+            mPipeline.back()->Unbind();
         }
     }
 }
 
-void OnMainLoop()
+void Model::Render()
 {
     // Update the model.
     {
         float ang = (float) glfwGetTime();
-        float ang_x = (gModel.Rotate == Model::RotateMode::X) ? ang : 0.0f;
-        float ang_y = (gModel.Rotate == Model::RotateMode::Y) ? ang : 0.0f;
-        float ang_z = (gModel.Rotate == Model::RotateMode::Z) ? ang : 0.0f;
+        float ang_x = (mRotate == Model::RotateMode::X) ? ang : 0.0f;
+        float ang_y = (mRotate == Model::RotateMode::Y) ? ang : 0.0f;
+        float ang_z = (mRotate == Model::RotateMode::Z) ? ang : 0.0f;
 
         math::mat4f m = math::mat4f::eye;
         m = math::rotate(m, math::vec3f{0.0f, 0.0f, 1.0f}, ang_z);
         m = math::rotate(m, math::vec3f{0.0f, 1.0f, 0.0f}, ang_y);
         m = math::rotate(m, math::vec3f{1.0f, 0.0f, 0.0f}, ang_x);
-        m = math::scale(m, math::vec3f{gModel.Scale, gModel.Scale, gModel.Scale});
+        m = math::scale(m, math::vec3f{mScale, mScale, mScale});
 
         auto viewport = Graphics::GetViewport();
         float ratio = viewport.width / viewport.height;
         math::mat4f p = math::orthographic(-ratio, ratio, -1.0f, 1.0f, -1.0f, 1.0f);
-        gModel.ModelView = math::dot(p, m);
+        mModelView = math::dot(p, m);
     }
 
     // Render the model.
     {
-        size_t id = gModel.CurrentMeshId;
-        gModel.Pipeline[id]->Use();
-        gModel.Pipeline[id]->SetUniformMatrix(
-            "u_mvp", GL_FLOAT_MAT4, true, gModel.ModelView.data);
-        gModel.Pipeline[id]->Clear();
-        gModel.Mesh[id]->Render();
+        size_t id = mCurrentMeshId;
+        mPipeline[id]->Use();
+        mPipeline[id]->SetUniformMatrix("u_mvp", GL_FLOAT_MAT4, true,
+            mModelView.data);
+        mPipeline[id]->Clear();
+        mMesh[id]->Render();
     }
 }
 
+/// -----------------------------------------------------------------------------
 int main(int argc, char const *argv[])
 {
     Graphics::Settings settings = {};
@@ -209,16 +213,18 @@ int main(int argc, char const *argv[])
     settings.GLVersionMinor = 3;
     settings.PollTimeout = 0.01;
     settings.MaxFrames = 600;
-    settings.OnKeyboard = OnKeyboard;
-    settings.OnInitialize = OnInitialize;
-    settings.OnMainLoop = OnMainLoop;
+    settings.OnKeyboard = Model::OnKeyboard;
+    settings.OnMouseMove = nullptr;
+    settings.OnMouseButton = nullptr;
+    Graphics::Initialize(settings);
 
-    try {
-        Graphics::MainLoop(settings);
-    } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
+    gModel.Initialize();
+    while (!Graphics::ShouldClose()) {
+        gModel.Render();
+        Graphics::Present();
     }
+
+    Graphics::Terminate();
 
     return EXIT_SUCCESS;
 }

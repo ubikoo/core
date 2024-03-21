@@ -14,13 +14,15 @@
 
 /// -----------------------------------------------------------------------------
 struct Triangle {
-    Graphics::Buffer Vbo;               // vertex buffer object
-    Graphics::Pipeline Pipeline;        // program rendering pipeline
+    Graphics::Buffer mVbo;              // vertex buffer object
+    Graphics::Pipeline mPipeline;       // program rendering pipeline
+
+    void Initialize();
+    void Render();
 };
 Triangle gTriangle;
 
-/// -----------------------------------------------------------------------------
-void OnInitialize()
+void Triangle::Initialize()
 {
     // Vertex position and color attributes with layout:
     // {(xyzw)_1, (xyzw)_2, ..., (rgba)_1, (rgba)_2}
@@ -45,8 +47,8 @@ void OnInitialize()
         info.size = vertex_data_size;
         info.usage = GL_STATIC_DRAW;
 
-        gTriangle.Vbo = Graphics::CreateBuffer(info);
-        gTriangle.Vbo->Copy(0, vertex_data_size, &vertex_data[0]);
+        mVbo = Graphics::CreateBuffer(info);
+        mVbo->Copy(0, vertex_data_size, &vertex_data[0]);
     }
 
     // Create the triangle rendering pipeline.
@@ -67,30 +69,31 @@ void OnInitialize()
             Graphics::CreateShaderFromFile(GL_VERTEX_SHADER, "data/triangle.vert"),
             Graphics::CreateShaderFromFile(GL_FRAGMENT_SHADER, "data/triangle.frag")};
 
-        gTriangle.Pipeline = Graphics::CreatePipeline(info);
-        gTriangle.Pipeline->Bind();
-        gTriangle.Vbo->Bind();
+        mPipeline = Graphics::CreatePipeline(info);
+        mPipeline->Bind();
+        mVbo->Bind();
         GLsizei stride = 4 * sizeof(GLfloat);
         GLsizeiptr offset_pos = 0;
         GLsizeiptr offset_col = vertex_data_size / 2;
         std::vector<Graphics::AttributeDescription> attributes{
             {"a_pos", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_pos, false, 0},
             {"a_col", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_col, false, 0}};
-        gTriangle.Pipeline->SetAttribute(attributes);
-        gTriangle.Pipeline->Unbind();
+        mPipeline->SetAttribute(attributes);
+        mPipeline->Unbind();
     }
 }
 
-void OnMainLoop()
+void Triangle::Render()
 {
     Graphics::Viewport viewport = Graphics::GetViewport();
-    gTriangle.Pipeline->Use();
-    gTriangle.Pipeline->SetUniform("u_width", GL_FLOAT, &viewport.width);
-    gTriangle.Pipeline->SetUniform("u_height", GL_FLOAT, &viewport.height);
-    gTriangle.Pipeline->Clear();
+    mPipeline->Use();
+    mPipeline->SetUniform("u_width", GL_FLOAT, &viewport.width);
+    mPipeline->SetUniform("u_height", GL_FLOAT, &viewport.height);
+    mPipeline->Clear();
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
+/// -----------------------------------------------------------------------------
 int main(int argc, char const *argv[])
 {
     Graphics::Settings settings = {};
@@ -101,15 +104,18 @@ int main(int argc, char const *argv[])
     settings.GLVersionMinor = 3;
     settings.PollTimeout = 0.01;
     settings.MaxFrames = 600;
-    settings.OnInitialize = OnInitialize;
-    settings.OnMainLoop = OnMainLoop;
+    settings.OnKeyboard = nullptr;
+    settings.OnMouseMove = nullptr;
+    settings.OnMouseButton = nullptr;
+    Graphics::Initialize(settings);
 
-    try {
-        Graphics::MainLoop(settings);
-    } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
+    gTriangle.Initialize();
+    while (!Graphics::ShouldClose()) {
+        gTriangle.Render();
+        Graphics::Present();
     }
+
+    Graphics::Terminate();
 
     return EXIT_SUCCESS;
 }

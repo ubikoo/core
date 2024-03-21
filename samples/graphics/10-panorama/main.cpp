@@ -17,36 +17,42 @@ static const std::string kImageFilename = "../assets/equirectangular.png";
 static const size_t kMeshNodes = 1024;
 
 struct Panorama {
-    math::mat4f ModelView;
-    Graphics::Camera Camera;
-    Graphics::Image Image;
-    Graphics::Mesh Mesh;
-    Graphics::Texture Texture;
-    Graphics::Pipeline Pipeline;
+    math::mat4f mModelView;
+    Graphics::Camera mCamera;
+    Graphics::Image mImage;
+    Graphics::Mesh mMesh;
+    Graphics::Texture mTexture;
+    Graphics::Pipeline mPipeline;
+
+    static void OnKeyboard(int code, int scancode, int action, int mods);
+    static void OnMouseMove(double xpos, double ypos);
+    static void OnMouseButton(int button, int action, int mods);
+
+    void Initialize();
+    void Render();
 };
 Panorama gPanorama;
 
-/// -----------------------------------------------------------------------------
-void OnKeyboard(int code, int scancode, int action, int mods)
+void Panorama::OnKeyboard(int code, int scancode, int action, int mods)
 {
-    gPanorama.Camera.Keyboard(code, scancode, action, mods);
+    gPanorama.mCamera.Keyboard(code, scancode, action, mods);
 }
 
-void OnMouseMove(double xpos, double ypos)
+void Panorama::OnMouseMove(double xpos, double ypos)
 {
-    gPanorama.Camera.MouseMove(xpos, ypos);
+    gPanorama.mCamera.MouseMove(xpos, ypos);
 }
 
-void OnMouseButton(int button, int action, int mods)
+void Panorama::OnMouseButton(int button, int action, int mods)
 {
-    gPanorama.Camera.MouseButton(button, action, mods);
+    gPanorama.mCamera.MouseButton(button, action, mods);
 }
 
-void OnInitialize()
+void Panorama::Initialize()
 {
     // Create panorama camera and initialize projection matrix.
     {
-        gPanorama.ModelView = math::mat4f::eye;
+        mModelView = math::mat4f::eye;
 
         auto viewport = Graphics::GetViewport();
         Graphics::CameraCreateInfo info = {};
@@ -59,29 +65,29 @@ void OnInitialize()
         info.zfar = 10.0f;
         info.moveSpeed = 0.1f;
         info.rotateSpeed = 0.001f * M_PI;
-        gPanorama.Camera = Graphics::CreateCamera(info);
+        mCamera = Graphics::CreateCamera(info);
     }
 
     // Load the image from the file, store it on a texture and create mesh.
     {
-        gPanorama.Image = Graphics::LoadImage(kImageFilename, true, 4);
+        mImage = Graphics::LoadImage(kImageFilename, true, 4);
 
         Graphics::TextureCreateInfo info = {};
         info.target = GL_TEXTURE_2D;
-        info.width = gPanorama.Image->mWidth;
-        info.height = gPanorama.Image->mHeight;
+        info.width = mImage->mWidth;
+        info.height = mImage->mHeight;
         info.internalFormat = GL_RGBA8;
-        info.pixelFormat = gPanorama.Image->mFormat;
+        info.pixelFormat = mImage->mFormat;
         info.pixelType = GL_UNSIGNED_BYTE;
-        info.pixels = &gPanorama.Image->mBitmap[0];
+        info.pixels = &mImage->mBitmap[0];
         info.generateMipmap = GL_TRUE;
         info.minFilter = GL_LINEAR;
         info.magFilter = GL_LINEAR;
         info.wrapS = GL_CLAMP_TO_EDGE;
         info.wrapT = GL_CLAMP_TO_EDGE;
-        gPanorama.Texture = Graphics::CreateTexture(info);
+        mTexture = Graphics::CreateTexture(info);
 
-        gPanorama.Mesh = Graphics::CreateSphere(
+        mMesh = Graphics::CreateSphere(
             "sphere",                   // vertex attributes prefix
             kMeshNodes,                 // n1 vertices
             kMeshNodes,                 // n2 vertices
@@ -110,11 +116,11 @@ void OnInitialize()
             Graphics::CreateShaderFromFile(GL_VERTEX_SHADER, "data/panorama.vert"),
             Graphics::CreateShaderFromFile(GL_FRAGMENT_SHADER, "data/panorama.frag")};
 
-        gPanorama.Pipeline = Graphics::CreatePipeline(info);
-        gPanorama.Pipeline->Bind();
-        gPanorama.Mesh->Bind();
-        gPanorama.Pipeline->SetAttribute(gPanorama.Mesh->mAttributes);
-        gPanorama.Pipeline->Unbind();
+        mPipeline = Graphics::CreatePipeline(info);
+        mPipeline->Bind();
+        mMesh->Bind();
+        mPipeline->SetAttribute(mMesh->mAttributes);
+        mPipeline->Unbind();
     }
 
     // Create the quad rendering pipeline.
@@ -135,21 +141,21 @@ void OnInitialize()
             Graphics::CreateShaderFromFile(GL_VERTEX_SHADER, "data/panorama.vert"),
             Graphics::CreateShaderFromFile(GL_FRAGMENT_SHADER, "data/panorama.frag")};
 
-        gPanorama.Pipeline = Graphics::CreatePipeline(info);
-        gPanorama.Pipeline->Bind();
-        gPanorama.Mesh->Bind();
-        gPanorama.Pipeline->SetAttribute(gPanorama.Mesh->mAttributes);
-        gPanorama.Pipeline->Unbind();
+        mPipeline = Graphics::CreatePipeline(info);
+        mPipeline->Bind();
+        mMesh->Bind();
+        mPipeline->SetAttribute(mMesh->mAttributes);
+        mPipeline->Unbind();
     }
 }
 
-void OnMainLoop()
+void Panorama::Render()
 {
     // Update the panorama camera view.
     {
-        math::mat4f proj = gPanorama.Camera.Proj();
-        math::mat4f view = gPanorama.Camera.View();
-        gPanorama.ModelView = math::dot(proj, view);
+        math::mat4f proj = mCamera.Proj();
+        math::mat4f view = mCamera.View();
+        mModelView = math::dot(proj, view);
     }
 
     // Render the panorama camera view..
@@ -157,18 +163,19 @@ void OnMainLoop()
         auto viewport = Graphics::GetViewport();
         GLenum texunit = 0;
 
-        gPanorama.Pipeline->Use();
-        gPanorama.Pipeline->SetUniform("u_width",  GL_FLOAT, &viewport.width);
-        gPanorama.Pipeline->SetUniform("u_height", GL_FLOAT, &viewport.height);
-        gPanorama.Pipeline->SetUniformMatrix(
-            "u_mvp", GL_FLOAT_MAT4, true, gPanorama.ModelView.data);
-        gPanorama.Pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
-        gPanorama.Texture->Bind(texunit);
-        gPanorama.Pipeline->Clear();
-        gPanorama.Mesh->Render();
+        mPipeline->Use();
+        mPipeline->SetUniform("u_width",  GL_FLOAT, &viewport.width);
+        mPipeline->SetUniform("u_height", GL_FLOAT, &viewport.height);
+        mPipeline->SetUniformMatrix("u_mvp", GL_FLOAT_MAT4, true,
+            mModelView.data);
+        mPipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
+        mTexture->Bind(texunit);
+        mPipeline->Clear();
+        mMesh->Render();
     }
 }
 
+/// -----------------------------------------------------------------------------
 int main(int argc, char const *argv[])
 {
     Graphics::Settings settings = {};
@@ -179,18 +186,18 @@ int main(int argc, char const *argv[])
     settings.GLVersionMinor = 3;
     settings.PollTimeout = 0.1;
     settings.MaxFrames = 600;
-    settings.OnKeyboard = OnKeyboard;
-    settings.OnMouseMove = OnMouseMove;
-    settings.OnMouseButton = OnMouseButton;
-    settings.OnInitialize = OnInitialize;
-    settings.OnMainLoop = OnMainLoop;
+    settings.OnKeyboard = Panorama::OnKeyboard;
+    settings.OnMouseMove = Panorama::OnMouseMove;
+    settings.OnMouseButton = Panorama::OnMouseButton;
+    Graphics::Initialize(settings);
 
-    try {
-        Graphics::MainLoop(settings);
-    } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
+    gPanorama.Initialize();
+    while (!Graphics::ShouldClose()) {
+        gPanorama.Render();
+        Graphics::Present();
     }
+
+    Graphics::Terminate();
 
     return EXIT_SUCCESS;
 }

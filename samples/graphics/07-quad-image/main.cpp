@@ -17,21 +17,23 @@ static const std::string kImageFilename = "../assets/baboon_512.png";
 static const size_t kMeshNodes = 1024;
 
 struct Quad {
-    math::mat4f ModelView;
-    Graphics::Mesh Mesh;
-    Graphics::Image Image;
-    Graphics::Texture Texture;
-    Graphics::Pipeline Pipeline;
+    math::mat4f mModelView;
+    Graphics::Mesh mMesh;
+    Graphics::Image mImage;
+    Graphics::Texture mTexture;
+    Graphics::Pipeline mPipeline;
+
+    void Initialize();
+    void Render();
 };
 Quad gQuad;
 
-/// -----------------------------------------------------------------------------
-void OnInitialize()
+void Quad::Initialize()
 {
     // Initialize mvp matrix and create a mesh over a rectangle.
     {
-        gQuad.ModelView = math::mat4f::eye;
-        gQuad.Mesh = Graphics::CreatePlane(
+        mModelView = math::mat4f::eye;
+        mMesh = Graphics::CreatePlane(
             "quad",                     // vertex attributes prefix
             kMeshNodes,                 // n1 vertices
             kMeshNodes,                 // n2 vertices
@@ -43,22 +45,22 @@ void OnInitialize()
 
     // Load the 2d-image from the specified filename.
     {
-        gQuad.Image = Graphics::LoadImage(kImageFilename, true, 4);
+        mImage = Graphics::LoadImage(kImageFilename, true, 4);
 
         Graphics::TextureCreateInfo info = {};
         info.target = GL_TEXTURE_2D;
-        info.width = gQuad.Image->mWidth;
-        info.height = gQuad.Image->mHeight;
+        info.width = mImage->mWidth;
+        info.height = mImage->mHeight;
         info.internalFormat = GL_RGBA8;
-        info.pixelFormat = gQuad.Image->mFormat;
+        info.pixelFormat = mImage->mFormat;
         info.pixelType = GL_UNSIGNED_BYTE;
-        info.pixels = &gQuad.Image->mBitmap[0];
+        info.pixels = &mImage->mBitmap[0];
         info.generateMipmap = GL_TRUE;
         info.minFilter = GL_LINEAR;
         info.magFilter = GL_LINEAR;
         info.wrapS = GL_CLAMP_TO_EDGE;
         info.wrapT = GL_CLAMP_TO_EDGE;
-        gQuad.Texture = Graphics::CreateTexture(info);
+        mTexture = Graphics::CreateTexture(info);
     }
 
     // Create the quad rendering pipeline.
@@ -79,15 +81,15 @@ void OnInitialize()
             Graphics::CreateShaderFromFile(GL_VERTEX_SHADER, "data/quad.vert"),
             Graphics::CreateShaderFromFile(GL_FRAGMENT_SHADER, "data/quad.frag")};
 
-        gQuad.Pipeline = Graphics::CreatePipeline(info);
-        gQuad.Pipeline->Bind();
-        gQuad.Mesh->Bind();
-        gQuad.Pipeline->SetAttribute(gQuad.Mesh->mAttributes);
-        gQuad.Pipeline->Unbind();
+        mPipeline = Graphics::CreatePipeline(info);
+        mPipeline->Bind();
+        mMesh->Bind();
+        mPipeline->SetAttribute(mMesh->mAttributes);
+        mPipeline->Unbind();
     }
 }
 
-void OnMainLoop()
+void Quad::Render()
 {
     auto viewport = Graphics::GetViewport();
 
@@ -106,25 +108,25 @@ void OnMainLoop()
 
         float ratio = viewport.width / viewport.height;
         math::mat4f p = math::orthographic(-ratio, ratio, -1.0f, 1.0f, -1.0f, 1.0f);
-        gQuad.ModelView = math::dot(p, m);
+        mModelView = math::dot(p, m);
     }
 
     // Render the quad.
     {
         GLenum texunit = 0;
-
-        gQuad.Pipeline->Use();
-        gQuad.Pipeline->SetUniform("u_width",  GL_FLOAT, &viewport.width);
-        gQuad.Pipeline->SetUniform("u_height", GL_FLOAT, &viewport.height);
-        gQuad.Pipeline->SetUniformMatrix(
-            "u_mvp", GL_FLOAT_MAT4, true, gQuad.ModelView.data);
-        gQuad.Pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
-        gQuad.Texture->Bind(texunit);
-        gQuad.Pipeline->Clear();
-        gQuad.Mesh->Render();
+        mPipeline->Use();
+        mPipeline->SetUniform("u_width",  GL_FLOAT, &viewport.width);
+        mPipeline->SetUniform("u_height", GL_FLOAT, &viewport.height);
+        mPipeline->SetUniformMatrix("u_mvp", GL_FLOAT_MAT4, true,
+            mModelView.data);
+        mPipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
+        mTexture->Bind(texunit);
+        mPipeline->Clear();
+        mMesh->Render();
     }
 }
 
+/// -----------------------------------------------------------------------------
 int main(int argc, char const *argv[])
 {
     Graphics::Settings settings = {};
@@ -135,15 +137,18 @@ int main(int argc, char const *argv[])
     settings.GLVersionMinor = 3;
     settings.PollTimeout = 0.01;
     settings.MaxFrames = 600;
-    settings.OnInitialize = OnInitialize;
-    settings.OnMainLoop = OnMainLoop;
+    settings.OnKeyboard = nullptr;
+    settings.OnMouseMove = nullptr;
+    settings.OnMouseButton = nullptr;
+    Graphics::Initialize(settings);
 
-    try {
-        Graphics::MainLoop(settings);
-    } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
+    gQuad.Initialize();
+    while (!Graphics::ShouldClose()) {
+        gQuad.Render();
+        Graphics::Present();
     }
+
+    Graphics::Terminate();
 
     return EXIT_SUCCESS;
 }

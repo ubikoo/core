@@ -14,15 +14,17 @@
 
 /// -----------------------------------------------------------------------------
 struct Quad {
-    math::mat4f ModelView;
-    Graphics::Buffer Vbo;
-    Graphics::Buffer Ebo;
-    Graphics::Pipeline Pipeline;
+    math::mat4f mModelView;
+    Graphics::Buffer mVbo;
+    Graphics::Buffer mEbo;
+    Graphics::Pipeline mPipeline;
+
+    void Initialize();
+    void Render();
 };
 Quad gQuad;
 
-/// -----------------------------------------------------------------------------
-void OnInitialize()
+void Quad::Initialize()
 {
     // Vertex positions and color attributes with layout:
     // {(xyzw)_1, (xyzw)_2, ..., (rgba)_1, (rgba)_2}
@@ -53,8 +55,8 @@ void OnInitialize()
         info.size = vertex_data_size;
         info.usage = GL_STATIC_DRAW;
 
-        gQuad.Vbo = Graphics::CreateBuffer(info);
-        gQuad.Vbo->Copy(0, vertex_data_size, &vertex_data[0]);
+        mVbo = Graphics::CreateBuffer(info);
+        mVbo->Copy(0, vertex_data_size, &vertex_data[0]);
     }
 
     // Create a buffer storage for the vertex indices.
@@ -64,8 +66,8 @@ void OnInitialize()
         info.size = index_data_size;
         info.usage = GL_STATIC_DRAW;
 
-        gQuad.Ebo = Graphics::CreateBuffer(info);
-        gQuad.Ebo->Copy(0, index_data_size, &index_data[0]);
+        mEbo = Graphics::CreateBuffer(info);
+        mEbo->Copy(0, index_data_size, &index_data[0]);
     }
 
     // Create the quad rendering pipeline.
@@ -86,10 +88,10 @@ void OnInitialize()
             Graphics::CreateShaderFromFile(GL_VERTEX_SHADER, "data/quad.vert"),
             Graphics::CreateShaderFromFile(GL_FRAGMENT_SHADER, "data/quad.frag")};
 
-        gQuad.Pipeline = Graphics::CreatePipeline(info);
-        gQuad.Pipeline->Bind();
-        gQuad.Ebo->Bind();
-        gQuad.Vbo->Bind();
+        mPipeline = Graphics::CreatePipeline(info);
+        mPipeline->Bind();
+        mEbo->Bind();
+        mVbo->Bind();
         GLsizei stride = 4 * sizeof(GLfloat);
         GLsizeiptr offset_pos = 0;
         GLsizeiptr offset_col = vertex_data_size / 2;
@@ -97,13 +99,13 @@ void OnInitialize()
             {"a_pos", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_pos, false, 0},
             {"a_col", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_col, false, 0},
         };
-        gQuad.Pipeline->SetAttribute(attributes);
+        mPipeline->SetAttribute(attributes);
 
-        gQuad.Pipeline->Unbind();
+        mPipeline->Unbind();
     }
 }
 
-void OnMainLoop()
+void Quad::Render()
 {
     auto viewport = Graphics::GetViewport();
 
@@ -120,21 +122,22 @@ void OnMainLoop()
 
         float ratio = viewport.width / viewport.height;
         math::mat4f p = math::orthographic(-ratio, ratio, -1.0f, 1.0f, -1.0f, 1.0f);
-        gQuad.ModelView = math::dot(p, m);
+        mModelView = math::dot(p, m);
     }
 
     // Render the quad.
     {
-        gQuad.Pipeline->Use();
-        gQuad.Pipeline->SetUniform("u_width",  GL_FLOAT, &viewport.width);
-        gQuad.Pipeline->SetUniform("u_height", GL_FLOAT, &viewport.height);
-        gQuad.Pipeline->SetUniformMatrix(
-            "u_mvp", GL_FLOAT_MAT4, true, gQuad.ModelView.data);
-        gQuad.Pipeline->Clear();
+        mPipeline->Use();
+        mPipeline->SetUniform("u_width",  GL_FLOAT, &viewport.width);
+        mPipeline->SetUniform("u_height", GL_FLOAT, &viewport.height);
+        mPipeline->SetUniformMatrix("u_mvp", GL_FLOAT_MAT4, true,
+            mModelView.data);
+        mPipeline->Clear();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (GLvoid *) 0);
     }
 }
 
+/// -----------------------------------------------------------------------------
 int main(int argc, char const *argv[])
 {
     Graphics::Settings settings = {};
@@ -145,15 +148,18 @@ int main(int argc, char const *argv[])
     settings.GLVersionMinor = 3;
     settings.PollTimeout = 0.01;
     settings.MaxFrames = 600;
-    settings.OnInitialize = OnInitialize;
-    settings.OnMainLoop = OnMainLoop;
+    settings.OnKeyboard = nullptr;
+    settings.OnMouseMove = nullptr;
+    settings.OnMouseButton = nullptr;
+    Graphics::Initialize(settings);
 
-    try {
-        Graphics::MainLoop(settings);
-    } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
+    gQuad.Initialize();
+    while (!Graphics::ShouldClose()) {
+        gQuad.Render();
+        Graphics::Present();
     }
+
+    Graphics::Terminate();
 
     return EXIT_SUCCESS;
 }
