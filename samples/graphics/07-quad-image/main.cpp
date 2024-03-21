@@ -56,9 +56,9 @@ void Graphics::OnInitialize()
         info.target = GL_TEXTURE_2D;
         info.width = gQuad.Image->mWidth;
         info.height = gQuad.Image->mHeight;
-        info.internalformat = GL_RGBA8;
-        info.pixelformat = gQuad.Image->mFormat;
-        info.pixeltype = GL_UNSIGNED_BYTE;
+        info.internalFormat = GL_RGBA8;
+        info.pixelFormat = gQuad.Image->mFormat;
+        info.pixelType = GL_UNSIGNED_BYTE;
         info.pixels = &gQuad.Image->mBitmap[0];
         info.generateMipmap = GL_TRUE;
         info.minFilter = GL_LINEAR;

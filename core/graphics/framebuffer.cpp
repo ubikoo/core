@@ -38,9 +38,9 @@ Framebuffer CreateFramebuffer(const FramebufferCreateInfo &info)
             texture_info.target = GL_TEXTURE_2D;
             texture_info.width = info.width;
             texture_info.height = info.height;
-            texture_info.internalformat = info.colorInternalformat;
-            texture_info.pixelformat = info.colorPixelformat;
-            texture_info.pixeltype = info.colorPixeltype;
+            texture_info.internalFormat = info.colorInternalformat;
+            texture_info.pixelFormat = info.colorPixelformat;
+            texture_info.pixelType = info.colorPixeltype;
             texture_info.pixels = nullptr;
             texture_info.minFilter = info.minFilter;
             texture_info.magFilter = info.magFilter;
@@ -65,9 +65,9 @@ Framebuffer CreateFramebuffer(const FramebufferCreateInfo &info)
             texture_info.target = GL_TEXTURE_2D;
             texture_info.width = info.width;
             texture_info.height = info.height;
-            texture_info.internalformat = info.depthInternalformat;
-            texture_info.pixelformat = info.depthPixelformat;
-            texture_info.pixeltype = info.depthPixeltype;
+            texture_info.internalFormat = info.depthInternalformat;
+            texture_info.pixelFormat = info.depthPixelformat;
+            texture_info.pixelType = info.depthPixeltype;
             texture_info.pixels = nullptr;
             texture_info.minFilter = info.minFilter;
             texture_info.magFilter = info.magFilter;

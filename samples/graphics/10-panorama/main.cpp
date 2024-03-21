@@ -70,9 +70,9 @@ void Graphics::OnInitialize()
         info.target = GL_TEXTURE_2D;
         info.width = gPanorama.Image->mWidth;
         info.height = gPanorama.Image->mHeight;
-        info.internalformat = GL_RGBA8;
-        info.pixelformat = gPanorama.Image->mFormat;
-        info.pixeltype = GL_UNSIGNED_BYTE;
+        info.internalFormat = GL_RGBA8;
+        info.pixelFormat = gPanorama.Image->mFormat;
+        info.pixelType = GL_UNSIGNED_BYTE;
         info.pixels = &gPanorama.Image->mBitmap[0];
         info.generateMipmap = GL_TRUE;
         info.minFilter = GL_LINEAR;

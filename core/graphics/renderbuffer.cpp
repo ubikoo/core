@@ -22,7 +22,7 @@ Renderbuffer CreateRenderbuffer(const RenderbufferCreateInfo &info)
         renderbuffer->Bind();
         glRenderbufferStorage(
             GL_RENDERBUFFER,
-            info.internalformat,
+            info.internalFormat,
             info.width,
             info.height);
         renderbuffer->Unbind();

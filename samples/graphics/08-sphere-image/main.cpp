@@ -59,9 +59,9 @@ void Graphics::OnInitialize()
         info.target = GL_TEXTURE_2D;
         info.width = gSphere.Image->mWidth;
         info.height = gSphere.Image->mHeight;
-        info.internalformat = GL_RGBA8;
-        info.pixelformat = gSphere.Image->mFormat;
-        info.pixeltype = GL_UNSIGNED_BYTE;
+        info.internalFormat = GL_RGBA8;
+        info.pixelFormat = gSphere.Image->mFormat;
+        info.pixelType = GL_UNSIGNED_BYTE;
         info.pixels = &gSphere.Image->mBitmap[0];
         info.generateMipmap = GL_TRUE;
         info.minFilter = GL_LINEAR;

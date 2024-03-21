@@ -276,9 +276,9 @@ Texture CreateTextureFromImage(Image &image)
     info.target = GL_TEXTURE_2D;
     info.width = image->mWidth;
     info.height = image->mHeight;
-    info.internalformat = GL_RGBA8;
-    info.pixelformat = image->mFormat;
-    info.pixeltype = GL_UNSIGNED_BYTE;
+    info.internalFormat = GL_RGBA8;
+    info.pixelFormat = image->mFormat;
+    info.pixelType = GL_UNSIGNED_BYTE;
     info.pixels = static_cast<GLvoid *>(&image->mBitmap[0]);
     return CreateTexture(info);
 }

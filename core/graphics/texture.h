@@ -24,9 +24,9 @@ struct TextureCreateInfo {
     GLsizei width{1};
     GLsizei height{1};
     GLsizei depth{1};
-    GLint internalformat{GL_RGBA8};
-    GLenum pixelformat{GL_RGBA};
-    GLenum pixeltype{GL_UNSIGNED_BYTE};
+    GLint internalFormat{GL_RGBA8};
+    GLenum pixelFormat{GL_RGBA};
+    GLenum pixelType{GL_UNSIGNED_BYTE};
     GLvoid *pixels{NULL};
     GLboolean generateMipmap{GL_FALSE};
     GLint baseLevel{0};
@@ -40,10 +40,15 @@ struct TextureCreateInfo {
 
 struct TextureObject {
     GLenum mTarget{0};
+    GLsizei mWidth{0};
+    GLsizei mHeight{0};
+    GLsizei mDepth{0};
+    GLint mInternalFormat{0};
     GLuint mId{0};
 
     void Bind(GLenum unit) const;
     void Unbind(GLenum unit) const;
+    void Copy(GLenum pixelFormat, GLenum pixelType, const GLvoid *pixels) const;
 };
 
 struct TextureDeleter {

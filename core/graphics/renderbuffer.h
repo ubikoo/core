@@ -22,7 +22,7 @@ namespace Graphics {
 struct RenderbufferCreateInfo {
     GLsizei width{1};
     GLsizei height{1};
-    GLenum internalformat{GL_RGBA};
+    GLenum internalFormat{GL_RGBA};
 };
 
 struct RenderbufferObject {

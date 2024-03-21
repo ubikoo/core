@@ -39,6 +39,10 @@ Texture CreateTexture(const TextureCreateInfo &info)
     {
         // Generate a texture object and bind to the first texture unit.
         texture->mTarget = info.target;
+        texture->mWidth = info.width;
+        texture->mHeight = info.height;
+        texture->mDepth = info.depth;
+        texture->mInternalFormat = info.internalFormat;
         glGenTextures(1, &texture->mId);
 
         // Bind the texture at the first texture unit.
@@ -50,11 +54,11 @@ Texture CreateTexture(const TextureCreateInfo &info)
             glTexImage1D(
                 info.target,
                 0,                      // level of detail - 0 is base image
-                info.internalformat,    // internal format
+                info.internalFormat,    // internal format
                 info.width,             // texture width
                 0,                      // border parameter - must be 0 (legacy)
-                info.pixelformat,       // format of pixel data
-                info.pixeltype,         // type of pixel data
+                info.pixelFormat,       // format of pixel data
+                info.pixelType,         // type of pixel data
                 info.pixels);           // pointer to pixel data
             break;
 
@@ -62,12 +66,12 @@ Texture CreateTexture(const TextureCreateInfo &info)
             glTexImage2D(
                 info.target,
                 0,                      // level of detail - 0 is base image
-                info.internalformat,    // internal format
+                info.internalFormat,    // internal format
                 info.width,             // texture width
                 info.height,            // texture height
                 0,                      // border parameter - must be 0 (legacy)
-                info.pixelformat,       // format of pixel data
-                info.pixeltype,         // type of pixel data(GLubyte)
+                info.pixelFormat,       // format of pixel data
+                info.pixelType,         // type of pixel data
                 info.pixels);           // pointer to pixel data
             break;
 
@@ -75,13 +79,13 @@ Texture CreateTexture(const TextureCreateInfo &info)
             glTexImage3D(
                 info.target,
                 0,                      // level of detail - 0 is base image
-                info.internalformat,    // internal format
+                info.internalFormat,    // internal format
                 info.width,             // texture width
                 info.height,            // texture height
                 info.depth,             // texture depth
                 0,                      // border parameter - must be 0 (legacy)
-                info.pixelformat,       // format of pixel data
-                info.pixeltype,         // type of pixel data(GLubyte)
+                info.pixelFormat,       // format of pixel data
+                info.pixelType,         // type of pixel data
                 info.pixels);           // pointer to pixel data
             break;
 
@@ -126,6 +130,36 @@ void TextureObject::Unbind(GLenum unit) const
     glActiveTexture(GL_TEXTURE0 + unit);
     glBindTexture(mTarget, 0);
     glActiveTexture(GL_TEXTURE0);
+}
+
+///
+/// @brief Update the texture data store with the specified pixel data.
+///
+void TextureObject::Copy(
+    GLenum pixelFormat,
+    GLenum pixelType,
+    const GLvoid *pixels) const
+{
+    switch (mTarget) {
+    case GL_TEXTURE_1D:
+        glTexImage1D(mTarget, 0, mInternalFormat, mWidth, 0,
+            pixelFormat, pixelType, pixels);
+        break;
+
+    case GL_TEXTURE_2D:
+        glTexImage2D(mTarget, 0, mInternalFormat, mWidth, mHeight, 0,
+            pixelFormat, pixelType, pixels);
+        break;
+
+    case GL_TEXTURE_3D:
+        glTexImage3D(mTarget, 0, mInternalFormat, mWidth, mHeight, mDepth, 0,
+            pixelFormat, pixelType, pixels);
+        break;
+
+    default:
+        throw std::runtime_error("invalid texture target");
+        break;
+    }
 }
 
 } // Graphics

@@ -89,9 +89,9 @@ void Map::Initialize()
         textureInfo.target = GL_TEXTURE_2D;
         textureInfo.width = image->mWidth;
         textureInfo.height = image->mHeight;
-        textureInfo.internalformat = GL_RGBA8;
-        textureInfo.pixelformat = image->mFormat;
-        textureInfo.pixeltype = GL_UNSIGNED_BYTE;
+        textureInfo.internalFormat = GL_RGBA8;
+        textureInfo.pixelFormat = image->mFormat;
+        textureInfo.pixelType = GL_UNSIGNED_BYTE;
         textureInfo.pixels = &image->mBitmap[0];
         textureInfo.generateMipmap = GL_TRUE;
         textureInfo.minFilter = GL_LINEAR;
