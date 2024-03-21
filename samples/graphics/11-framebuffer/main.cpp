@@ -282,15 +282,14 @@ int main(int argc, char const *argv[])
     settings.OnKeyboard = Drawable::OnKeyboard;
     settings.OnMouseMove = nullptr;
     settings.OnMouseButton = nullptr;
-    Graphics::Initialize(settings);
 
+    Graphics::Initialize(settings);
     gDrawable.Initialize();
     while (!Graphics::ShouldClose()) {
         gDrawable.Update();
         gDrawable.Render();
         Graphics::Present();
     }
-
     Graphics::Terminate();
 
     return EXIT_SUCCESS;

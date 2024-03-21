@@ -142,14 +142,13 @@ int main(int argc, char const *argv[])
     settings.OnKeyboard = nullptr;
     settings.OnMouseMove = nullptr;
     settings.OnMouseButton = nullptr;
-    Graphics::Initialize(settings);
 
+    Graphics::Initialize(settings);
     gSphere.Initialize();
     while (!Graphics::ShouldClose()) {
         gSphere.Render();
         Graphics::Present();
     }
-
     Graphics::Terminate();
 
     return EXIT_SUCCESS;

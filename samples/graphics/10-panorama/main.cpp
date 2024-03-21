@@ -189,14 +189,13 @@ int main(int argc, char const *argv[])
     settings.OnKeyboard = Panorama::OnKeyboard;
     settings.OnMouseMove = Panorama::OnMouseMove;
     settings.OnMouseButton = Panorama::OnMouseButton;
-    Graphics::Initialize(settings);
 
+    Graphics::Initialize(settings);
     gPanorama.Initialize();
     while (!Graphics::ShouldClose()) {
         gPanorama.Render();
         Graphics::Present();
     }
-
     Graphics::Terminate();
 
     return EXIT_SUCCESS;

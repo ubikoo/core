@@ -94,14 +94,13 @@ int main(int argc, char const *argv[])
     settings.OnKeyboard = OnKeyboard;
     settings.OnMouseMove = OnMouseMove;
     settings.OnMouseButton = OnMouseButton;
-    Graphics::Initialize(settings);
 
+    Graphics::Initialize(settings);
     Initialize();
     while (!Graphics::ShouldClose()) {
         Render();
         Graphics::Present();
     }
-
     Graphics::Terminate();
 
     return EXIT_SUCCESS;

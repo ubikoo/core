@@ -269,14 +269,13 @@ int main(int argc, char const *argv[])
     settings.OnKeyboard = Map::OnKeyboard;
     settings.OnMouseMove = nullptr;
     settings.OnMouseButton = nullptr;
-    Graphics::Initialize(settings);
 
+    Graphics::Initialize(settings);
     gMap.Initialize();
     while (!Graphics::ShouldClose()) {
         gMap.Render();
         Graphics::Present();
     }
-
     Graphics::Terminate();
 
     return EXIT_SUCCESS;

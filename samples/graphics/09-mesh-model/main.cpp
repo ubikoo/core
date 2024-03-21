@@ -216,14 +216,13 @@ int main(int argc, char const *argv[])
     settings.OnKeyboard = Model::OnKeyboard;
     settings.OnMouseMove = nullptr;
     settings.OnMouseButton = nullptr;
-    Graphics::Initialize(settings);
 
+    Graphics::Initialize(settings);
     gModel.Initialize();
     while (!Graphics::ShouldClose()) {
         gModel.Render();
         Graphics::Present();
     }
-
     Graphics::Terminate();
 
     return EXIT_SUCCESS;

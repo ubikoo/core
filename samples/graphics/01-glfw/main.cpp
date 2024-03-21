@@ -48,15 +48,14 @@ int main(int argc, char const *argv[])
     settings.OnKeyboard = OnKeyboard;
     settings.OnMouseMove = OnMouseMove;
     settings.OnMouseButton = OnMouseButton;
-    Graphics::Initialize(settings);
 
+    Graphics::Initialize(settings);
     while (!Graphics::ShouldClose()) {
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClearDepth(1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         Graphics::Present();
     }
-
     Graphics::Terminate();
 
     return EXIT_SUCCESS;

@@ -151,14 +151,13 @@ int main(int argc, char const *argv[])
     settings.OnKeyboard = nullptr;
     settings.OnMouseMove = nullptr;
     settings.OnMouseButton = nullptr;
-    Graphics::Initialize(settings);
 
+    Graphics::Initialize(settings);
     gQuad.Initialize();
     while (!Graphics::ShouldClose()) {
         gQuad.Render();
         Graphics::Present();
     }
-
     Graphics::Terminate();
 
     return EXIT_SUCCESS;

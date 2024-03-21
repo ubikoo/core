@@ -169,14 +169,13 @@ int main(int argc, char const *argv[])
     settings.OnKeyboard = nullptr;
     settings.OnMouseMove = nullptr;
     settings.OnMouseButton = nullptr;
-    Graphics::Initialize(settings);
 
+    Graphics::Initialize(settings);
     gTriangle.Initialize();
     while (!Graphics::ShouldClose()) {
         gTriangle.Render();
         Graphics::Present();
     }
-
     Graphics::Terminate();
 
     return EXIT_SUCCESS;
