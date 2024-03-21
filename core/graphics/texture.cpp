@@ -140,6 +140,7 @@ void TextureObject::Copy(
     GLenum pixelType,
     const GLvoid *pixels) const
 {
+    glBindTexture(mTarget, mId);
     switch (mTarget) {
     case GL_TEXTURE_1D:
         glTexImage1D(mTarget, 0, mInternalFormat, mWidth, 0,
@@ -160,6 +161,7 @@ void TextureObject::Copy(
         throw std::runtime_error("invalid texture target");
         break;
     }
+    glBindTexture(mTarget, 0);
 }
 
 } // Graphics
