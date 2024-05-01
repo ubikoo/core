@@ -26,28 +26,28 @@ struct ortho {
     static_assert(std::is_floating_point<T>::value, "non floating point");
 
     // Create an orthonormal basis from a single fixed vector.
-    static ortho<T> create_from_u(const vec3<T> &e_u);
-    static ortho<T> create_from_v(const vec3<T> &e_v);
-    static ortho<T> create_from_w(const vec3<T> &e_w);
+    static ortho<T> CreateFromU(const vec3<T> &e_u);
+    static ortho<T> CreateFromV(const vec3<T> &e_v);
+    static ortho<T> CreateFromW(const vec3<T> &e_w);
 
     //
     // Create an orthonormal basis from two vectors. The first vector is fixed,
     // the second is projected in a direction orthogonal to the first vector.
     //
-    static ortho<T> create_from_uv(const vec3<T> &e_u, const vec3<T> &e_v);
-    static ortho<T> create_from_vu(const vec3<T> &e_v, const vec3<T> &e_u);
+    static ortho<T> CreateFromUV(const vec3<T> &e_u, const vec3<T> &e_v);
+    static ortho<T> CreateFromVU(const vec3<T> &e_v, const vec3<T> &e_u);
 
-    static ortho<T> create_from_vw(const vec3<T> &e_v, const vec3<T> &e_w);
-    static ortho<T> create_from_wv(const vec3<T> &e_w, const vec3<T> &e_v);
+    static ortho<T> CreateFromVW(const vec3<T> &e_v, const vec3<T> &e_w);
+    static ortho<T> CreateFromWV(const vec3<T> &e_w, const vec3<T> &e_v);
 
-    static ortho<T> create_from_wu(const vec3<T> &e_w, const vec3<T> &e_u);
-    static ortho<T> create_from_uw(const vec3<T> &e_u, const vec3<T> &e_w);
+    static ortho<T> CreateFromWU(const vec3<T> &e_w, const vec3<T> &e_u);
+    static ortho<T> CreateFromUW(const vec3<T> &e_u, const vec3<T> &e_w);
 
     // Return the projection of the vector from world to local space.
-    vec3<T> world_to_local(const vec3<T> &a) const;
+    vec3<T> WorldToLocal(const vec3<T> &a) const;
 
     // Return the projection of the vector from local to world space.
-    vec3<T> local_to_world(const vec3<T> &a) const;
+    vec3<T> LocalToWorld(const vec3<T> &a) const;
 
     // Orthonormal basis vectors.
     vec3<T> u;
@@ -59,11 +59,10 @@ typedef ortho<float>  orthof;
 typedef ortho<double> orthod;
 
 /// -----------------------------------------------------------------------------
-/// ortho<T>::create_from_u
 /// @brief Create an orthonormal basis set given the fixed vector u.
 ///
 template<typename T>
-inline ortho<T> ortho<T>::create_from_u(const vec3<T> &e_u)
+inline ortho<T> ortho<T>::CreateFromU(const vec3<T> &e_u)
 {
     static const T eps = std::sqrt(std::numeric_limits<T>::epsilon());
     static const vec3<T> e_1{(T) 1, (T) 0, (T) 0};
@@ -81,11 +80,10 @@ inline ortho<T> ortho<T>::create_from_u(const vec3<T> &e_u)
 }
 
 ///
-/// ortho<T>::create_from_v
 /// @brief Create an orthonormal basis set given the fixed vector v.
 ///
 template<typename T>
-inline ortho<T> ortho<T>::create_from_v(const vec3<T> &e_v)
+inline ortho<T> ortho<T>::CreateFromV(const vec3<T> &e_v)
 {
     static const T eps = std::sqrt(std::numeric_limits<T>::epsilon());
     static const vec3<T> e_1{(T) 1, (T) 0, (T) 0};
@@ -103,11 +101,10 @@ inline ortho<T> ortho<T>::create_from_v(const vec3<T> &e_v)
 }
 
 ///
-/// ortho<T>::create_from_w
 /// @brief Create an orthonormal basis set given the fixed vector w.
 ///
 template<typename T>
-inline ortho<T> ortho<T>::create_from_w(const vec3<T> &e_w)
+inline ortho<T> ortho<T>::CreateFromW(const vec3<T> &e_w)
 {
     static const T eps = std::sqrt(std::numeric_limits<T>::epsilon());
     static const vec3<T> e_1{(T) 1, (T) 0, (T) 0};
@@ -125,14 +122,12 @@ inline ortho<T> ortho<T>::create_from_w(const vec3<T> &e_w)
 }
 
 /// -----------------------------------------------------------------------------
-/// ortho<T>::create_from_uv
 /// @brief Create an orthonormal basis set from two vectors:
 ///  u is fixed.
 ///  v is orthogonalized using a Gram-Schmidt process.
 ///
 template<typename T>
-inline ortho<T> ortho<T>::create_from_uv(
-    const vec3<T> &e_u, const vec3<T> &e_v)
+inline ortho<T> ortho<T>::CreateFromUV(const vec3<T> &e_u, const vec3<T> &e_v)
 {
     ortho<T> o;
     o.u = normalize(e_u);                           // u = u / |u|
@@ -142,13 +137,12 @@ inline ortho<T> ortho<T>::create_from_uv(
 }
 
 ///
-/// ortho<T>::create_from_vu
 /// @brief Create an orthonormal basis set from two vectors:
 ///  v is fixed.
 ///  u is orthogonalized using a Gram-Schmidt process.
 ///
 template<typename T>
-inline ortho<T> ortho<T>::create_from_vu(
+inline ortho<T> ortho<T>::CreateFromVU(
     const vec3<T> &e_v, const vec3<T> &e_u)
 {
     ortho<T> o;
@@ -159,14 +153,12 @@ inline ortho<T> ortho<T>::create_from_vu(
 }
 
 /// -----------------------------------------------------------------------------
-/// ortho<T>::create_from_vw
 /// @brief Create an orthonormal basis set from two vectors:
 ///  v is fixed.
 ///  w is orthogonalized using a Gram-Schmidt process.
 ///
 template<typename T>
-inline ortho<T> ortho<T>::create_from_vw(
-    const vec3<T> &e_v, const vec3<T> &e_w)
+inline ortho<T> ortho<T>::CreateFromVW(const vec3<T> &e_v, const vec3<T> &e_w)
 {
     ortho<T> o;
     o.v = normalize(e_v);                           // v = v / |v|
@@ -176,13 +168,12 @@ inline ortho<T> ortho<T>::create_from_vw(
 }
 
 ///
-/// ortho<T>::create_from_wv
 /// @brief Create an orthonormal basis set from two vectors:
 ///  w is fixed.
 ///  v is orthogonalized using a Gram-Schmidt process.
 ///
 template<typename T>
-inline ortho<T> ortho<T>::create_from_wv(
+inline ortho<T> ortho<T>::CreateFromWV(
     const vec3<T> &e_w, const vec3<T> &e_v)
 {
     ortho<T> o;
@@ -193,13 +184,12 @@ inline ortho<T> ortho<T>::create_from_wv(
 }
 
 /// -----------------------------------------------------------------------------
-/// ortho<T>::create_from_wu
 /// @brief Create an orthonormal basis set from two vectors:
 ///  w is fixed.
 ///  u is orthogonalized using a Gram-Schmidt process.
 ///
 template<typename T>
-inline ortho<T> ortho<T>::create_from_wu(
+inline ortho<T> ortho<T>::CreateFromWU(
     const vec3<T> &e_w, const vec3<T> &e_u)
 {
     ortho<T> o;
@@ -210,14 +200,12 @@ inline ortho<T> ortho<T>::create_from_wu(
 }
 
 ///
-/// ortho<T>::create_from_uw
 /// @brief Create an orthonormal basis set from two vectors:
 ///  u is fixed.
 ///  w is orthogonalized using a Gram-Schmidt process.
 ///
 template<typename T>
-inline ortho<T> ortho<T>::create_from_uw(
-    const vec3<T> &e_u, const vec3<T> &e_w)
+inline ortho<T> ortho<T>::CreateFromUW(const vec3<T> &e_u, const vec3<T> &e_w)
 {
     ortho<T> o;
     o.u = normalize(e_u);                           // u = u / |u|
@@ -227,12 +215,11 @@ inline ortho<T> ortho<T>::create_from_uw(
 }
 
 /// -----------------------------------------------------------------------------
-/// ortho<T>::world_to_local
 /// @brief Project a vector coordinates from world to local
 /// reference frame defined by the orthonormal basis set.
 ///
 template<typename T>
-inline vec3<T> ortho<T>::world_to_local(const vec3<T> &a) const
+inline vec3<T> ortho<T>::WorldToLocal(const vec3<T> &a) const
 {
     return {u.x * a.x + u.y * a.y + u.z * a.z,
             v.x * a.x + v.y * a.y + v.z * a.z,
@@ -240,12 +227,11 @@ inline vec3<T> ortho<T>::world_to_local(const vec3<T> &a) const
 }
 
 ///
-/// ortho<T>::local_to_world
 /// @brief Project a vector coordinates from local to world
 /// reference frame defined by the orthonormal basis set.
 ///
 template<typename T>
-inline vec3<T> ortho<T>::local_to_world(const vec3<T> &a) const
+inline vec3<T> ortho<T>::LocalToWorld(const vec3<T> &a) const
 {
     return {u.x * a.x + v.x * a.y + w.x * a.z,
             u.y * a.x + v.y * a.y + w.y * a.z,

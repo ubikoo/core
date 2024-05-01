@@ -17,10 +17,9 @@
 namespace math {
 
 /// -----------------------------------------------------------------------------
-/// @brief Function object providing an interface std::random_device and
-/// returning std::random_device
+/// @brief Function object providing an interface std::random_device.
 ///
-struct random_device {
+struct RandomDevice {
     std::random_device seed;
     uint64_t operator()() {
         uint64_t lo = seed();
@@ -47,7 +46,7 @@ struct random_device {
 /// even number larger than 2 is not prime.  If 2 does not divide n, then every
 /// other even number smaller than n will also not divide n.
 ///
-inline uint64_t random_prime(random_device &device)
+inline uint64_t RandomPrime(RandomDevice &device)
 {
     auto is_prime = [] (const uint64_t n) -> bool {
         if (n%2 == 0) {         // Even numbers are not prime
@@ -86,7 +85,7 @@ inline uint64_t random_prime(random_device &device)
 ///
 /// @see http://www.cs.ucl.ac.uk/staff/d.jones/GoodPracticeRNG.pdf
 ///
-struct random_engine {
+struct RandomEngine {
     uint64_t x  = 123456789123ULL;      // linear congruential generator
     uint64_t y  = 987654321987ULL;      // xor-shift generator
     uint32_t z1 = 43219876U;            // multiply-with-carry generator
@@ -105,10 +104,10 @@ struct random_engine {
 ///      0 < c2 < 698769069U
 /// Do not set y = 0 and avoid x = z1 = c1 = z2 = c2 = 0.
 ///
-inline random_engine make_random()
+inline RandomEngine CreateRandomEngine()
 {
     // Generate a random odd number between 0 and n_max
-    random_device device;
+    RandomDevice device;
     auto random_seed = [&](uint64_t n_max) -> uint64_t {
         uint64_t n = device() % (n_max - 1);
         if (n%2 == 0) { ++n; }
@@ -116,7 +115,7 @@ inline random_engine make_random()
     };
 
     // Create a zeroth state.
-    random_engine engine = {};
+    RandomEngine engine = {};
 
     // Seed the linear congruential generator state.
     engine.x = random_seed(0xffffffffffffffff);
@@ -138,7 +137,7 @@ inline random_engine make_random()
 ///
 /// @brief 32-bit random number generator.
 ///
-inline uint32_t random32(random_engine &rng)
+inline uint32_t Random32(RandomEngine &rng)
 {
     static constexpr uint64_t m1 = 1490024343005336237ULL;
     static constexpr uint64_t m2 = 123456789ULL;
@@ -164,7 +163,7 @@ inline uint32_t random32(random_engine &rng)
 ///
 /// @brief 64-bit random number generator.
 ///
-inline uint64_t random64(random_engine &rng)
+inline uint64_t Random64(RandomEngine &rng)
 {
     static constexpr uint64_t m1 = 1490024343005336237ULL;
     static constexpr uint64_t m2 = 123456789ULL;
@@ -197,29 +196,29 @@ inline uint64_t random64(random_engine &rng)
 /// @brief Sample a random number from a uniform distribution in interval [a,b].
 ///
 template<typename T>
-struct random_uniform {};
+struct RandomUniform {};
 
 template<>
-struct random_uniform<float> {
-    float operator()(random_engine &rng, float lo = 0.0f, float hi = 1.0f) {
-        float r = (float) random32(rng) / (float) UINT32_MAX;
+struct RandomUniform<float> {
+    float operator()(RandomEngine &rng, float lo = 0.0f, float hi = 1.0f) {
+        float r = (float) Random32(rng) / (float) UINT32_MAX;
         return (lo + r * (hi - lo));
     }
 };
 
 template<>
-struct random_uniform<double> {
-    double operator()(random_engine &rng, double lo = 0.0, double hi = 1.0) {
-        double r = (double) random64(rng) / (float) UINT64_MAX;
+struct RandomUniform<double> {
+    double operator()(RandomEngine &rng, double lo = 0.0, double hi = 1.0) {
+        double r = (double) Random64(rng) / (float) UINT64_MAX;
         return (lo + r * (hi - lo));
     }
 };
 
 template<>
-struct random_uniform<uint32_t> {
-    random_uniform<float> urand;
+struct RandomUniform<uint32_t> {
+    RandomUniform<float> urand;
     uint32_t operator()(
-        random_engine &rng,
+        RandomEngine &rng,
         uint32_t lo = 0,
         uint32_t hi = UINT32_MAX - 1) {
         float r = (float) (hi - lo + 1) * urand(rng);
@@ -229,10 +228,10 @@ struct random_uniform<uint32_t> {
 };
 
 template<>
-struct random_uniform<uint64_t> {
-    random_uniform<double> urand;
+struct RandomUniform<uint64_t> {
+    RandomUniform<double> urand;
     uint64_t operator()(
-        random_engine &rng,
+        RandomEngine &rng,
         uint64_t lo = 0,
         uint64_t hi = UINT64_MAX - 1) {
         double r = (double) (hi - lo + 1) * urand(rng);
@@ -242,10 +241,10 @@ struct random_uniform<uint64_t> {
 };
 
 template<>
-struct random_uniform<int32_t> {
-    random_uniform<float> urand;
+struct RandomUniform<int32_t> {
+    RandomUniform<float> urand;
     int32_t operator()(
-        random_engine &rng,
+        RandomEngine &rng,
         int32_t lo = INT32_MIN,
         int32_t hi = INT32_MAX - 1) {
         float r = (float) (hi - lo + 1) * urand(rng);
@@ -255,10 +254,10 @@ struct random_uniform<int32_t> {
 };
 
 template<>
-struct random_uniform<int64_t> {
-    random_uniform<double> urand;
+struct RandomUniform<int64_t> {
+    RandomUniform<double> urand;
     int64_t operator()(
-        random_engine &rng,
+        RandomEngine &rng,
         int64_t lo = INT64_MIN,
         int64_t hi = INT64_MAX - 1) {
         double r = (double) (hi - lo + 1) * urand(rng);
@@ -281,19 +280,19 @@ struct random_uniform<int64_t> {
 /// Compute the normal deviate X using the corresponding linear relation.
 ///
 template<typename T>
-struct random_gauss {};
+struct RandomGauss {};
 
 template<>
-struct random_gauss<float> {
+struct RandomGauss<float> {
     static constexpr float zero = (float) 0;
     static constexpr float one  = (float) 1;
     static constexpr float two  = (float) 2;
 
     bool has_cache = false;     // normal random deviate cache state
     float cache = zero;         // stored normal random deviate
-    random_uniform<float> urand;
+    RandomUniform<float> urand;
 
-    float operator()(random_engine &rng, float mu = zero, float sig = one) {
+    float operator()(RandomEngine &rng, float mu = zero, float sig = one) {
         float value = zero;
         if (has_cache) {
             // Get the stored random deviate and reset cache state.
@@ -319,16 +318,16 @@ struct random_gauss<float> {
 };
 
 template<>
-struct random_gauss<double> {
+struct RandomGauss<double> {
     static constexpr double zero = (double) 0;
     static constexpr double one  = (double) 1;
     static constexpr double two  = (double) 2;
 
     bool has_cache = false;     // normal random deviate cache state
     double cache = zero;        // stored normal random deviate
-    random_uniform<double> urand;
+    RandomUniform<double> urand;
 
-    double operator()(random_engine &rng, double mu = zero, double sig = one) {
+    double operator()(RandomEngine &rng, double mu = zero, double sig = one) {
         double value = zero;
         if (has_cache) {
             // Get the stored random deviate and reset cache state.

@@ -137,105 +137,105 @@ inline void test_ortho_run(const size_t n_iters)
             std::cerr << "ortho " <<  math::to_string(ortho) << "\n";
         };
 
-        // Check create_from_u
+        // Check CreateFromU
         {
-            math::ortho<T> ortho = math::ortho<T>::create_from_u(arr_u);
+            math::ortho<T> ortho = math::ortho<T>::CreateFromU(arr_u);
             bool is_valid = test_ortho_is_valid(ortho);
             if (!is_valid) {
-                errmsg1("create_from_u", arr_u, ortho);
+                errmsg1("CreateFromU", arr_u, ortho);
             }
             REQUIRE(is_valid);
         }
 
-        // Check create_from_v
+        // Check CreateFromV
         {
-            math::ortho<T> ortho = math::ortho<T>::create_from_v(arr_v);
+            math::ortho<T> ortho = math::ortho<T>::CreateFromV(arr_v);
             bool is_valid = test_ortho_is_valid(ortho);
             if (!is_valid) {
-                errmsg1("create_from_v", arr_v, ortho);
+                errmsg1("CreateFromV", arr_v, ortho);
             }
             REQUIRE(is_valid);
         }
 
-        // Check create_from_w
+        // Check CreateFromW
         {
-            math::ortho<T> ortho = math::ortho<T>::create_from_w(arr_w);
+            math::ortho<T> ortho = math::ortho<T>::CreateFromW(arr_w);
             bool is_valid = test_ortho_is_valid(ortho);
             if (!is_valid) {
-                errmsg1("create_from_w", arr_w, ortho);
+                errmsg1("CreateFromW", arr_w, ortho);
             }
             REQUIRE(is_valid);
         }
 
-        // Check create_from_uv
+        // Check CreateFromUV
         {
-            math::ortho<T> ortho = math::ortho<T>::create_from_uv(arr_u, arr_v);
+            math::ortho<T> ortho = math::ortho<T>::CreateFromUV(arr_u, arr_v);
             bool is_valid = test_ortho_is_valid(ortho);
             if (!is_valid) {
-                errmsg2("create_from_uv", arr_u, arr_v, ortho);
+                errmsg2("CreateFromUV", arr_u, arr_v, ortho);
             }
             REQUIRE(is_valid);
         }
 
-        // Check create_from_vu
+        // Check CreateFromVU
         {
-            math::ortho<T> ortho = math::ortho<T>::create_from_vu(arr_v, arr_u);
+            math::ortho<T> ortho = math::ortho<T>::CreateFromVU(arr_v, arr_u);
             bool is_valid = test_ortho_is_valid(ortho);
             if (!is_valid) {
-                errmsg2("create_from_vu", arr_v, arr_u, ortho);
+                errmsg2("CreateFromVU", arr_v, arr_u, ortho);
             }
             REQUIRE(is_valid);
         }
 
-        // Check create_from_vw
+        // Check CreateFromVW
         {
-            math::ortho<T> ortho = math::ortho<T>::create_from_vw(arr_v, arr_w);
+            math::ortho<T> ortho = math::ortho<T>::CreateFromVW(arr_v, arr_w);
             bool is_valid = test_ortho_is_valid(ortho);
             if (!is_valid) {
-                errmsg2("create_from_vw", arr_v, arr_w, ortho);
+                errmsg2("CreateFromVW", arr_v, arr_w, ortho);
             }
             REQUIRE(is_valid);
         }
 
-        // Check create_from_wv
+        // Check CreateFromWV
         {
-            math::ortho<T> ortho = math::ortho<T>::create_from_wv(arr_w, arr_v);
+            math::ortho<T> ortho = math::ortho<T>::CreateFromWV(arr_w, arr_v);
             bool is_valid = test_ortho_is_valid(ortho);
             if (!is_valid) {
-                errmsg2("create_from_wv", arr_w, arr_v, ortho);
+                errmsg2("CreateFromWV", arr_w, arr_v, ortho);
             }
             REQUIRE(is_valid);
         }
 
-        // Check create_from_wu
+        // Check CreateFromWU
         {
-            math::ortho<T> ortho = math::ortho<T>::create_from_wu(arr_w, arr_u);
+            math::ortho<T> ortho = math::ortho<T>::CreateFromWU(arr_w, arr_u);
             bool is_valid = test_ortho_is_valid(ortho);
             if (!is_valid) {
-                errmsg2("create_from_wu", arr_w, arr_u, ortho);
+                errmsg2("CreateFromWU", arr_w, arr_u, ortho);
             }
             REQUIRE(is_valid);
         }
 
-        // Check create_from_uw
+        // Check CreateFromUW
         {
-            math::ortho<T> ortho = math::ortho<T>::create_from_uw(arr_u, arr_w);
+            math::ortho<T> ortho = math::ortho<T>::CreateFromUW(arr_u, arr_w);
             bool is_valid = test_ortho_is_valid(ortho);
             if (!is_valid) {
-                errmsg2("create_from_uw", arr_u, arr_w, ortho);
+                errmsg2("CreateFromUW", arr_u, arr_w, ortho);
             }
             REQUIRE(is_valid);
         }
 
-        // Check world_to_local and local_to_world
+        // Check WorldToLocal and LocalToWorld
         {
-            math::ortho<T> ortho = math::ortho<T>::create_from_u(arr_u);
+            math::ortho<T> ortho = math::ortho<T>::CreateFromU(arr_u);
             math::vec3<T> a = {dist(rng), dist(rng), dist(rng)};
-            math::vec3<T> b = ortho.world_to_local(a);
-            math::vec3<T> e = a - ortho.local_to_world(b);
+            math::vec3<T> b = ortho.WorldToLocal(a);
+            math::vec3<T> e = a - ortho.LocalToWorld(b);
             bool is_valid = math::iseq(norm(e), zero);
             if (!is_valid) {
-                std::cerr << "world_to_local -> local_to_world\n";
+                std::cerr << "WorldToLocal -> LocalToWorld\n";
                 std::cerr << "o: " << math::to_string(ortho) << "\n";
                 std::cerr << "a: " << math::to_string(a) << "\n";
                 std::cerr << "b: " << math::to_string(b) << "\n";
