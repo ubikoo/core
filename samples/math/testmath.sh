@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# testmath.sh
+# math.sh
 #
 # Copyright (c) 2020 Carlos Braga
 # This program is free software; you can redistribute it and/or modify it under
@@ -33,8 +33,11 @@ ask() {
 
 # -------------------------------------------------------------------------------
 # Execute tests
+pushd testmath
 run ./testmath
+popd
+
 pushd plot
-run ./plot_ent.bash
+run ./plot_ent.sh
 gnuplot plot_ent.gnuplot
 popd

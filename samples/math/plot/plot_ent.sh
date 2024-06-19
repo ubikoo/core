@@ -14,7 +14,7 @@ NTHREADS=64
 # -------------------------------------------------------------------------------
 # Compile the ent executable
 TMPDIR="/tmp"
-ENT="../../external/ent/ent"
+ENT="../ent/ent"
 
 # Create the output plot files
 RANDOM32_PLOT="$TMPDIR/out.random32_plot"
