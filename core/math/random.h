@@ -17,7 +17,7 @@
 namespace math {
 
 /// -----------------------------------------------------------------------------
-/// @brief Function object providing an interface std::random_device.
+/// @brief Function object providing an 64bit interface std::random_device.
 ///
 struct RandomDevice {
     std::random_device seed;
@@ -34,14 +34,14 @@ struct RandomDevice {
 ///
 /// Is n a prime number? Search for any divisor p < n. If none is found, then n
 /// is a prime. We only need to test i < (sqrt(n) + 1):
-///  If n = p * q, then
-///      p ≤ sqrt(n) or q ≤ sqrt(n), otherwise p*q > n.
-///  If p = q, then
-///      n = p * p and p = sqrt(n)
-///  If p != q, then
-///      p > sqrt(n) and q < sqrt(n)
-///  or
-///      p < sqrt(n) and q > sqrt(n)
+///     If n = p * q, then
+///         p ≤ sqrt(n) or q ≤ sqrt(n), otherwise p*q > n.
+///     If p = q, then
+///         n = p * p and p = sqrt(n)
+///     If p != q, then
+///         p > sqrt(n) and q < sqrt(n)
+///     or
+///         p < sqrt(n) and q > sqrt(n)
 /// If there is no divisor p < sqrt(n), then n%p == 0, and n is a prime. Every
 /// even number larger than 2 is not prime.  If 2 does not divide n, then every
 /// other even number smaller than n will also not divide n.
@@ -52,7 +52,7 @@ inline uint64_t RandomPrime(RandomDevice &device)
         if (n%2 == 0) {         // Even numbers are not prime
             return false;
         }
-        uint64_t sqrt_n = std::sqrt((double) n) + 1.0;
+        uint64_t sqrt_n = (uint64_t) (std::sqrt((double) n) + 1.0);
         for (uint64_t p = 3; p < sqrt_n; p += 2) {
             if (n%p == 0) {     // If p is a divisor, n is not prime
                 return false;
@@ -110,60 +110,60 @@ inline RandomEngine CreateRandomEngine()
     RandomDevice device;
     auto random_seed = [&](uint64_t n_max) -> uint64_t {
         uint64_t n = device() % (n_max - 1);
-        if (n%2 == 0) { ++n; }
+        if (n%2 == 0) { ++n; }  // even numbers are not prime
         return n;
     };
 
     // Create a zeroth state.
-    RandomEngine engine = {};
+    RandomEngine eng = {};
 
     // Seed the linear congruential generator state.
-    engine.x = random_seed(0xffffffffffffffff);
+    eng.x = random_seed(0xffffffffffffffff);
 
     // Seed the xor-shift register generator state.
-    engine.y = random_seed(0xffffffffffffffff);
+    eng.y = random_seed(0xffffffffffffffff);
 
     // Seed the first multiply-with-carry generator state.
-    engine.z1 = random_seed(0xffffffffffffffff);
-    engine.c1 = (uint32_t) random_seed(698769069ULL);
+    eng.z1 = random_seed(0xffffffffffffffff);
+    eng.c1 = (uint32_t) random_seed(698769069ULL);
 
     // Seed the second multiply-with-carry generator state.
-    engine.z2 = random_seed(0xffffffffffffffff);
-    engine.c2 = (uint32_t) random_seed(698769069ULL);
+    eng.z2 = random_seed(0xffffffffffffffff);
+    eng.c2 = (uint32_t) random_seed(698769069ULL);
 
-    return engine;
+    return eng;
 }
 
 ///
 /// @brief 32-bit random number generator.
 ///
-inline uint32_t Random32(RandomEngine &rng)
+inline uint32_t Random32(RandomEngine &eng)
 {
     static constexpr uint64_t m1 = 1490024343005336237ULL;
     static constexpr uint64_t m2 = 123456789ULL;
     static constexpr uint64_t m3 = 4294584393ULL;
 
     // Linear congruential generator
-    rng.x =  m1 * rng.x + m2;
+    eng.x =  m1 * eng.x + m2;
 
     // Xorshift register generator - do not set y = 0
-    rng.y ^= rng.y << 21;
-    rng.y ^= rng.y >> 17;
-    rng.y ^= rng.y << 30;
+    eng.y ^= eng.y << 21;
+    eng.y ^= eng.y >> 17;
+    eng.y ^= eng.y << 30;
 
     // First multiply-with-carry generator - avoid z1 = c1 = 0
-    uint64_t t1 = m3 * rng.z1 + rng.c1;
-    rng.c1 = t1 >> 32;
-    rng.z1 = t1;
+    uint64_t t1 = m3 * eng.z1 + eng.c1;
+    eng.c1 = t1 >> 32;
+    eng.z1 = t1;
 
     // Return 32-bit result
-    return (uint32_t) (rng.x >> 32) + (uint32_t) rng.y + rng.z1;
+    return (uint32_t) (eng.x >> 32) + (uint32_t) eng.y + eng.z1;
 }
 
 ///
 /// @brief 64-bit random number generator.
 ///
-inline uint64_t Random64(RandomEngine &rng)
+inline uint64_t Random64(RandomEngine &eng)
 {
     static constexpr uint64_t m1 = 1490024343005336237ULL;
     static constexpr uint64_t m2 = 123456789ULL;
@@ -171,25 +171,25 @@ inline uint64_t Random64(RandomEngine &rng)
     static constexpr uint64_t m4 = 4246477509ULL;
 
     // Linear congruential generator
-    rng.x =  m1 * rng.x + m2;
+    eng.x =  m1 * eng.x + m2;
 
     // Xorshift register generator - do not set y = 0
-    rng.y ^= rng.y << 21;
-    rng.y ^= rng.y >> 17;
-    rng.y ^= rng.y << 30;
+    eng.y ^= eng.y << 21;
+    eng.y ^= eng.y >> 17;
+    eng.y ^= eng.y << 30;
 
     // First multiply-with-carry generator - avoid z1 = c1 = 0
-    uint64_t t1 = m3 * rng.z1 + rng.c1;
-    rng.c1 = t1 >> 32;
-    rng.z1 = t1;
+    uint64_t t1 = m3 * eng.z1 + eng.c1;
+    eng.c1 = t1 >> 32;
+    eng.z1 = t1;
 
     // Second multiply-with-carry generator - avoid z2 = c2 = 0
-    uint64_t t2 = m4 * rng.z2 + rng.c2;
-    rng.c2 = t2 >> 32;
-    rng.z2 = t2;
+    uint64_t t2 = m4 * eng.z2 + eng.c2;
+    eng.c2 = t2 >> 32;
+    eng.z2 = t2;
 
-    // Return 64-bit result
-    return rng.x + rng.y + ((uint64_t) rng.z1) + ((uint64_t) rng.z2 << 32);
+    // Return combined 64-bit result
+    return eng.x + eng.y + ((uint64_t) eng.z1) + ((uint64_t) eng.z2 << 32);
 }
 
 /// ---- Random number generator samplers -------------------------------------
@@ -200,16 +200,16 @@ struct RandomUniform {};
 
 template<>
 struct RandomUniform<float> {
-    float operator()(RandomEngine &rng, float lo = 0.0f, float hi = 1.0f) {
-        float r = (float) Random32(rng) / (float) UINT32_MAX;
+    float operator()(RandomEngine &eng, float lo = 0.0f, float hi = 1.0f) {
+        float r = (float) Random32(eng) / (float) UINT32_MAX;
         return (lo + r * (hi - lo));
     }
 };
 
 template<>
 struct RandomUniform<double> {
-    double operator()(RandomEngine &rng, double lo = 0.0, double hi = 1.0) {
-        double r = (double) Random64(rng) / (float) UINT64_MAX;
+    double operator()(RandomEngine &eng, double lo = 0.0, double hi = 1.0) {
+        double r = (double) Random64(eng) / (float) UINT64_MAX;
         return (lo + r * (hi - lo));
     }
 };
@@ -218,10 +218,10 @@ template<>
 struct RandomUniform<uint32_t> {
     RandomUniform<float> urand;
     uint32_t operator()(
-        RandomEngine &rng,
+        RandomEngine &eng,
         uint32_t lo = 0,
         uint32_t hi = UINT32_MAX - 1) {
-        float r = (float) (hi - lo + 1) * urand(rng);
+        float r = (float) (hi - lo + 1) * urand(eng);
         float n = (float) lo + std::floor(r);
         return ((uint32_t) n);
     }
@@ -231,10 +231,10 @@ template<>
 struct RandomUniform<uint64_t> {
     RandomUniform<double> urand;
     uint64_t operator()(
-        RandomEngine &rng,
+        RandomEngine &eng,
         uint64_t lo = 0,
         uint64_t hi = UINT64_MAX - 1) {
-        double r = (double) (hi - lo + 1) * urand(rng);
+        double r = (double) (hi - lo + 1) * urand(eng);
         double n = (double) lo + std::floor(r);
         return ((uint64_t) n);
     }
@@ -244,10 +244,10 @@ template<>
 struct RandomUniform<int32_t> {
     RandomUniform<float> urand;
     int32_t operator()(
-        RandomEngine &rng,
+        RandomEngine &eng,
         int32_t lo = INT32_MIN,
         int32_t hi = INT32_MAX - 1) {
-        float r = (float) (hi - lo + 1) * urand(rng);
+        float r = (float) (hi - lo + 1) * urand(eng);
         float n = (float) lo + std::floor(r);
         return ((int32_t) n);
     }
@@ -257,10 +257,10 @@ template<>
 struct RandomUniform<int64_t> {
     RandomUniform<double> urand;
     int64_t operator()(
-        RandomEngine &rng,
+        RandomEngine &eng,
         int64_t lo = INT64_MIN,
         int64_t hi = INT64_MAX - 1) {
-        double r = (double) (hi - lo + 1) * urand(rng);
+        double r = (double) (hi - lo + 1) * urand(eng);
         double n = (double) lo + std::floor(r);
         return ((int64_t) n);
     }
@@ -292,7 +292,7 @@ struct RandomGauss<float> {
     float cache = zero;         // stored normal random deviate
     RandomUniform<float> urand;
 
-    float operator()(RandomEngine &rng, float mu = zero, float sig = one) {
+    float operator()(RandomEngine &eng, float mu = zero, float sig = one) {
         float value = zero;
         if (has_cache) {
             // Get the stored random deviate and reset cache state.
@@ -303,8 +303,8 @@ struct RandomGauss<float> {
             // in the interval [-one, one] using the Box-Muller transform.
             float x, y, r;
             do {
-                x = urand(rng, -one, one);
-                y = urand(rng, -one, one);
+                x = urand(eng, -one, one);
+                y = urand(eng, -one, one);
                 r = x*x + y*y;
             } while (iseq(r, zero) || !islt(r, one));
 
@@ -327,7 +327,7 @@ struct RandomGauss<double> {
     double cache = zero;        // stored normal random deviate
     RandomUniform<double> urand;
 
-    double operator()(RandomEngine &rng, double mu = zero, double sig = one) {
+    double operator()(RandomEngine &eng, double mu = zero, double sig = one) {
         double value = zero;
         if (has_cache) {
             // Get the stored random deviate and reset cache state.
@@ -338,8 +338,8 @@ struct RandomGauss<double> {
             // in the interval [-one, one] using the Box-Muller transform.
             double x, y, r;
             do {
-                x = urand(rng, -one, one);
-                y = urand(rng, -one, one);
+                x = urand(eng, -one, one);
+                y = urand(eng, -one, one);
                 r = x*x + y*y;
             } while (iseq(r, zero) || !islt(r, one));
 
