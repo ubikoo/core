@@ -171,7 +171,7 @@ void Panorama::Render()
         mPipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
         mTexture->Bind(texunit);
         mPipeline->Clear();
-        mMesh->Render();
+        mMesh->Draw();
     }
 }
 

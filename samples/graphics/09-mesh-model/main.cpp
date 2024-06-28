@@ -198,7 +198,7 @@ void Model::Render()
         mPipeline[id]->SetUniformMatrix("u_mvp", GL_FLOAT_MAT4, true,
             mModelView.data);
         mPipeline[id]->Clear();
-        mMesh[id]->Render();
+        mMesh[id]->Draw();
     }
 }
 

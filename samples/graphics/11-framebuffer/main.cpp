@@ -238,7 +238,7 @@ void Drawable::Render()
         mSphere.pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
         mSphere.texture->Bind(texunit);
         mSphere.pipeline->Clear();
-        mSphere.mesh->Render();
+        mSphere.mesh->Draw();
 
         Graphics::SetViewport(viewport);
         mFbo->Unbind();
@@ -263,7 +263,7 @@ void Drawable::Render()
         mQuad.pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
         mFbo->mColorAttachments[0]->Bind(texunit);
         mQuad.pipeline->Clear();
-        mQuad.mesh->Render();
+        mQuad.mesh->Draw();
         Graphics::SetViewport(viewport);
     }
 }

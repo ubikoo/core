@@ -217,7 +217,7 @@ void Map::Render()
         mBeginPass.pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
         mBeginPass.texture->Bind(texunit);
         mBeginPass.pipeline->Clear();
-        mBeginPass.quad->Render();
+        mBeginPass.quad->Draw();
 
         mIOBuffer[mWriteIx]->Unbind();
         Graphics::SetViewport(viewport);
@@ -236,7 +236,7 @@ void Map::Render()
         mRunPass.pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
         mIOBuffer[mReadIx]->mColorAttachments[0]->Bind(texunit);
         mRunPass.pipeline->Clear();
-        mRunPass.quad->Render();
+        mRunPass.quad->Draw();
 
         mIOBuffer[mWriteIx]->Unbind();
         Graphics::SetViewport(viewport);
@@ -251,7 +251,7 @@ void Map::Render()
         mEndPass.pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
         mIOBuffer[mReadIx]->mColorAttachments[0]->Bind(texunit);
         mEndPass.pipeline->Clear();
-        mEndPass.quad->Render();
+        mEndPass.quad->Draw();
     }
 }
 

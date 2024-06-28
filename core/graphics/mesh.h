@@ -91,8 +91,9 @@ struct MeshObject {
     void Bind() const;
     void Unbind() const;
 
-    // Render the mesh.
-    void Render() const;
+    // Draw the mesh.
+    void Draw() const;
+    void DrawInstanced(GLsizei count) const;
 };
 
 using Mesh = std::unique_ptr<MeshObject>;

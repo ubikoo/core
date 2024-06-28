@@ -46,13 +46,23 @@ void MeshObject::Unbind() const
 }
 
 ///
-/// @brief Render the mesh.
+/// @brief Draw the mesh.
 ///
-void MeshObject::Render() const
+void MeshObject::Draw() const
 {
     GLsizei numElements = mIndices.size();
     glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_INT, (GLvoid *) 0);
 }
+
+///
+/// @brief Draw count instances of the mesh.
+///
+void MeshObject::DrawInstanced(GLsizei count) const
+{
+    GLsizei numElements = mIndices.size();
+    glDrawElementsInstanced(GL_TRIANGLES, numElements, GL_UNSIGNED_INT, (GLvoid *) 0, count);
+}
+
 
 ///
 /// @brief A mesh grid with (n1 * n2) vertices along the first and second
@@ -123,10 +133,10 @@ Mesh CreateMesh(
 
     // Specify vertex attributes description.
     {
-        std::string positionName = mesh->mName + std::string("_position");
-        std::string normalName = mesh->mName + std::string("_normal");
-        std::string colorName = mesh->mName + std::string("_color");
-        std::string texcoordName = mesh->mName + std::string("_texcoord");
+        std::string positionName = std::string("in") + mesh->mName + std::string("Position");
+        std::string normalName = std::string("in") + mesh->mName + std::string("Normal");
+        std::string colorName = std::string("in") + mesh->mName + std::string("Color");
+        std::string texcoordName = std::string("in") + mesh->mName + std::string("Texcoord");
 
         GLsizei stride = sizeof(MeshObject::Vertex);
 
