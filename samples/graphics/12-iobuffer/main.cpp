@@ -89,7 +89,7 @@ void Map::Initialize()
     // Initialize the map begin pass.
     {
         mBeginPass.quad = Graphics::CreatePlane(
-            "quad",     // attributes prefix
+            "Quad",     // attributes prefix
             2,          // n1 vertices
             2,          // n2 vertices
             -1.0,       // xlo
@@ -138,7 +138,7 @@ void Map::Initialize()
     // Initialize the map run pass.
     {
         mRunPass.quad = Graphics::CreatePlane(
-            "quad",             // vertex attributes prefix
+            "Quad",             // vertex attributes prefix
             2,                  // n1 vertices
             2,                  // n2 vertices
             -1.0,               // xlo
@@ -171,7 +171,7 @@ void Map::Initialize()
     // Initialize end render pass.
     {
         mEndPass.quad = Graphics::CreatePlane(
-            "quad",             // vertex attributes prefix
+            "Quad",             // vertex attributes prefix
             2,                  // n1 vertices
             2,                  // n2 vertices
             -1.0,               // xlo
@@ -214,7 +214,7 @@ void Map::Render()
 
         GLenum texunit = 0;
         mBeginPass.pipeline->Use();
-        mBeginPass.pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
+        mBeginPass.pipeline->SetUniform("uTexSampler", GL_SAMPLER_2D, &texunit);
         mBeginPass.texture->Bind(texunit);
         mBeginPass.pipeline->Clear();
         mBeginPass.quad->Draw();
@@ -233,7 +233,7 @@ void Map::Render()
 
         GLenum texunit = 0;
         mRunPass.pipeline->Use();
-        mRunPass.pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
+        mRunPass.pipeline->SetUniform("uTexSampler", GL_SAMPLER_2D, &texunit);
         mIOBuffer[mReadIx]->mColorAttachments[0]->Bind(texunit);
         mRunPass.pipeline->Clear();
         mRunPass.quad->Draw();
@@ -248,7 +248,7 @@ void Map::Render()
 
         GLenum texunit = 0;
         mEndPass.pipeline->Use();
-        mEndPass.pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
+        mEndPass.pipeline->SetUniform("uTexSampler", GL_SAMPLER_2D, &texunit);
         mIOBuffer[mReadIx]->mColorAttachments[0]->Bind(texunit);
         mEndPass.pipeline->Clear();
         mEndPass.quad->Draw();

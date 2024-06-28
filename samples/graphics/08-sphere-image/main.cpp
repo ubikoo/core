@@ -34,7 +34,7 @@ void Sphere::Initialize()
     {
         mModelView = math::mat4f::eye;
         mMesh = Graphics::CreateSphere(
-            "sphere",                   // vertex attributes prefix
+            "Sphere",                   // vertex attributes prefix
             kMeshNodes,                 // n1 vertices
             kMeshNodes,                 // n2 vertices
             1.0,                        // radius
@@ -117,11 +117,11 @@ void Sphere::Render()
     {
         GLenum texunit = 0;
         mPipeline->Use();
-        mPipeline->SetUniform("u_width",  GL_FLOAT, &viewport.width);
-        mPipeline->SetUniform("u_height", GL_FLOAT, &viewport.height);
-        mPipeline->SetUniformMatrix("u_mvp", GL_FLOAT_MAT4, true,
+        mPipeline->SetUniform("uWidth",  GL_FLOAT, &viewport.width);
+        mPipeline->SetUniform("uHeight", GL_FLOAT, &viewport.height);
+        mPipeline->SetUniformMatrix("uMvp", GL_FLOAT_MAT4, true,
             mModelView.data);
-        mPipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
+        mPipeline->SetUniform("uTexSampler", GL_SAMPLER_2D, &texunit);
         mTexture->Bind(texunit);
         mPipeline->Clear();
         mMesh->Draw();

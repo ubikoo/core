@@ -1,14 +1,14 @@
 #version 330 core
 
-uniform sampler2D u_texsampler;
+uniform sampler2D uTexSampler;
 
-in vec4 vert_quad_normal;
-in vec4 vert_quad_color;
-in vec2 vert_quad_texcoord;
+in vec4 vQuadNormal;
+in vec4 vQuadColor;
+in vec2 vQuadTexcoord;
 
-out vec4 frag_color;
+out vec4 outFragColor;
 
 void main()
 {
-    frag_color = texture(u_texsampler, vert_quad_texcoord);
+    outFragColor = texture(uTexSampler, vQuadTexcoord);
 }

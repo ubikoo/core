@@ -96,8 +96,8 @@ void Quad::Initialize()
         GLsizeiptr offset_pos = 0;
         GLsizeiptr offset_col = vertex_data_size / 2;
         std::vector<Graphics::AttributeDescription> attributes{
-            {"a_pos", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_pos, false, 0},
-            {"a_col", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_col, false, 0},
+            {"inPos", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_pos, false, 0},
+            {"inCol", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_col, false, 0},
         };
         mPipeline->SetAttribute(attributes);
 
@@ -128,9 +128,9 @@ void Quad::Render()
     // Render the quad.
     {
         mPipeline->Use();
-        mPipeline->SetUniform("u_width",  GL_FLOAT, &viewport.width);
-        mPipeline->SetUniform("u_height", GL_FLOAT, &viewport.height);
-        mPipeline->SetUniformMatrix("u_mvp", GL_FLOAT_MAT4, true,
+        mPipeline->SetUniform("uWidth",  GL_FLOAT, &viewport.width);
+        mPipeline->SetUniform("uHeight", GL_FLOAT, &viewport.height);
+        mPipeline->SetUniformMatrix("uMvp", GL_FLOAT_MAT4, true,
             mModelView.data);
         mPipeline->Clear();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (GLvoid *) 0);

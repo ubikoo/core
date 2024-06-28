@@ -1,15 +1,15 @@
 #version 330 core
 
-uniform float u_width;
-uniform float u_height;
+uniform float uWidth;
+uniform float uHeight;
 
-in vec4 vert_col;
-out vec4 frag_col;
+in vec4 vColor;
+out vec4 outFragColor;
 
-vec3 get_coord()
+vec3 getCoord()
 {
-    float du = 2.0 / u_width;
-    float dv = 2.0 / u_height;
+    float du = 2.0 / uWidth;
+    float dv = 2.0 / uHeight;
     float dw = 2.0;
     return vec3(gl_FragCoord.x*du-1.0,
                 gl_FragCoord.y*dv-1.0,
@@ -18,6 +18,6 @@ vec3 get_coord()
 
 void main()
 {
-    vec3 r = get_coord();
-    frag_col = vert_col;
+    vec3 r = getCoord();
+    outFragColor = vColor;
 }

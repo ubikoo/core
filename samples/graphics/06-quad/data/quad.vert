@@ -1,13 +1,13 @@
 #version 330 core
 
-uniform mat4 u_mvp;
+uniform mat4 uMvp;
 
-layout (location = 0) in vec4 a_pos;
-layout (location = 1) in vec4 a_col;
-out vec4 vert_col;
+layout (location = 0) in vec4 inPos;
+layout (location = 1) in vec4 inCol;
+out vec4 vColor;
 
 void main()
 {
-    gl_Position = u_mvp * a_pos;
-    vert_col = a_col;
+    gl_Position = uMvp * inPos;
+    vColor = inCol;
 }

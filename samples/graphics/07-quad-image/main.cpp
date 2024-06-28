@@ -34,7 +34,7 @@ void Quad::Initialize()
     {
         mModelView = math::mat4f::eye;
         mMesh = Graphics::CreatePlane(
-            "quad",                     // vertex attributes prefix
+            "Quad",                     // vertex attributes prefix
             kMeshNodes,                 // n1 vertices
             kMeshNodes,                 // n2 vertices
             -1.0,                       // xlo
@@ -115,11 +115,11 @@ void Quad::Render()
     {
         GLenum texunit = 0;
         mPipeline->Use();
-        mPipeline->SetUniform("u_width",  GL_FLOAT, &viewport.width);
-        mPipeline->SetUniform("u_height", GL_FLOAT, &viewport.height);
-        mPipeline->SetUniformMatrix("u_mvp", GL_FLOAT_MAT4, true,
+        mPipeline->SetUniform("uWidth",  GL_FLOAT, &viewport.width);
+        mPipeline->SetUniform("uHeight", GL_FLOAT, &viewport.height);
+        mPipeline->SetUniformMatrix("uMvp", GL_FLOAT_MAT4, true,
             mModelView.data);
-        mPipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
+        mPipeline->SetUniform("uTexSampler", GL_SAMPLER_2D, &texunit);
         mTexture->Bind(texunit);
         mPipeline->Clear();
         mMesh->Draw();

@@ -84,8 +84,8 @@ void Triangle::Initialize()
         GLsizeiptr offset_pos = 0;
         GLsizeiptr offset_col = vertex_data_size / 2;
         std::vector<Graphics::AttributeDescription> attributes{
-            {"a_pos", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_pos, false, 0},
-            {"a_col", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_col, false, 0}};
+            {"inPos", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_pos, false, 0},
+            {"inCol", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_col, false, 0}};
         mPipeline->SetAttribute(attributes);
         mPipeline->Unbind();
     }
@@ -132,11 +132,11 @@ void Triangle::Render()
     // Render the triangles.
     {
         mPipeline->Use();
-        mPipeline->SetUniform("u_width", GL_FLOAT, &viewport.width);
-        mPipeline->SetUniform("u_height", GL_FLOAT, &viewport.height);
+        mPipeline->SetUniform("uWidth", GL_FLOAT, &viewport.width);
+        mPipeline->SetUniform("uHeight", GL_FLOAT, &viewport.height);
         mPipeline->Clear();
         for (auto &m : mModelView) {
-            mPipeline->SetUniformMatrix("u_mvp", GL_FLOAT_MAT4, true, m.data);
+            mPipeline->SetUniformMatrix("uMvp", GL_FLOAT_MAT4, true, m.data);
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
     }

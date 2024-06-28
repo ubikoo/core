@@ -1,16 +1,16 @@
 #version 330 core
 
-uniform float u_width;
-uniform float u_height;
-uniform sampler2D u_texsampler;
+uniform float uWidth;
+uniform float uHeight;
+uniform sampler2D uTexSampler;
 
-in vec4 vert_sphere_normal;
-in vec4 vert_sphere_color;
-in vec2 vert_sphere_texcoord;
+in vec4 vSphereNormal;
+in vec4 vSphereColor;
+in vec2 vSphereTexcoord;
 
-out vec4 frag_color;
+out vec4 outFragColor;
 
 void main()
 {
-    frag_color = texture(u_texsampler, vert_sphere_texcoord);
+    outFragColor = texture(uTexSampler, vSphereTexcoord);
 }

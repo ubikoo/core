@@ -1,20 +1,20 @@
 #version 330 core
 
-uniform float u_width;
-uniform float u_height;
-uniform sampler2D u_texsampler;
+uniform float uWidth;
+uniform float uHeight;
+uniform sampler2D uTexSampler;
 
-in vec4 vert_quad_normal;
-in vec4 vert_quad_color;
-in vec2 vert_quad_texcoord;
+in vec4 vQuadNormal;
+in vec4 vQuadColor;
+in vec2 vQuadTexcoord;
 
-out vec4 frag_color;
+out vec4 outFragColor;
 
 // Compute fragment position in normalized device coordinates.
-vec3 get_coord()
+vec3 getCoord()
 {
-    float du = 2.0 / u_width;
-    float dv = 2.0 / u_height;
+    float du = 2.0 / uWidth;
+    float dv = 2.0 / uHeight;
     float dw = 2.0;
     return vec3(gl_FragCoord.x*du-1.0,
                 gl_FragCoord.y*dv-1.0,
@@ -23,8 +23,8 @@ vec3 get_coord()
 
 void main()
 {
-    vec3 coord = get_coord();
-    vec4 tex_color = texture(u_texsampler, vert_quad_texcoord);
-    vec4 pos_color = vert_quad_color;
-    frag_color = mix(tex_color, pos_color, 0.5);
+    vec3 coord = getCoord();
+    vec4 tex_color = texture(uTexSampler, vQuadTexcoord);
+    vec4 pos_color = vQuadColor;
+    outFragColor = mix(tex_color, pos_color, 0.5);
 }

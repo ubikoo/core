@@ -110,14 +110,14 @@ void Triangle::Initialize()
         GLsizeiptr offset_pos = 0;
         GLsizeiptr offset_col = vertex_data_size / 2;
         std::vector<Graphics::AttributeDescription> vertex_attributes{
-            {"a_pos", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_pos, false, 0},
-            {"a_col", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_col, false, 0},
+            {"inPos", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_pos, false, 0},
+            {"inCol", GL_FLOAT, GL_FLOAT_VEC4, stride, offset_col, false, 0},
         };
         mPipeline->SetAttribute(vertex_attributes);
 
         mOffset.Vbo->Bind();
         std::vector<Graphics::AttributeDescription> offset_attribute{
-            {"a_offset", GL_FLOAT, GL_FLOAT_VEC3, 3 * sizeof(GLfloat), 0, false, 1},
+            {"inOffset", GL_FLOAT, GL_FLOAT_VEC3, 3 * sizeof(GLfloat), 0, false, 1},
         };
         mPipeline->SetAttribute(offset_attribute);
         mPipeline->Unbind();
@@ -148,7 +148,7 @@ void Triangle::Render()
     // Render the triangles. Draw a triangle associated with each offset.
     {
         mPipeline->Use();
-        mPipeline->SetUniformMatrix("u_mvp", GL_FLOAT_MAT4, true,
+        mPipeline->SetUniformMatrix("uMvp", GL_FLOAT_MAT4, true,
             mModelView.data);
         mPipeline->Clear();
         glDrawArraysInstanced(GL_TRIANGLES, 0, 3, mOffset.data.size());

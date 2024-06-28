@@ -1,19 +1,19 @@
 #version 330 core
 
-uniform float u_width;
-uniform float u_height;
-uniform sampler2D u_texsampler;
+uniform float uWidth;
+uniform float uHeight;
+uniform sampler2D uTexSampler;
 
-in vec4 vert_model_normal;
-in vec4 vert_model_color;
-in vec2 vert_model_texcoord;
+in vec4 vModelNormal;
+in vec4 vModelColor;
+in vec2 vModelTexcoord;
 
-out vec4 frag_color;
+out vec4 outFragColor;
 
-vec3 get_coord()
+vec3 getCoord()
 {
-    float du = 2.0 / u_width;
-    float dv = 2.0 / u_height;
+    float du = 2.0 / uWidth;
+    float dv = 2.0 / uHeight;
     float dw = 2.0;
     return vec3(gl_FragCoord.x * du - 1.0,
                 gl_FragCoord.y * dv - 1.0,
@@ -22,6 +22,6 @@ vec3 get_coord()
 
 void main()
 {
-    vec3 normal = 0.5 + 0.5*vert_model_normal.xyz;
-    frag_color = vec4(normal.x, normal.y, normal.z, 1);
+    vec3 normal = 0.5 + 0.5*vModelNormal.xyz;
+    outFragColor = vec4(normal.x, normal.y, normal.z, 1);
 }

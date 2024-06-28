@@ -1,16 +1,16 @@
 #version 330 core
 
-uniform sampler2D u_texsampler;
+uniform sampler2D uTexSampler;
 
-in vec4 vert_quad_normal;
-in vec4 vert_quad_color;
-in vec2 vert_quad_texcoord;
+in vec4 vQuadNormal;
+in vec4 vQuadColor;
+in vec2 vQuadTexcoord;
 
-out vec4 frag_color;
+out vec4 outFragColor;
 
 void main()
 {
-    vec2 src = vert_quad_texcoord;
+    vec2 src = vQuadTexcoord;
 
     // vec2 dst;
     // if (src.x < 0.5) {
@@ -23,5 +23,5 @@ void main()
     vec2 dst = vec2(src.x + src.y, src.x + 2.0*src.y);
     dst = mod(dst, 1.0);
 
-    frag_color = texture(u_texsampler, dst);
+    outFragColor = texture(uTexSampler, dst);
 }

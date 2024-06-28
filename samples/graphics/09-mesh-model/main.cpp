@@ -79,7 +79,7 @@ void Model::Initialize()
 
     // Load the model meshes.
     for (auto &filename : kFilenames) {
-        Graphics::Mesh mesh = Graphics::LoadMesh("model", filename);
+        Graphics::Mesh mesh = Graphics::LoadMesh("Model", filename);
 
         // Reset mesh centre of mass position.
         math::vec3f com = {};
@@ -195,7 +195,7 @@ void Model::Render()
     {
         size_t id = mCurrentMeshId;
         mPipeline[id]->Use();
-        mPipeline[id]->SetUniformMatrix("u_mvp", GL_FLOAT_MAT4, true,
+        mPipeline[id]->SetUniformMatrix("uMvp", GL_FLOAT_MAT4, true,
             mModelView.data);
         mPipeline[id]->Clear();
         mMesh[id]->Draw();

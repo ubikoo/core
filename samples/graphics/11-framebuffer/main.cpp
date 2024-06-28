@@ -75,7 +75,7 @@ void Drawable::InitializeSphere()
 {
     mSphere.mvp = math::mat4f::eye;
     mSphere.mesh = Graphics::CreateSphere(
-        "sphere",                   // vertex attributes prefix
+        "Sphere",                   // vertex attributes prefix
         kMeshNodes,                 // n1 vertices
         kMeshNodes,                 // n2 vertices
         1.0,                        // radius
@@ -129,7 +129,7 @@ void Drawable::InitializeQuad()
 {
     mQuad.mvp = math::mat4f::eye;
     mQuad.mesh = Graphics::CreatePlane(
-        "quad",                     // vertex attributes prefix
+        "Quad",                     // vertex attributes prefix
         kMeshNodes,                 // n1 vertices
         kMeshNodes,                 // n2 vertices
         -1.0,                       // xlo
@@ -233,9 +233,9 @@ void Drawable::Render()
 
         GLenum texunit = 0;
         mSphere.pipeline->Use();
-        mSphere.pipeline->SetUniformMatrix("u_mvp", GL_FLOAT_MAT4, true,
+        mSphere.pipeline->SetUniformMatrix("uMvp", GL_FLOAT_MAT4, true,
             mSphere.mvp.data);
-        mSphere.pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
+        mSphere.pipeline->SetUniform("uTexSampler", GL_SAMPLER_2D, &texunit);
         mSphere.texture->Bind(texunit);
         mSphere.pipeline->Clear();
         mSphere.mesh->Draw();
@@ -258,9 +258,9 @@ void Drawable::Render()
 
         GLenum texunit = 0;
         mQuad.pipeline->Use();
-        mQuad.pipeline->SetUniformMatrix("u_mvp", GL_FLOAT_MAT4, true,
+        mQuad.pipeline->SetUniformMatrix("uMvp", GL_FLOAT_MAT4, true,
             mQuad.mvp.data);
-        mQuad.pipeline->SetUniform("u_texsampler", GL_SAMPLER_2D, &texunit);
+        mQuad.pipeline->SetUniform("uTexSampler", GL_SAMPLER_2D, &texunit);
         mFbo->mColorAttachments[0]->Bind(texunit);
         mQuad.pipeline->Clear();
         mQuad.mesh->Draw();
