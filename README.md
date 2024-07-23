@@ -1,9 +1,9 @@
-## core
+## minicore
 
 Lightweight foundation code for physics and graphics projects. The library is
 deliberately basic to ease learning and prototyping.
 
-    core/
+    minicore/
         compute         - compute interface to OpenCL.
         graphics        - graphics interface to OpenGL.
         math            - vector, matrix, linear algebra, etc.
