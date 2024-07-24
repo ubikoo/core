@@ -10,19 +10,19 @@
 #ifndef TEST_MATH_MATRIX3_H_
 #define TEST_MATH_MATRIX3_H_
 
-#include "core/math/math.h"
+#include "minicore/math/math.h"
 #include "common.h"
 
 ///
-/// @brief mat3 test client.
+/// @brief Mat3 test client.
 ///
 template<typename T>
 void test_matrix3(void)
 {
     // Constructor and assignment.
     {
-        math::mat3<T> a{};
-        math::mat3<T> b = {
+        Math::Mat3<T> a{};
+        Math::Mat3<T> b = {
             static_cast<T>(1),
             static_cast<T>(1),
             static_cast<T>(1),
@@ -34,8 +34,8 @@ void test_matrix3(void)
             static_cast<T>(1),
             static_cast<T>(1),
             static_cast<T>(1)};
-        math::mat3<T> c = math::mat3<T>::zeros;
-        math::mat3<T> d = math::mat3<T>::ones;
+        Math::Mat3<T> c = Math::Mat3<T>::Zeros;
+        Math::Mat3<T> d = Math::Mat3<T>::Ones;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == c[i]);
             REQUIRE(b[i] == d[i]);
@@ -44,18 +44,18 @@ void test_matrix3(void)
 
     // Compound assignment operators (matrix).
     {
-        math::mat3<T> a = {};
-        a += math::mat3<T>::ones;
+        Math::Mat3<T> a = {};
+        a += Math::Mat3<T>::Ones;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(1));
         }
 
-        a -= math::mat3<T>::ones;
+        a -= Math::Mat3<T>::Ones;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(0));
         }
 
-        math::mat3<T> b = {
+        Math::Mat3<T> b = {
             static_cast<T>(2),
             static_cast<T>(2),
             static_cast<T>(2),
@@ -67,7 +67,7 @@ void test_matrix3(void)
             static_cast<T>(2),
             static_cast<T>(2),
             static_cast<T>(2)};
-        a = math::mat3<T>::ones;
+        a = Math::Mat3<T>::Ones;
         a *= b;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(2));
@@ -81,7 +81,7 @@ void test_matrix3(void)
 
     // Compound assignment operators (scalar).
     {
-        math::mat3<T> a = {};
+        Math::Mat3<T> a = {};
         a += static_cast<T>(1);
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(1));
@@ -92,7 +92,7 @@ void test_matrix3(void)
             REQUIRE(a[i] == static_cast<T>(0));
         }
 
-        a = math::mat3<T>::ones;
+        a = Math::Mat3<T>::Ones;
         a *= static_cast<T>(2);
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(2));
@@ -106,9 +106,9 @@ void test_matrix3(void)
 
     // Arithmetic operators (matrix).
     {
-        math::mat3<T> a = math::mat3<T>::ones * static_cast<T>(2);
-        math::mat3<T> b = math::mat3<T>::ones * static_cast<T>(4);
-        math::mat3<T> c = a + b;
+        Math::Mat3<T> a = Math::Mat3<T>::Ones * static_cast<T>(2);
+        Math::Mat3<T> b = Math::Mat3<T>::Ones * static_cast<T>(4);
+        Math::Mat3<T> c = a + b;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(c[i] == static_cast<T>(6));
         }
@@ -131,8 +131,8 @@ void test_matrix3(void)
 
     // Arithmetic operators (scalar).
     {
-        math::mat3<T> a = math::mat3<T>::ones * static_cast<T>(4);
-        math::mat3<T> c = a + static_cast<T>(2);
+        Math::Mat3<T> a = Math::Mat3<T>::Ones * static_cast<T>(4);
+        Math::Mat3<T> c = a + static_cast<T>(2);
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(c[i] == static_cast<T>(6));
         }
@@ -155,8 +155,8 @@ void test_matrix3(void)
 
     // Arithmetic operators (scalar).
     {
-        math::mat3<T> a = static_cast<T>(2) * math::mat3<T>::ones;
-        math::mat3<T> c = static_cast<T>(2) + a;
+        Math::Mat3<T> a = static_cast<T>(2) * Math::Mat3<T>::Ones;
+        Math::Mat3<T> c = static_cast<T>(2) + a;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(c[i] == static_cast<T>(4));
         }
@@ -179,9 +179,9 @@ void test_matrix3(void)
 
     // Unary and increment operators
     {
-        math::mat3<T> a = math::mat3<T>::ones * static_cast<T>(2);
+        Math::Mat3<T> a = Math::Mat3<T>::Ones * static_cast<T>(2);
 
-        math::mat3<T> c = +a;
+        Math::Mat3<T> c = +a;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(c[i] == static_cast<T>(2));
         }

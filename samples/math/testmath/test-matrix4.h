@@ -10,19 +10,19 @@
 #ifndef TEST_MATH_MATRIX4_H_
 #define TEST_MATH_MATRIX4_H_
 
-#include "core/math/math.h"
+#include "minicore/math/math.h"
 #include "common.h"
 
 ///
-/// @brief mat4 test client.
+/// @brief Mat4 test client.
 ///
 template<typename T>
 void test_matrix4(void)
 {
     // Constructor and assignment.
     {
-        math::mat4<T> a{};
-        math::mat4<T> b = {
+        Math::Mat4<T> a{};
+        Math::Mat4<T> b = {
             static_cast<T>(1),
             static_cast<T>(1),
             static_cast<T>(1),
@@ -42,8 +42,8 @@ void test_matrix4(void)
             static_cast<T>(1),
             static_cast<T>(1),
             static_cast<T>(1)};
-        math::mat4<T> c = math::mat4<T>::zeros;
-        math::mat4<T> d = math::mat4<T>::ones;
+        Math::Mat4<T> c = Math::Mat4<T>::Zeros;
+        Math::Mat4<T> d = Math::Mat4<T>::Ones;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == c[i]);
             REQUIRE(b[i] == d[i]);
@@ -52,18 +52,18 @@ void test_matrix4(void)
 
     // Compound assignment operators (matrix).
     {
-        math::mat4<T> a = {};
-        a += math::mat4<T>::ones;
+        Math::Mat4<T> a = {};
+        a += Math::Mat4<T>::Ones;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(1));
         }
 
-        a -= math::mat4<T>::ones;
+        a -= Math::Mat4<T>::Ones;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(0));
         }
 
-        math::mat4<T> b = {
+        Math::Mat4<T> b = {
             static_cast<T>(2),
             static_cast<T>(2),
             static_cast<T>(2),
@@ -83,7 +83,7 @@ void test_matrix4(void)
             static_cast<T>(2),
             static_cast<T>(2),
             static_cast<T>(2)};
-        a = math::mat4<T>::ones;
+        a = Math::Mat4<T>::Ones;
         a *= b;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(2));
@@ -97,7 +97,7 @@ void test_matrix4(void)
 
     // Compound assignment operators (scalar).
     {
-        math::mat4<T> a = {};
+        Math::Mat4<T> a = {};
         a += static_cast<T>(1);
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(1));
@@ -108,7 +108,7 @@ void test_matrix4(void)
             REQUIRE(a[i] == static_cast<T>(0));
         }
 
-        a = math::mat4<T>::ones;
+        a = Math::Mat4<T>::Ones;
         a *= static_cast<T>(2);
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(2));
@@ -123,9 +123,9 @@ void test_matrix4(void)
 
     // Arithmetic operators (matrix).
     {
-        math::mat4<T> a = math::mat4<T>::ones * static_cast<T>(2);
-        math::mat4<T> b = math::mat4<T>::ones * static_cast<T>(4);
-        math::mat4<T> c = a + b;
+        Math::Mat4<T> a = Math::Mat4<T>::Ones * static_cast<T>(2);
+        Math::Mat4<T> b = Math::Mat4<T>::Ones * static_cast<T>(4);
+        Math::Mat4<T> c = a + b;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(c[i] == static_cast<T>(6));
         }
@@ -148,8 +148,8 @@ void test_matrix4(void)
 
     // Arithmetic operators (scalar).
     {
-        math::mat4<T> a = math::mat4<T>::ones * static_cast<T>(4);
-        math::mat4<T> c = a + static_cast<T>(2);
+        Math::Mat4<T> a = Math::Mat4<T>::Ones * static_cast<T>(4);
+        Math::Mat4<T> c = a + static_cast<T>(2);
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(c[i] == static_cast<T>(6));
         }
@@ -172,8 +172,8 @@ void test_matrix4(void)
 
     // Arithmetic operators (scalar).
     {
-        math::mat4<T> a = static_cast<T>(2) * math::mat4<T>::ones;
-        math::mat4<T> c = static_cast<T>(2) + a;
+        Math::Mat4<T> a = static_cast<T>(2) * Math::Mat4<T>::Ones;
+        Math::Mat4<T> c = static_cast<T>(2) + a;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(c[i] == static_cast<T>(4));
         }
@@ -196,9 +196,9 @@ void test_matrix4(void)
 
     // Unary and increment operators
     {
-        math::mat4<T> a = math::mat4<T>::ones * static_cast<T>(2);
+        Math::Mat4<T> a = Math::Mat4<T>::Ones * static_cast<T>(2);
 
-        math::mat4<T> c = +a;
+        Math::Mat4<T> c = +a;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(c[i] == static_cast<T>(2));
         }

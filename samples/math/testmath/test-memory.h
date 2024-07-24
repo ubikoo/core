@@ -10,7 +10,8 @@
 #ifndef TEST_CORE_MEMORY_H_
 #define TEST_CORE_MEMORY_H_
 
-#include "core/math/math.h"
+#include "minicore/base/base.h"
+#include "minicore/math/math.h"
 #include "common.h"
 
 void test_core_memory(void);

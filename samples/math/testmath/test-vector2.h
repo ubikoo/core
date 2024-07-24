@@ -10,21 +10,21 @@
 #ifndef TEST_MATH_VECTOR2_H_
 #define TEST_MATH_VECTOR2_H_
 
-#include "core/math/math.h"
+#include "minicore/math/math.h"
 #include "common.h"
 
 ///
-/// @brief vec2 test client.
+/// @brief Vec2 test client.
 ///
 template<typename T>
 void test_vector2(void)
 {
     // Constructor and assignment.
     {
-        math::vec2<T> a{};
-        math::vec2<T> b = {static_cast<T>(1), static_cast<T>(1)};
-        math::vec2<T> c = math::vec2<T>::zeros;
-        math::vec2<T> d = math::vec2<T>::ones;
+        Math::Vec2<T> a{};
+        Math::Vec2<T> b = {static_cast<T>(1), static_cast<T>(1)};
+        Math::Vec2<T> c = Math::Vec2<T>::Zeros;
+        Math::Vec2<T> d = Math::Vec2<T>::Ones;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == c[i]);
             REQUIRE(b[i] == d[i]);
@@ -33,19 +33,19 @@ void test_vector2(void)
 
     // Compound assignment operators (vector).
     {
-        math::vec2<T> a = {};
-        a += math::vec2<T>::ones;
+        Math::Vec2<T> a = {};
+        a += Math::Vec2<T>::Ones;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(1));
         }
 
-        a -= math::vec2<T>::ones;
+        a -= Math::Vec2<T>::Ones;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(0));
         }
 
-        math::vec2<T> b = {static_cast<T>(2), static_cast<T>(2)};
-        a = math::vec2<T>::ones;
+        Math::Vec2<T> b = {static_cast<T>(2), static_cast<T>(2)};
+        a = Math::Vec2<T>::Ones;
         a *= b;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(2));
@@ -59,7 +59,7 @@ void test_vector2(void)
 
     // Compound assignment operators (scalar).
     {
-        math::vec2<T> a = {};
+        Math::Vec2<T> a = {};
         a += static_cast<T>(1);
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(1));
@@ -70,7 +70,7 @@ void test_vector2(void)
             REQUIRE(a[i] == static_cast<T>(0));
         }
 
-        a = math::vec2<T>::ones;
+        a = Math::Vec2<T>::Ones;
         a *= static_cast<T>(2);
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(2));
@@ -84,9 +84,9 @@ void test_vector2(void)
 
     // Arithmetic operators (vector).
     {
-        math::vec2<T> a = math::vec2<T>::ones * static_cast<T>(2);
-        math::vec2<T> b = math::vec2<T>::ones * static_cast<T>(4);
-        math::vec2<T> c = a + b;
+        Math::Vec2<T> a = Math::Vec2<T>::Ones * static_cast<T>(2);
+        Math::Vec2<T> b = Math::Vec2<T>::Ones * static_cast<T>(4);
+        Math::Vec2<T> c = a + b;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(c[i] == static_cast<T>(6));
         }
@@ -109,8 +109,8 @@ void test_vector2(void)
 
     // Arithmetic operators (scalar).
     {
-        math::vec2<T> a = math::vec2<T>::ones * static_cast<T>(4);
-        math::vec2<T> c = a + static_cast<T>(2);
+        Math::Vec2<T> a = Math::Vec2<T>::Ones * static_cast<T>(4);
+        Math::Vec2<T> c = a + static_cast<T>(2);
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(c[i] == static_cast<T>(6));
         }
@@ -133,8 +133,8 @@ void test_vector2(void)
 
     // Arithmetic operators (scalar).
     {
-        math::vec2<T> a = static_cast<T>(2) * math::vec2<T>::ones;
-        math::vec2<T> c = static_cast<T>(2) + a;
+        Math::Vec2<T> a = static_cast<T>(2) * Math::Vec2<T>::Ones;
+        Math::Vec2<T> c = static_cast<T>(2) + a;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(c[i] == static_cast<T>(4));
         }
@@ -157,9 +157,9 @@ void test_vector2(void)
 
     // Unary and increment operators
     {
-        math::vec2<T> a = math::vec2<T>::ones * static_cast<T>(2);
+        Math::Vec2<T> a = Math::Vec2<T>::Ones * static_cast<T>(2);
 
-        math::vec2<T> c = +a;
+        Math::Vec2<T> c = +a;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(c[i] == static_cast<T>(2));
         }

@@ -10,11 +10,11 @@
 #include <iostream>
 #include <exception>
 #include <vector>
-#include "core/graphics/graphics.h"
+#include "minicore/graphics/graphics.h"
 
 /// -----------------------------------------------------------------------------
 struct Quad {
-    math::mat4f mModelView;
+    Math::Mat4f mModelView;
     Graphics::Buffer mVbo;
     Graphics::Buffer mEbo;
     Graphics::Pipeline mPipeline;
@@ -115,14 +115,14 @@ void Quad::Render()
         float ang_x = 0.6 * time;
         float ang_y = 0.4 * time;
         float ang_z = 0.2 * time;
-        math::mat4f m = math::mat4f::eye;
-        m = math::rotate(m, math::vec3f{0.0f, 0.0f, 1.0f}, ang_z);
-        m = math::rotate(m, math::vec3f{0.0f, 1.0f, 0.0f}, ang_y);
-        m = math::rotate(m, math::vec3f{1.0f, 0.0f, 0.0f}, ang_x);
+        Math::Mat4f m = Math::Mat4f::Eye;
+        m = Math::Rotate(m, Math::Vec3f{0.0f, 0.0f, 1.0f}, ang_z);
+        m = Math::Rotate(m, Math::Vec3f{0.0f, 1.0f, 0.0f}, ang_y);
+        m = Math::Rotate(m, Math::Vec3f{1.0f, 0.0f, 0.0f}, ang_x);
 
         float ratio = viewport.width / viewport.height;
-        math::mat4f p = math::orthographic(-ratio, ratio, -1.0f, 1.0f, -1.0f, 1.0f);
-        mModelView = math::dot(p, m);
+        Math::Mat4f p = Math::Orthographic(-ratio, ratio, -1.0f, 1.0f, -1.0f, 1.0f);
+        mModelView = Math::Dot(p, m);
     }
 
     // Render the quad.

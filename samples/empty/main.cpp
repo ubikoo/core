@@ -11,9 +11,9 @@
 #include <exception>
 #include <array>
 
-#include "core/math/math.h"
-#include "core/compute/compute.h"
-#include "core/graphics/graphics.h"
+#include "minicore/math/math.h"
+#include "minicore/compute/compute.h"
+#include "minicore/graphics/graphics.h"
 
 /// -----------------------------------------------------------------------------
 Graphics::Camera gCamera;

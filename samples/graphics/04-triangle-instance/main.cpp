@@ -10,14 +10,15 @@
 #include <iostream>
 #include <exception>
 #include <vector>
-#include "core/graphics/graphics.h"
+#include "minicore/base/base.h"
+#include "minicore/graphics/graphics.h"
 
 /// -----------------------------------------------------------------------------
 static const size_t kLatticeCells = 10;
 
 struct Triangle {
-    math::mat4f mModelView;
-    std::vector<math::vec3f, math::align_allocator<math::vec3f>> mOffset;
+    Math::Mat4f mModelView;
+    std::vector<Math::Vec3f, Base::Allocator<Math::Vec3f>> mOffset;
     Graphics::Buffer mVbo;
     Graphics::Pipeline mPipeline;
 
@@ -47,7 +48,7 @@ void Triangle::Initialize()
     for (size_t i = 0; i < kLatticeCells; ++i) {
         for (size_t j = 0; j < kLatticeCells; ++j) {
             for (size_t k = 0; k < kLatticeCells; ++k) {
-                math::vec3f o{
+                Math::Vec3f o{
                     -1.0f + 2.0f * scale * static_cast<GLfloat>(i),
                     -1.0f + 2.0f * scale * static_cast<GLfloat>(j),
                     -1.0f + 2.0f * scale * static_cast<GLfloat>(k)};
@@ -109,15 +110,15 @@ void Triangle::Render()
         float ang_y = 0.4 * time;
         float ang_z = 0.2 * time;
 
-        math::mat4f m = math::mat4f::eye;
-        m = math::rotate(m, math::vec3f{0.0f, 0.0f, 1.0f}, ang_z);
-        m = math::rotate(m, math::vec3f{0.0f, 1.0f, 0.0f}, ang_y);
-        m = math::rotate(m, math::vec3f{1.0f, 0.0f, 0.0f}, ang_x);
+        Math::Mat4f m = Math::Mat4f::Eye;
+        m = Math::Rotate(m, Math::Vec3f{0.0f, 0.0f, 1.0f}, ang_z);
+        m = Math::Rotate(m, Math::Vec3f{0.0f, 1.0f, 0.0f}, ang_y);
+        m = Math::Rotate(m, Math::Vec3f{1.0f, 0.0f, 0.0f}, ang_x);
 
         auto viewport = Graphics::GetViewport();
         float ratio = viewport.width / viewport.height;
-        math::mat4f p = math::orthographic(-ratio, ratio, -1.0f, 1.0f, -1.0f, 1.0f);
-        mModelView = math::dot(p, m);
+        Math::Mat4f p = Math::Orthographic(-ratio, ratio, -1.0f, 1.0f, -1.0f, 1.0f);
+        mModelView = Math::Dot(p, m);
     }
 
     // Render the triangles. Draw a triangle associated with each offset.

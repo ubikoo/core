@@ -10,7 +10,7 @@
 #include <iostream>
 #include <exception>
 #include <vector>
-#include "core/graphics/graphics.h"
+#include "minicore/graphics/graphics.h"
 
 /// -----------------------------------------------------------------------------
 static const std::string kImageFilename = "../assets/equirectangular.png";
@@ -21,7 +21,7 @@ struct Drawable {
     uint8_t Rotate{RotateMode::X};
 
     struct {
-        math::mat4f mvp;                // sphere mvp matrix
+        Math::Mat4f mvp;                // sphere mvp matrix
         Graphics::Mesh mesh;            // image and texture
         Graphics::Texture texture;      // sphere texture
         Graphics::Pipeline pipeline;    // rendering pipeline
@@ -29,7 +29,7 @@ struct Drawable {
 
 
     struct {
-        math::mat4f mvp;                // quad mvp matrix
+        Math::Mat4f mvp;                // quad mvp matrix
         Graphics::Mesh mesh;            // image and texture
         Graphics::Pipeline pipeline;    // rendering pipeline
     } mQuad;                            // quad draw pass.
@@ -73,7 +73,7 @@ void Drawable::Initialize()
 
 void Drawable::InitializeSphere()
 {
-    mSphere.mvp = math::mat4f::eye;
+    mSphere.mvp = Math::Mat4f::Eye;
     mSphere.mesh = Graphics::CreateSphere(
         "Sphere",                   // vertex attributes prefix
         kMeshNodes,                 // n1 vertices
@@ -127,7 +127,7 @@ void Drawable::InitializeSphere()
 
 void Drawable::InitializeQuad()
 {
-    mQuad.mvp = math::mat4f::eye;
+    mQuad.mvp = Math::Mat4f::Eye;
     mQuad.mesh = Graphics::CreatePlane(
         "Quad",                     // vertex attributes prefix
         kMeshNodes,                 // n1 vertices
@@ -188,20 +188,20 @@ void Drawable::Update()
         float angY = 2.0f * time;
         float angZ = 0.0f * time;
 
-        math::mat4f m = math::mat4f::eye;
-        m = math::rotate(m, math::vec3f{1.0f, 0.0f, 0.0f}, angX);
+        Math::Mat4f m = Math::Mat4f::Eye;
+        m = Math::Rotate(m, Math::Vec3f{1.0f, 0.0f, 0.0f}, angX);
 
-        math::vec4f dirY = math::dot(m, math::vec4f{0.0f,1.0f,0.0f,1.0f});
-        m = math::rotate(m, math::vec3f{dirY.x, dirY.y, dirY.z}, angY);
+        Math::Vec4f dirY = Math::Dot(m, Math::Vec4f{0.0f,1.0f,0.0f,1.0f});
+        m = Math::Rotate(m, Math::Vec3f{dirY.x, dirY.y, dirY.z}, angY);
 
-        math::vec4f dirZ = math::dot(m, math::vec4f{0.0f,0.0f,1.0f,1.0f});
-        m = math::rotate(m, math::vec3f{dirZ.x, dirZ.y, dirZ.z}, angZ);
+        Math::Vec4f dirZ = Math::Dot(m, Math::Vec4f{0.0f,0.0f,1.0f,1.0f});
+        m = Math::Rotate(m, Math::Vec3f{dirZ.x, dirZ.y, dirZ.z}, angZ);
 
         auto viewport = Graphics::GetViewport();
         float ratio = viewport.width / viewport.height;
-        math::mat4f proj = math::orthographic(
+        Math::Mat4f proj = Math::Orthographic(
             -ratio, ratio, -1.0f, 1.0f, -1.0f, 1.0f);
-        mSphere.mvp = math::dot(proj, m);
+        mSphere.mvp = Math::Dot(proj, m);
     }
 
     // Update the quad ModelView matrix
@@ -211,15 +211,15 @@ void Drawable::Update()
         float angY = gDrawable.Rotate == Drawable::RotateMode::Y ? rate : 0.0f;
         float angZ = gDrawable.Rotate == Drawable::RotateMode::Z ? rate : 0.0f;
 
-        math::mat4f m = math::mat4f::eye;
-        m = math::rotate(m, math::vec3f{0.0f, 0.0f, 1.0f}, angZ);
-        m = math::rotate(m, math::vec3f{0.0f, 1.0f, 0.0f}, angY);
-        m = math::rotate(m, math::vec3f{1.0f, 0.0f, 0.0f}, angX);
+        Math::Mat4f m = Math::Mat4f::Eye;
+        m = Math::Rotate(m, Math::Vec3f{0.0f, 0.0f, 1.0f}, angZ);
+        m = Math::Rotate(m, Math::Vec3f{0.0f, 1.0f, 0.0f}, angY);
+        m = Math::Rotate(m, Math::Vec3f{1.0f, 0.0f, 0.0f}, angX);
 
         float ratio = (float) mWidth / mHeight;
-        math::mat4f proj = math::orthographic(
+        Math::Mat4f proj = Math::Orthographic(
             -ratio, ratio, -1.0f, 1.0f, -1.0f, 1.0f);
-        mQuad.mvp = math::dot(proj, m);
+        mQuad.mvp = Math::Dot(proj, m);
     }
 }
 

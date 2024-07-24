@@ -10,13 +10,14 @@
 #include <iostream>
 #include <exception>
 #include <vector>
-#include "core/graphics/graphics.h"
+#include "minicore/base/base.h"
+#include "minicore/graphics/graphics.h"
 
 /// -----------------------------------------------------------------------------
 static const size_t kNumTriangles = 30;
 
 struct Triangle {
-    std::vector<math::mat4f, math::align_allocator<math::mat4f>> mModelView;
+    std::vector<Math::Mat4f, Base::Allocator<Math::Mat4f>> mModelView;
     Graphics::Buffer mVbo;               // vertex buffer object
     Graphics::Pipeline mPipeline;        // program rendering pipeline
 
@@ -44,7 +45,7 @@ void Triangle::Initialize()
 
     // Compute the triangle offset along each dimension.
     for (size_t i = 0; i < kNumTriangles; ++i) {
-        mModelView.push_back(math::mat4f::eye);
+        mModelView.push_back(Math::Mat4f::Eye);
     }
 
     // Create buffer storage for vertex position and color and specify how OpenGL
@@ -99,7 +100,7 @@ void Triangle::Render()
     {
         float ratio = viewport.width / viewport.height;
         float length = 0.5f * (float) mModelView.size();
-        math::mat4f projection = math::orthographic(
+        Math::Mat4f projection = Math::Orthographic(
             -ratio * length, ratio * length,
             -length, length,
             -length, length);
@@ -113,19 +114,19 @@ void Triangle::Render()
             float ang_y = 0.6f * time * (float) (i+1) / n_matrices;
             float ang_z = 0.4f * time * (float) (i+1) / n_matrices;
 
-            math::mat4f &m = mModelView[i];
-            m = math::mat4f::eye;
-            m = math::rotate(m, math::vec3f{0.0f, 0.0f, 1.0f}, ang_z);
-            m = math::rotate(m, math::vec3f{0.0f, 1.0f, 0.0f}, ang_y);
-            m = math::rotate(m, math::vec3f{1.0f, 0.0f, 0.0f}, ang_x);
+            Math::Mat4f &m = mModelView[i];
+            m = Math::Mat4f::Eye;
+            m = Math::Rotate(m, Math::Vec3f{0.0f, 0.0f, 1.0f}, ang_z);
+            m = Math::Rotate(m, Math::Vec3f{0.0f, 1.0f, 0.0f}, ang_y);
+            m = Math::Rotate(m, Math::Vec3f{1.0f, 0.0f, 0.0f}, ang_x);
 
             // translate the matrix
             float radius = std::cos(time) * n_matrices / M_PI;
             float u1 = 2.0f * M_PI * (float) i / n_matrices;
             float u2 = 2.0f * (float) i / n_matrices - 1.0;
-            math::vec3f trans{radius * std::cos(u1), radius * std::sin(u1), u2};
-            m = math::translate(m, trans);
-            m = dot(projection, m);
+            Math::Vec3f trans{radius * std::cos(u1), radius * std::sin(u1), u2};
+            m = Math::Translate(m, trans);
+            m = Dot(projection, m);
         }
     }
 

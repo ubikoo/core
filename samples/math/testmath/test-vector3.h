@@ -10,24 +10,24 @@
 #ifndef TEST_MATH_VECTOR3_H_
 #define TEST_MATH_VECTOR3_H_
 
-#include "core/math/math.h"
+#include "minicore/math/math.h"
 #include "common.h"
 
 ///
-/// @brief vec3 test client.
+/// @brief Vec3 test client.
 ///
 template<typename T>
 void test_vector3(void)
 {
     // Constructor and assignment.
     {
-        math::vec3<T> a{};
-        math::vec3<T> b = {
+        Math::Vec3<T> a{};
+        Math::Vec3<T> b = {
             static_cast<T>(1),
             static_cast<T>(1),
             static_cast<T>(1)};
-        math::vec3<T> c = math::vec3<T>::zeros;
-        math::vec3<T> d = math::vec3<T>::ones;
+        Math::Vec3<T> c = Math::Vec3<T>::Zeros;
+        Math::Vec3<T> d = Math::Vec3<T>::Ones;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == c[i]);
             REQUIRE(b[i] == d[i]);
@@ -36,22 +36,22 @@ void test_vector3(void)
 
     // Compound assignment operators (vector).
     {
-        math::vec3<T> a = {};
-        a += math::vec3<T>::ones;
+        Math::Vec3<T> a = {};
+        a += Math::Vec3<T>::Ones;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(1));
         }
 
-        a -= math::vec3<T>::ones;
+        a -= Math::Vec3<T>::Ones;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(0));
         }
 
-        math::vec3<T> b = {
+        Math::Vec3<T> b = {
             static_cast<T>(2),
             static_cast<T>(2),
             static_cast<T>(2)};
-        a = math::vec3<T>::ones;
+        a = Math::Vec3<T>::Ones;
         a *= b;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(2));
@@ -65,7 +65,7 @@ void test_vector3(void)
 
     // Compound assignment operators (scalar).
     {
-        math::vec3<T> a = {};
+        Math::Vec3<T> a = {};
         a += static_cast<T>(1);
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(1));
@@ -76,7 +76,7 @@ void test_vector3(void)
             REQUIRE(a[i] == static_cast<T>(0));
         }
 
-        a = math::vec3<T>::ones;
+        a = Math::Vec3<T>::Ones;
         a *= static_cast<T>(2);
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(a[i] == static_cast<T>(2));
@@ -90,9 +90,9 @@ void test_vector3(void)
 
     // Arithmetic operators (vector).
     {
-        math::vec3<T> a = math::vec3<T>::ones * static_cast<T>(2);
-        math::vec3<T> b = math::vec3<T>::ones * static_cast<T>(4);
-        math::vec3<T> c = a + b;
+        Math::Vec3<T> a = Math::Vec3<T>::Ones * static_cast<T>(2);
+        Math::Vec3<T> b = Math::Vec3<T>::Ones * static_cast<T>(4);
+        Math::Vec3<T> c = a + b;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(c[i] == static_cast<T>(6));
         }
@@ -115,8 +115,8 @@ void test_vector3(void)
 
     // Arithmetic operators (scalar).
     {
-        math::vec3<T> a = math::vec3<T>::ones * static_cast<T>(4);
-        math::vec3<T> c = a + static_cast<T>(2);
+        Math::Vec3<T> a = Math::Vec3<T>::Ones * static_cast<T>(4);
+        Math::Vec3<T> c = a + static_cast<T>(2);
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(c[i] == static_cast<T>(6));
         }
@@ -139,8 +139,8 @@ void test_vector3(void)
 
     // Arithmetic operators (scalar).
     {
-        math::vec3<T> a = static_cast<T>(2) * math::vec3<T>::ones;
-        math::vec3<T> c = static_cast<T>(2) + a;
+        Math::Vec3<T> a = static_cast<T>(2) * Math::Vec3<T>::Ones;
+        Math::Vec3<T> c = static_cast<T>(2) + a;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(c[i] == static_cast<T>(4));
         }
@@ -163,9 +163,9 @@ void test_vector3(void)
 
     // Unary and increment operators
     {
-        math::vec3<T> a = math::vec3<T>::ones * static_cast<T>(2);
+        Math::Vec3<T> a = Math::Vec3<T>::Ones * static_cast<T>(2);
 
-        math::vec3<T> c = +a;
+        Math::Vec3<T> c = +a;
         for (size_t i = 0; i < a.length; ++i) {
             REQUIRE(c[i] == static_cast<T>(2));
         }

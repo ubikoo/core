@@ -21,19 +21,19 @@
 TEST_CASE("Algebra") {
     static const size_t n_iters = 8192;
 
-    SECTION("vec2") {
+    SECTION("Vec2") {
         test_algebra_vector2<float>(n_iters);
         test_algebra_vector2<double>(n_iters);
         test_algebra_matrix2<float>(n_iters);
         test_algebra_matrix2<double>(n_iters);
     }
-    SECTION("vec3") {
+    SECTION("Vec3") {
         test_algebra_vector3<float>(n_iters);
         test_algebra_vector3<double>(n_iters);
         test_algebra_matrix3<float>(n_iters);
         test_algebra_matrix3<double>(n_iters);
     }
-    SECTION("vec4") {
+    SECTION("Vec4") {
         test_algebra_vector4<float>(n_iters);
         test_algebra_vector4<double>(n_iters);
         test_algebra_matrix4<float>(n_iters);

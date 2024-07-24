@@ -12,7 +12,7 @@
 #include <iostream>
 #include <fstream>
 #include "external/catch2/catch.hpp"
-#include "core/math/math.h"
+#include "minicore/math/math.h"
 #include "common.h"
 
 ///
@@ -28,13 +28,13 @@ TEST_CASE("Random")
     SECTION("random32")
     {
         // Create a collection of random engines, one for each thread.
-        std::vector<math::RandomEngine> engine;
+        std::vector<Math::RandomEngine> engine;
         #pragma omp parallel default(none) shared(std::cout, engine)
         {
             size_t n_threads = omp_get_num_threads();
             #pragma omp master
             for (size_t i = 0; i < n_threads; ++i) {
-                engine.push_back(math::CreateRandomEngine());
+                engine.push_back(Math::CreateRandomEngine());
                 std::cout << "engine " << engine.size()
                     << " x "  << engine.back().x << " "
                     << " y "  << engine.back().y << " "
@@ -55,7 +55,7 @@ TEST_CASE("Random")
                 size_t tid = omp_get_thread_num();
                 #pragma omp for schedule(static)
                 for (size_t i = 0; i < samples.size(); ++i) {
-                    samples[i] = math::Random32(engine[tid]);
+                    samples[i] = Math::Random32(engine[tid]);
                 }
             }
 
@@ -76,7 +76,7 @@ TEST_CASE("Random")
                 size_t tid = omp_get_thread_num();
                 #pragma omp for schedule(static)
                 for (size_t i = 0; i < samples.size(); ++i) {
-                    samples[i] = math::Random32(engine[tid]);
+                    samples[i] = Math::Random32(engine[tid]);
                 }
             }
 
@@ -93,13 +93,13 @@ TEST_CASE("Random")
     SECTION("random64")
     {
         // Create a collection of random engines, one for each thread.
-        std::vector<math::RandomEngine> engine;
+        std::vector<Math::RandomEngine> engine;
         #pragma omp parallel default(none) shared(std::cout, engine)
         {
             size_t n_threads = omp_get_num_threads();
             #pragma omp master
             for (size_t i = 0; i < n_threads; ++i) {
-                engine.push_back(math::CreateRandomEngine());
+                engine.push_back(Math::CreateRandomEngine());
                 std::cout << "engine " << engine.size()
                     << " x "  << engine.back().x << " "
                     << " y "  << engine.back().y << " "
@@ -119,7 +119,7 @@ TEST_CASE("Random")
                 size_t tid = omp_get_thread_num();
                 #pragma omp for schedule(static)
                 for (size_t i = 0; i < samples.size(); ++i) {
-                    samples[i] = math::Random64(engine[tid]);
+                    samples[i] = Math::Random64(engine[tid]);
                 }
             }
 
@@ -140,7 +140,7 @@ TEST_CASE("Random")
                 size_t tid = omp_get_thread_num();
                 #pragma omp for schedule(static)
                 for (size_t i = 0; i < samples.size(); ++i) {
-                    samples[i] = math::Random64(engine[tid]);
+                    samples[i] = Math::Random64(engine[tid]);
                 }
             }
 

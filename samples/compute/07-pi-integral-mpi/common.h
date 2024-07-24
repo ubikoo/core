@@ -10,7 +10,7 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
-#include "core/compute/compute.h"
+#include "minicore/compute/compute.h"
 
 // OpenCL parameters
 static const cl_ulong kDeviceIndex = 3;

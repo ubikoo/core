@@ -36,10 +36,10 @@ struct X {
     X(size_t num, size_t value) {
         m_num = num;
         m_value = value;
-        m_arr = math::align_array_alloc<size_t>(m_num, m_value);
+        m_arr = Base::AlignArrayAlloc<size_t>(m_num, m_value);
     }
     ~X() {
-        math::align_array_free<size_t>(m_arr, m_num);
+        Base::AlignArrayFree<size_t>(m_arr, m_num);
     }
 
     // Disable copy constructor/assignment operators
@@ -50,7 +50,7 @@ struct X {
 struct XPtrDeleter {
     void operator()(X *ptr) const {
         if (ptr) {
-            math::align_free(ptr);
+            Base::AlignFree(ptr);
         }
     }
 };
@@ -66,7 +66,7 @@ void test_core_memory()
         XPtrDeleter del;
         std::vector<XUniquePtr> vector_data;
         for (size_t i = 0; i < NumArrays; ++i) {
-            XUniquePtr ptr(math::align_alloc<X>(ArraySize, 1), del);
+            XUniquePtr ptr(Base::AlignAlloc<X>(ArraySize, 1), del);
             vector_data.push_back(std::move(ptr));
         }
 

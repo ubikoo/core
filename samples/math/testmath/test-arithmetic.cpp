@@ -16,15 +16,15 @@
 /// @brief Vector arithmetic test client.
 ///
 TEST_CASE("Arithmetic") {
-    SECTION("vec2") {
+    SECTION("Vec2") {
         test_arithmetic2<float>();
         test_arithmetic2<double>();
     }
-    SECTION("vec3") {
+    SECTION("Vec3") {
         test_arithmetic3<float>();
         test_arithmetic3<double>();
     }
-    SECTION("vec4") {
+    SECTION("Vec4") {
         test_arithmetic4<float>();
         test_arithmetic4<double>();
     }

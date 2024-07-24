@@ -27,5 +27,5 @@ add_executable(${PROJECT_NAME}
     test-vector3.h
     test-vector4.h)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE coremath)
+target_link_libraries(${PROJECT_NAME} PRIVATE corebase coremath)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR})

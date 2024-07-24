@@ -16,7 +16,7 @@
 /// @brief Matrix test client.
 ///
 TEST_CASE("Matrix") {
-    SECTION("mat2") {
+    SECTION("Mat2") {
         test_matrix2<int32_t>();
         test_matrix2<int64_t>();
         test_matrix2<uint32_t>();
@@ -25,7 +25,7 @@ TEST_CASE("Matrix") {
         test_matrix2<double>();
     }
 
-    SECTION("mat3") {
+    SECTION("Mat3") {
         test_matrix3<int32_t>();
         test_matrix3<int64_t>();
         test_matrix3<uint32_t>();
@@ -34,7 +34,7 @@ TEST_CASE("Matrix") {
         test_matrix3<double>();
     }
 
-    SECTION("mat4") {
+    SECTION("Mat4") {
         test_matrix4<int32_t>();
         test_matrix4<int64_t>();
         test_matrix4<uint32_t>();

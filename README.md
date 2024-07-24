@@ -4,6 +4,7 @@ Lightweight foundation code for physics and graphics projects. The library is
 deliberately basic to ease learning and prototyping.
 
     minicore/
+        base            - base error handling, memory allocation, etc.
         compute         - compute interface to OpenCL.
         graphics        - graphics interface to OpenGL.
         math            - vector, matrix, linear algebra, etc.
@@ -17,7 +18,6 @@ deliberately basic to ease learning and prototyping.
 The library is used by the following projects:
 
     playground
-    sandbox
 
 ## License
 

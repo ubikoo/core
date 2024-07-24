@@ -16,7 +16,7 @@
 /// @brief Vector test client.
 ///
 TEST_CASE("Vector") {
-    SECTION("vec2") {
+    SECTION("Vec2") {
         test_vector2<int32_t>();
         test_vector2<int64_t>();
         test_vector2<uint32_t>();
@@ -25,7 +25,7 @@ TEST_CASE("Vector") {
         test_vector2<double>();
     }
 
-    SECTION("vec3") {
+    SECTION("Vec3") {
         test_vector3<int32_t>();
         test_vector3<int64_t>();
         test_vector3<uint32_t>();
@@ -34,7 +34,7 @@ TEST_CASE("Vector") {
         test_vector3<double>();
     }
 
-    SECTION("vec4") {
+    SECTION("Vec4") {
         test_vector4<int32_t>();
         test_vector4<int64_t>();
         test_vector4<uint32_t>();

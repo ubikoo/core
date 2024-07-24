@@ -10,7 +10,7 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
-#include "core/compute/compute.h"
+#include "minicore/compute/compute.h"
 
 static const cl_ulong kDeviceIndex = 3;
 static const cl_ulong kWorkGroupSize = 256;

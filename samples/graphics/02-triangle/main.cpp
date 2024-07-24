@@ -10,7 +10,7 @@
 #include <iostream>
 #include <exception>
 #include <vector>
-#include "core/graphics/graphics.h"
+#include "minicore/graphics/graphics.h"
 
 /// -----------------------------------------------------------------------------
 struct Triangle {

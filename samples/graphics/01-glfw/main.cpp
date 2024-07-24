@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <exception>
-#include "core/graphics/graphics.h"
+#include "minicore/graphics/graphics.h"
 
 void OnKeyboard(int code, int scancode, int action, int mods)
 {

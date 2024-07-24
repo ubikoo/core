@@ -13,7 +13,7 @@
 #include <utility>
 #include <chrono>
 
-#include "core/compute/compute.h"
+#include "minicore/compute/compute.h"
 
 ///
 /// @brief Compute run driver.

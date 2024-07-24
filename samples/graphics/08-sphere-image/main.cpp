@@ -10,14 +10,14 @@
 #include <iostream>
 #include <exception>
 #include <vector>
-#include "core/graphics/graphics.h"
+#include "minicore/graphics/graphics.h"
 
 /// -----------------------------------------------------------------------------
 static const std::string kImageFilename = "../assets/equirectangular.png";
 static const size_t kMeshNodes = 1024;
 
 struct Sphere {
-    math::mat4f mModelView;
+    Math::Mat4f mModelView;
     Graphics::Mesh mMesh;
     Graphics::Image mImage;
     Graphics::Texture mTexture;
@@ -32,7 +32,7 @@ void Sphere::Initialize()
 {
     // Initialize mvp matrix and create a mesh over a rectangle.
     {
-        mModelView = math::mat4f::eye;
+        mModelView = Math::Mat4f::Eye;
         mMesh = Graphics::CreateSphere(
             "Sphere",                   // vertex attributes prefix
             kMeshNodes,                 // n1 vertices
@@ -99,18 +99,18 @@ void Sphere::Render()
         // Update the ModelView matrix
         float time = (float) glfwGetTime();
 
-        math::mat4f m = math::mat4f::eye;
-        m = math::rotate(m, math::vec3f{1.0f, 0.0f, 0.0f}, (float) (0.5*M_PI));
+        Math::Mat4f m = Math::Mat4f::Eye;
+        m = Math::Rotate(m, Math::Vec3f{1.0f, 0.0f, 0.0f}, (float) (0.5*M_PI));
 
-        math::vec4f dir_y = math::dot(m, math::vec4f{0.0, 1.0, 0.0, 1.0});
-        m = math::rotate(m, math::vec3f{dir_y.x, dir_y.y, dir_y.z}, 0.2f*time);
+        Math::Vec4f dir_y = Math::Dot(m, Math::Vec4f{0.0, 1.0, 0.0, 1.0});
+        m = Math::Rotate(m, Math::Vec3f{dir_y.x, dir_y.y, dir_y.z}, 0.2f*time);
 
-        math::vec4f dir_z = math::dot(m, math::vec4f{0.0, 0.0, 1.0, 1.0});
-        m = math::rotate(m, math::vec3f{dir_z.x, dir_z.y, dir_z.z}, 0.8f*time);
+        Math::Vec4f dir_z = Math::Dot(m, Math::Vec4f{0.0, 0.0, 1.0, 1.0});
+        m = Math::Rotate(m, Math::Vec3f{dir_z.x, dir_z.y, dir_z.z}, 0.8f*time);
 
         float ratio = viewport.width / viewport.height;
-        math::mat4f p = math::orthographic(-ratio, ratio, -1.0f, 1.0f, -1.0f, 1.0f);
-        mModelView = math::dot(p, m);
+        Math::Mat4f p = Math::Orthographic(-ratio, ratio, -1.0f, 1.0f, -1.0f, 1.0f);
+        mModelView = Math::Dot(p, m);
     }
 
     // Render the sphere.

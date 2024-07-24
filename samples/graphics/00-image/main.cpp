@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "core/graphics/graphics.h"
+#include "minicore/graphics/graphics.h"
 
 /// -----------------------------------------------------------------------------
 /// @brief Constants and globals.

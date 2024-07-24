@@ -10,14 +10,14 @@
 #include <iostream>
 #include <exception>
 #include <vector>
-#include "core/graphics/graphics.h"
+#include "minicore/graphics/graphics.h"
 
 /// -----------------------------------------------------------------------------
 static const std::string kImageFilename = "../assets/equirectangular.png";
 static const size_t kMeshNodes = 1024;
 
 struct Panorama {
-    math::mat4f mModelView;
+    Math::Mat4f mModelView;
     Graphics::Camera mCamera;
     Graphics::Image mImage;
     Graphics::Mesh mMesh;
@@ -52,7 +52,7 @@ void Panorama::Initialize()
 {
     // Create panorama camera and initialize projection matrix.
     {
-        mModelView = math::mat4f::eye;
+        mModelView = Math::Mat4f::Eye;
 
         auto viewport = Graphics::GetViewport();
         Graphics::CameraCreateInfo info = {};
@@ -153,9 +153,9 @@ void Panorama::Render()
 {
     // Update the panorama camera view.
     {
-        math::mat4f proj = mCamera.Proj();
-        math::mat4f view = mCamera.View();
-        mModelView = math::dot(proj, view);
+        Math::Mat4f proj = mCamera.Proj();
+        Math::Mat4f view = mCamera.View();
+        mModelView = Math::Dot(proj, view);
     }
 
     // Render the panorama camera view..

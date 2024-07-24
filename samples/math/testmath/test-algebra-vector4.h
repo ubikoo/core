@@ -10,11 +10,11 @@
 #ifndef TEST_MATH_ALGEBRA_VECTOR4_H_
 #define TEST_MATH_ALGEBRA_VECTOR4_H_
 
-#include "core/math/math.h"
+#include "minicore/math/math.h"
 #include "common.h"
 
 ///
-/// @brief vec4 algebra test client.
+/// @brief Vec4 algebra test client.
 ///
 template<typename T>
 void test_algebra_vector4_run(const size_t n_iters)
@@ -24,126 +24,126 @@ void test_algebra_vector4_run(const size_t n_iters)
     std::uniform_real_distribution<T> dist(0.0, 1.0);
 
     for (size_t iter = 0; iter < n_iters; ++iter) {
-        math::vec4<T> arr_a = {dist(rng),  dist(rng), dist(rng), dist(rng)};
-        math::vec4<T> arr_b = -arr_a;
-        math::vec4<T> arr_c = math::vec4<T>::zeros;
+        Math::Vec4<T> arr_a = {dist(rng),  dist(rng), dist(rng), dist(rng)};
+        Math::Vec4<T> arr_b = -arr_a;
+        Math::Vec4<T> arr_c = Math::Vec4<T>::Zeros;
 
         // Test arithmetic assignment
         (arr_c = arr_a) += arr_b;
         for (size_t j = 0; j < arr_c.length; ++j) {
-            REQUIRE(math::iseq(arr_c[j], static_cast<T>(0)));
+            REQUIRE(Math::IsEq(arr_c[j], static_cast<T>(0)));
         }
 
         (arr_c = arr_a) -= arr_b;
         for (size_t j = 0; j < arr_c.length; ++j) {
-            REQUIRE(math::iseq(arr_c[j], static_cast<T>(2) * arr_a[j]));
+            REQUIRE(Math::IsEq(arr_c[j], static_cast<T>(2) * arr_a[j]));
         }
 
         arr_c = arr_a + arr_b;
         for (size_t j = 0; j < arr_c.length; ++j) {
-            REQUIRE(math::iseq(arr_c[j], static_cast<T>(0)));
+            REQUIRE(Math::IsEq(arr_c[j], static_cast<T>(0)));
         }
 
         arr_c = arr_a - arr_b;
         for (size_t j = 0; j < arr_c.length; ++j) {
-            REQUIRE(math::iseq(arr_c[j], static_cast<T>(2) * arr_a[j]));
+            REQUIRE(Math::IsEq(arr_c[j], static_cast<T>(2) * arr_a[j]));
         }
 
-        // Test dot, norm and normalize
+        // Test Dot, norm and normalize
         arr_c = arr_a - arr_b;
 
-        T d_0 = math::dot(arr_c, arr_c);
-        T d_1 = 4.0 * math::dot(arr_a, arr_a);
-        REQUIRE(math::iseq(d_0, d_1));
+        T d_0 = Math::Dot(arr_c, arr_c);
+        T d_1 = 4.0 * Math::Dot(arr_a, arr_a);
+        REQUIRE(Math::IsEq(d_0, d_1));
 
-        T d_2 = math::norm(arr_c);
-        T d_3 = 2.0 * std::sqrt(math::dot(arr_a, arr_a));
-        REQUIRE(math::iseq(d_2, d_3));
+        T d_2 = Math::Norm(arr_c);
+        T d_3 = 2.0 * std::sqrt(Math::Dot(arr_a, arr_a));
+        REQUIRE(Math::IsEq(d_2, d_3));
 
-        T d_4 = math::norm(math::normalize(arr_c));
-        REQUIRE(math::iseq(d_4, static_cast<T>(1)));
+        T d_4 = Math::Norm(Math::Normalize(arr_c));
+        REQUIRE(Math::IsEq(d_4, static_cast<T>(1)));
     }
 }
 
 template<typename T>
 void test_algebra_vector4(const size_t n_iters)
 {
-    // Test dot
+    // Test Dot
     {
         const T zero = (T) 0;
         const T one = (T) 1;
         const T two = (T) 2;
 
-        math::vec4<T> a = {0.0, 0.0, 1.0, 1.0};
-        math::vec4<T> b = {0.0, 0.0, 0.0, 1.0};
-        math::vec4<T> c = {0.0, 0.0,-1.0, 1.0};
+        Math::Vec4<T> a = {0.0, 0.0, 1.0, 1.0};
+        Math::Vec4<T> b = {0.0, 0.0, 0.0, 1.0};
+        Math::Vec4<T> c = {0.0, 0.0,-1.0, 1.0};
 
-        REQUIRE(math::iseq(dot(a,a), two));
-        REQUIRE(math::iseq(dot(b,b), one));
-        REQUIRE(math::iseq(dot(c,c), two));
+        REQUIRE(Math::IsEq(Dot(a,a), two));
+        REQUIRE(Math::IsEq(Dot(b,b), one));
+        REQUIRE(Math::IsEq(Dot(c,c), two));
 
-        REQUIRE(math::iseq(dot(a,b), one));
-        REQUIRE(math::iseq(dot(a,c), zero));
-        REQUIRE(math::iseq(dot(b,c), one));
+        REQUIRE(Math::IsEq(Dot(a,b), one));
+        REQUIRE(Math::IsEq(Dot(a,c), zero));
+        REQUIRE(Math::IsEq(Dot(b,c), one));
     }
 
-    // Test norm
+    // Test Norm
     {
         const T sqrt2 = (T) std::sqrt(2.0);
         const T one = (T) 1;
 
-        math::vec4<T> a = {0.0, 0.0, 1.0, 1.0};
-        math::vec4<T> b = {0.0, 0.0, 0.0, 1.0};
-        math::vec4<T> c = {0.0, 0.0,-1.0, 1.0};
+        Math::Vec4<T> a = {0.0, 0.0, 1.0, 1.0};
+        Math::Vec4<T> b = {0.0, 0.0, 0.0, 1.0};
+        Math::Vec4<T> c = {0.0, 0.0,-1.0, 1.0};
 
-        REQUIRE(math::iseq(norm(a), sqrt2));
-        REQUIRE(math::iseq(norm(b), one));
-        REQUIRE(math::iseq(norm(c), sqrt2));
+        REQUIRE(Math::IsEq(Norm(a), sqrt2));
+        REQUIRE(Math::IsEq(Norm(b), one));
+        REQUIRE(Math::IsEq(Norm(c), sqrt2));
     }
 
-    // Test normalize
+    // Test Normalize
     {
         const T one = (T) 1;
 
-        math::vec4<T> a = {0.0, 0.0, 1.0, 1.0};
-        math::vec4<T> b = {0.0, 0.0, 0.0, 1.0};
-        math::vec4<T> c = {0.0, 0.0,-1.0, 1.0};
+        Math::Vec4<T> a = {0.0, 0.0, 1.0, 1.0};
+        Math::Vec4<T> b = {0.0, 0.0, 0.0, 1.0};
+        Math::Vec4<T> c = {0.0, 0.0,-1.0, 1.0};
 
-        math::vec4<T> norm_a = normalize(a);
-        math::vec4<T> norm_b = normalize(b);
-        math::vec4<T> norm_c = normalize(c);
+        Math::Vec4<T> norm_a = Normalize(a);
+        Math::Vec4<T> norm_b = Normalize(b);
+        Math::Vec4<T> norm_c = Normalize(c);
 
-        REQUIRE(math::iseq(norm(norm_a), one));
-        REQUIRE(math::iseq(norm(norm_b), one));
-        REQUIRE(math::iseq(norm(norm_c), one));
+        REQUIRE(Math::IsEq(Norm(norm_a), one));
+        REQUIRE(Math::IsEq(Norm(norm_b), one));
+        REQUIRE(Math::IsEq(Norm(norm_c), one));
     }
 
-    // Test distance
+    // Test Distance
     {
         const T zero = (T) 0;
 
-        math::vec4<T> a = {0.0, 0.0, 1.0, 1.0};
-        math::vec4<T> b = {0.0, 0.0, 0.0, 1.0};
-        math::vec4<T> c = {0.0, 0.0,-1.0, 1.0};
+        Math::Vec4<T> a = {0.0, 0.0, 1.0, 1.0};
+        Math::Vec4<T> b = {0.0, 0.0, 0.0, 1.0};
+        Math::Vec4<T> c = {0.0, 0.0,-1.0, 1.0};
 
-        math::vec4<T> ab  = a - b;
-        math::vec4<T> ac  = a - c;
-        math::vec4<T> cb1 = c - b;
-        math::vec4<T> cb2 = ab - ac;
+        Math::Vec4<T> ab  = a - b;
+        Math::Vec4<T> ac  = a - c;
+        Math::Vec4<T> cb1 = c - b;
+        Math::Vec4<T> cb2 = ab - ac;
 
-        REQUIRE(math::iseq(norm(ab), distance(a,b)));
-        REQUIRE(math::iseq(distance(b,a), distance(a,b)));
+        REQUIRE(Math::IsEq(Norm(ab), Distance(a,b)));
+        REQUIRE(Math::IsEq(Distance(b,a), Distance(a,b)));
 
-        REQUIRE(math::iseq(norm(ac), distance(a,c)));
-        REQUIRE(math::iseq(distance(a,c), distance(a,c)));
+        REQUIRE(Math::IsEq(Norm(ac), Distance(a,c)));
+        REQUIRE(Math::IsEq(Distance(a,c), Distance(a,c)));
 
-        REQUIRE(math::iseq(norm(cb1), norm(cb2)));
-        REQUIRE(math::iseq(norm(cb1), distance(c,b)));
-        REQUIRE(math::iseq(distance(b,c), distance(c,b)));
-        REQUIRE(math::iseq(distance(cb1,cb2), zero));
+        REQUIRE(Math::IsEq(Norm(cb1), Norm(cb2)));
+        REQUIRE(Math::IsEq(Norm(cb1), Distance(c,b)));
+        REQUIRE(Math::IsEq(Distance(b,c), Distance(c,b)));
+        REQUIRE(Math::IsEq(Distance(cb1,cb2), zero));
     }
 
-    // Test random vectors
+    // Test Random Vectors
     {
         #pragma omp parallel default(none) shared(n_iters)
         {
