@@ -4,7 +4,6 @@ add_executable(${PROJECT_NAME}
     test-algebra.cpp
     test-arithmetic.cpp
     test-matrix.cpp
-    test-memory.cpp
     test-ortho.cpp
     test-random.cpp
     test-vector.cpp
@@ -21,7 +20,6 @@ add_executable(${PROJECT_NAME}
     test-matrix2.h
     test-matrix3.h
     test-matrix4.h
-    test-memory.h
     test-ortho.h
     test-vector2.h
     test-vector3.h

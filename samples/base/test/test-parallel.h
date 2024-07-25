@@ -1,5 +1,5 @@
 //
-// test-memory.h
+// test-parallel.h
 //
 // Copyright (c) 2020 Carlos Braga
 // This program is free software; you can redistribute it and/or modify it
@@ -7,13 +7,11 @@
 // https://opensource.org/licenses/MIT.
 //
 
-#ifndef TEST_CORE_MEMORY_H_
-#define TEST_CORE_MEMORY_H_
+#ifndef TEST_BASE_PARALLEL_H_
+#define TEST_BASE_PARALLEL_H_
 
 #include "minicore/base/base.h"
-#include "minicore/math/math.h"
-#include "common.h"
 
-void test_core_memory(void);
+void test_base_parallel(void);
 
-#endif // TEST_CORE_MEMORY_H_
+#endif // TEST_BASE_PARALLEL_H_

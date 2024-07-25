@@ -33,11 +33,6 @@ ask() {
 
 # -------------------------------------------------------------------------------
 # Execute tests
-pushd testmath
-run ./testmath
-popd
-
-pushd plot
-run ./plot_ent.sh
-gnuplot plot_ent.gnuplot
+pushd test
+run ./testbase
 popd

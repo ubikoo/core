@@ -7,15 +7,16 @@
 // https://opensource.org/licenses/MIT.
 //
 
-#include <cassert>
-#include <stddef.h>
+#include "external/catch2/catch.hpp"
+#include <iostream>
+#include <iomanip>
+#include <vector>
 #include "test-memory.h"
 
 static const size_t NumArrays = 16;
 static const size_t ArraySize = 1024;
 
-/// ---- Memory test structure ------------------------------------------------
-///
+/// -----------------------------------------------------------------------------
 struct X {
     size_t m_num = 0;
     size_t m_value = 0;
@@ -57,29 +58,31 @@ struct XPtrDeleter {
 
 using XUniquePtr = std::unique_ptr<X, XPtrDeleter>;
 
-// ---- Memory ----------------------------------------------------------------
-///
-void test_core_memory()
+/// -----------------------------------------------------------------------------
+void test_base_memory()
 {
     // Test align_unique_ptr
     {
         XPtrDeleter del;
-        std::vector<XUniquePtr> vector_data;
+        std::vector<XUniquePtr> data;
         for (size_t i = 0; i < NumArrays; ++i) {
             XUniquePtr ptr(Base::AlignAlloc<X>(ArraySize, 1), del);
-            vector_data.push_back(std::move(ptr));
+            data.push_back(std::move(ptr));
         }
 
-        for (auto &x : vector_data) {
-            assert(x->check());
+        for (auto &x : data) {
+            REQUIRE(x->check());
         }
 
-        std::cout << "vector_data size before clear: "
-            << vector_data.size() << "\n";
-        assert(vector_data.size() == NumArrays);
-        vector_data.clear();
-        std::cout << "vector_data size after clear: "
-            << vector_data.size() << "\n";
-        assert(vector_data.size() == 0);
+        std::cout << "data size before clear: " << data.size() << "\n";
+        REQUIRE(data.size() == NumArrays);
+        data.clear();
+        std::cout << "data size after clear: " << data.size() << "\n";
+        REQUIRE(data.size() == 0);
     }
+}
+
+/// -----------------------------------------------------------------------------
+TEST_CASE("BaseMemory") {
+    test_base_memory();
 }

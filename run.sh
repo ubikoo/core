@@ -91,8 +91,12 @@ if [[ $DO_EXECUTE == "true" ]]; then
     do_execute empty
     popd
 
+    pushd build/samples/base
+    ./test.sh
+    popd
+
     pushd build/samples/math
-    ./testmath.sh
+    ./test.sh
     popd
 
     pushd build/samples/compute

@@ -1,5 +1,5 @@
 project(samplesmath)
 add_subdirectory(ent)
-add_subdirectory(testmath)
+add_subdirectory(test)
 file(COPY plot DESTINATION ${PROJECT_BINARY_DIR})
-file(COPY testmath.sh DESTINATION ${PROJECT_BINARY_DIR})
+file(COPY test.sh DESTINATION ${PROJECT_BINARY_DIR})
