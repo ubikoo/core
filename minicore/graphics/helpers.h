@@ -19,9 +19,7 @@ namespace Graphics {
 using Base::ThrowIf;
 using Base::ThrowIfNot;
 
-///
 /// @brief Check the OpenGL error queue.
-///
 GLenum GetError();
 
 /// @brief Does the OpenGL error queue have an error?
@@ -30,9 +28,7 @@ bool HasError();
 /// @brief Clear the OpenGL error queue of any errors.
 void ClearError();
 
-///
 /// @brief Get/Set the current viewport.
-///
 struct Viewport {
     GLfloat x;
     GLfloat y;

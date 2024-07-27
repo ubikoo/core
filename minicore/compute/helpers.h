@@ -18,14 +18,13 @@
 
 namespace Compute {
 
+/// -----------------------------------------------------------------------------
+/// @brief Fast-fail helper function.
 using Base::ThrowIf;
 using Base::ThrowIfNot;
 
-/// -----------------------------------------------------------------------------
-/// @brief Fast-fail helper function.
-///
 inline void ThrowIfFailed(cl_int result) {
-    Base::ThrowIfNot(result == CL_SUCCESS);
+    ThrowIfNot(result == CL_SUCCESS);
 }
 
 /// -----------------------------------------------------------------------------
