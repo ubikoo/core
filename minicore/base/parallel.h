@@ -22,7 +22,7 @@ struct ThreadPool {
         void (*run) (void *);
         void *data;
     };
-    static size_t Size();
+    static size_t NumThreads();
     static void Initialize(const uint32_t numThreads);
     static void Terminate();
     static void *Execute(void *arg);

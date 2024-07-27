@@ -29,7 +29,7 @@ static std::queue<ThreadPool::Work> gWorkQueue;
 ///
 /// @brief Return the number of threads in the pool.
 ///
-size_t ThreadPool::Size()
+size_t ThreadPool::NumThreads()
 {
     return gWorkThreads.size();
 }
@@ -154,7 +154,7 @@ struct ParallelChunk {
 void ParallelFor(void (*run) (size_t, void *), const size_t count, void *data)
 {
     // Create work chunks.
-    size_t numThreads = ThreadPool::Size();
+    size_t numThreads = ThreadPool::NumThreads();
     size_t numChunks = (count < numThreads) ? 1 : numThreads;
     size_t chunkSize = count / numChunks;
 
