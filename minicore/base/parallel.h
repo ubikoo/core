@@ -22,12 +22,15 @@ struct ThreadPool {
         void (*run) (void *);
         void *data;
     };
-    static size_t NumThreads();
+
     static void Initialize(const uint32_t numThreads);
     static void Terminate();
     static void *Execute(void *arg);
     static void Enqueue(void (*func) (void *), void *data);
     static void Wait();
+    static size_t GetNumThreads();
+    static size_t GetThreadId();
+    static size_t RoundUp(size_t count);
 };
 
 /// @brief Parallel for loop over an array of items.

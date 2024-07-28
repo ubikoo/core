@@ -9,6 +9,7 @@
 
 #include <queue>
 #include <vector>
+#include <unordered_map>
 #include <pthread.h>
 #include "parallel.h"
 
@@ -24,15 +25,8 @@ static pthread_mutex_t gQueueLock;
 static pthread_cond_t gQueueHasWork;
 static pthread_cond_t gWorkFinished;
 static std::vector<pthread_t> gWorkThreads;
+static std::unordered_map<pthread_t, size_t> gWorkThreadId;
 static std::queue<ThreadPool::Work> gWorkQueue;
-
-///
-/// @brief Return the number of threads in the pool.
-///
-size_t ThreadPool::NumThreads()
-{
-    return gWorkThreads.size();
-}
 
 ///
 /// @brief Initialize the thread pool with a specified number of threads using
@@ -47,8 +41,9 @@ void ThreadPool::Initialize(const uint32_t numThreads)
     pthread_cond_init(&gQueueHasWork, NULL);
     pthread_cond_init(&gWorkFinished, NULL);
     gWorkThreads.resize(numThreads);
-    for (auto &thread : gWorkThreads) {
-        pthread_create(&thread, NULL, Execute, NULL);
+    for (size_t id = 0; id < numThreads; ++id) {
+        pthread_create(&gWorkThreads[id], NULL, Execute, NULL);
+        gWorkThreadId[gWorkThreads[id]] = id;
     }
 }
 
@@ -139,6 +134,32 @@ void ThreadPool::Wait()
 }
 
 ///
+/// @brief Return the number of threads in the pool.
+///
+size_t ThreadPool::GetNumThreads()
+{
+    return gWorkThreads.size();
+}
+
+///
+/// @brief Return the number of threads in the pool.
+///
+size_t ThreadPool::GetThreadId()
+{
+    pthread_t thread = pthread_self();
+    return gWorkThreadId[thread];
+}
+
+///
+/// @brief Return the number of threads in the pool.
+///
+size_t ThreadPool::RoundUp(size_t count)
+{
+    size_t multiple = GetNumThreads();
+    return ((count + multiple - 1) / multiple) * multiple;
+}
+
+///
 /// @brief Parallel for loop over an array of items.
 /// @param run is a pointer to a function of each item in the array.
 /// @param count is the number of work items.
@@ -153,27 +174,19 @@ struct ParallelChunk {
 
 void ParallelFor(void (*run) (size_t, void *), const size_t count, void *data)
 {
-    // Create work chunks.
-    size_t numThreads = ThreadPool::NumThreads();
-    size_t numChunks = (count < numThreads) ? 1 : numThreads;
-    size_t chunkSize = count / numChunks;
+    // Enqueue each chunk to the thread pool and wait for all threads to finish.
+    size_t numThreads = ThreadPool::GetNumThreads();
+    size_t chunkSize = (count + numThreads - 1) / numThreads;
 
-    std::vector<ParallelChunk> chunks(numChunks);
-    size_t begin = 0;
-    for (size_t i = 0; i < numChunks - 1; ++i) {
-        chunks[i].begin = begin;
-        chunks[i].end = begin + chunkSize;
+    std::vector<ParallelChunk> chunks(numThreads);
+    for (size_t i = 0; i < numThreads; ++i) {
+        chunks[i].begin = std::min(count, i * chunkSize);
+        chunks[i].end = std::min(count, (i + 1) * chunkSize);
         chunks[i].run = run;
         chunks[i].data = data;
-        begin += chunkSize;
     }
-    chunks[numChunks - 1].begin = begin;
-    chunks[numChunks - 1].end = count;
-    chunks[numChunks - 1].run = run;
-    chunks[numChunks - 1].data = data;
 
-    // Enqueue each chunk to the thread pool and wait for all threads to finish.
-    for (size_t i = 0; i < numChunks; ++i) {
+    for (size_t i = 0; i < numThreads; ++i) {
         ThreadPool::Enqueue(
             [](void *data) {
                 ParallelChunk *chunk = static_cast<ParallelChunk *>(data);
